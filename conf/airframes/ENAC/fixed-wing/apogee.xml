@@ -33,6 +33,7 @@
       <subsystem name="radio_control" type="sbus"/>
     </target>
 
+    <define name="USE_BARO_BOARD" value="FALSE"/>
 
     <!-- Communication -->
     <subsystem name="telemetry" type="xbee_api"/>

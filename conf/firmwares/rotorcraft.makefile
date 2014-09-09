@@ -141,8 +141,6 @@ ap.srcs += subsystems/actuators.c
 #
 ap.srcs += subsystems/air_data.c
 
-include $(CFG_SHARED)/baro_board.makefile
-
 #
 # Analog Backend
 #

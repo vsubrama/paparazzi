@@ -161,9 +161,6 @@ ap_srcs 		+= $(SRC_ARCH)/subsystems/settings_arch.c
 # AIR DATA
 ap_srcs += subsystems/air_data.c
 
-# BARO
-include $(CFG_SHARED)/baro_board.makefile
-
 
 ######################################################################
 ##

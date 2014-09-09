@@ -51,7 +51,7 @@
 struct InsAltFloat ins_impl;
 
 #if USE_BAROMETER
-#include "subsystems/sensors/baro.h"
+#include "modules/sensors/baro_board_module.h"
 #include "math/pprz_isa.h"
 
 PRINT_CONFIG_MSG("USE_BAROMETER is TRUE: Using baro for altitude estimation.")
