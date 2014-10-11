@@ -28,7 +28,7 @@
 
 #include "peripherals/mpu60x0_spi.h"
 
-void mpu60x0_spi_init(struct Mpu60x0_Spi *mpu, struct spi_periph *spi_p, uint8_t slave_idx)
+void mpu60x0_spi_init(struct Mpu60x0_Spi* mpu, struct spi_periph* spi_p, uint8_t slave_idx)
 {
   /* set spi_peripheral */
   mpu->spi_p = spi_p;
@@ -63,7 +63,8 @@ void mpu60x0_spi_init(struct Mpu60x0_Spi *mpu, struct spi_periph *spi_p, uint8_t
 }
 
 
-static void mpu60x0_spi_write_to_reg(void* mpu, uint8_t _reg, uint8_t _val) {
+static void mpu60x0_spi_write_to_reg(void* mpu, uint8_t _reg, uint8_t _val)
+{
   struct Mpu60x0_Spi* mpu_spi = (struct Mpu60x0_Spi*)(mpu);
   mpu_spi->spi_trans.output_length = 2;
   mpu_spi->spi_trans.input_length = 0;
@@ -73,7 +74,7 @@ static void mpu60x0_spi_write_to_reg(void* mpu, uint8_t _reg, uint8_t _val) {
 }
 
 // Configuration function called once before normal use
-void mpu60x0_spi_start_configure(struct Mpu60x0_Spi *mpu)
+void mpu60x0_spi_start_configure(struct Mpu60x0_Spi* mpu)
 {
   if (mpu->config.init_status == MPU60X0_CONF_UNINIT) {
     mpu->config.init_status++;
@@ -83,7 +84,7 @@ void mpu60x0_spi_start_configure(struct Mpu60x0_Spi *mpu)
   }
 }
 
-void mpu60x0_spi_read(struct Mpu60x0_Spi *mpu)
+void mpu60x0_spi_read(struct Mpu60x0_Spi* mpu)
 {
   if (mpu->config.initialized && mpu->spi_trans.status == SPITransDone) {
     mpu->spi_trans.output_length = 1;
@@ -96,13 +97,12 @@ void mpu60x0_spi_read(struct Mpu60x0_Spi *mpu)
 
 #define Int16FromBuf(_buf,_idx) ((int16_t)((_buf[_idx]<<8) | _buf[_idx+1]))
 
-void mpu60x0_spi_event(struct Mpu60x0_Spi *mpu)
+void mpu60x0_spi_event(struct Mpu60x0_Spi* mpu)
 {
   if (mpu->config.initialized) {
     if (mpu->spi_trans.status == SPITransFailed) {
       mpu->spi_trans.status = SPITransDone;
-    }
-    else if (mpu->spi_trans.status == SPITransSuccess) {
+    } else if (mpu->spi_trans.status == SPITransSuccess) {
       // Successfull reading
       if (bit_is_set(mpu->rx_buf[1], 0)) {
         // new data
@@ -114,23 +114,24 @@ void mpu60x0_spi_event(struct Mpu60x0_Spi *mpu)
         mpu->data_rates.rates.r = Int16FromBuf(mpu->rx_buf, 14);
 
         // if we are reading slaves, copy the ext_sens_data
-        if (mpu->config.nb_slaves > 0)
-          memcpy(mpu->data_ext, (void *) &(mpu->rx_buf[16]), mpu->config.nb_bytes - 15);
+        if (mpu->config.nb_slaves > 0) {
+          memcpy(mpu->data_ext, (void*) & (mpu->rx_buf[16]), mpu->config.nb_bytes - 15);
+        }
 
         mpu->data_available = TRUE;
       }
       mpu->spi_trans.status = SPITransDone;
     }
-  }
-  else if (mpu->config.init_status != MPU60X0_CONF_UNINIT) { // Configuring but not yet initialized
+  } else if (mpu->config.init_status != MPU60X0_CONF_UNINIT) { // Configuring but not yet initialized
     switch (mpu->spi_trans.status) {
       case SPITransFailed:
         mpu->config.init_status--; // Retry config (TODO max retry)
       case SPITransSuccess:
       case SPITransDone:
         mpu60x0_send_config(mpu60x0_spi_write_to_reg, (void*)mpu, &(mpu->config));
-        if (mpu->config.initialized)
+        if (mpu->config.initialized) {
           mpu->spi_trans.status = SPITransDone;
+        }
         break;
       default:
         break;
@@ -143,13 +144,14 @@ bool_t mpu60x0_configure_i2c_slaves(Mpu60x0ConfigSet mpu_set, void* mpu)
 {
   struct Mpu60x0_Spi* mpu_spi = (struct Mpu60x0_Spi*)(mpu);
 
-  if (mpu_spi->slave_init_status == MPU60X0_SPI_CONF_UNINIT)
+  if (mpu_spi->slave_init_status == MPU60X0_SPI_CONF_UNINIT) {
     mpu_spi->slave_init_status++;
+  }
 
   switch (mpu_spi->slave_init_status) {
     case MPU60X0_SPI_CONF_I2C_MST_CLK:
       /* configure MPU I2C master clock and stop/start between slave reads */
-      mpu_set(mpu, MPU60X0_REG_I2C_MST_CTRL, ((1<<4) | mpu_spi->config.i2c_mst_clk));
+      mpu_set(mpu, MPU60X0_REG_I2C_MST_CTRL, ((1 << 4) | mpu_spi->config.i2c_mst_clk));
       mpu_spi->slave_init_status++;
       break;
     case MPU60X0_SPI_CONF_I2C_MST_DELAY:
@@ -165,8 +167,9 @@ bool_t mpu60x0_configure_i2c_slaves(Mpu60x0ConfigSet mpu_set, void* mpu)
       break;
     case MPU60X0_SPI_CONF_SLAVES_CONFIGURE:
       /* configure first slave, only one slave supported so far */
-      if (mpu_spi->config.slaves[0].configure(mpu_set, mpu))
+      if (mpu_spi->config.slaves[0].configure(mpu_set, mpu)) {
         mpu_spi->slave_init_status++;
+      }
       break;
     case MPU60X0_SPI_CONF_DONE:
       return TRUE;

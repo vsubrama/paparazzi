@@ -41,10 +41,10 @@ extern void mcu_arch_init(void);
  */
 #define MyByteSwap16(in, out) {                 \
     asm volatile (                              \
-          "rev16        %0, %1\n\t"     \
-          : "=r" (out)                  \
-          : "r"(in)                     \
-          );                            \
+        "rev16        %0, %1\n\t"     \
+        : "=r" (out)                  \
+        : "r"(in)                     \
+                 );                            \
   }
 
 #define mcu_int_enable()  {}
@@ -52,10 +52,10 @@ extern void mcu_arch_init(void);
 
 /** @todo: these should go into libopencm3 */
 #ifdef TIM9_BASE
-#define TIM9				TIM9_BASE
+#define TIM9        TIM9_BASE
 #endif
 #ifdef TIM12_BASE
-#define TIM12				TIM12_BASE
+#define TIM12       TIM12_BASE
 #endif
 
 uint32_t timer_get_frequency(uint32_t timer_peripheral);

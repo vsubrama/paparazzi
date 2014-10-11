@@ -60,7 +60,7 @@ struct Bmp085Calib {
 typedef bool_t (*Bmp085EOC)(void);
 
 struct Bmp085 {
-  struct i2c_periph *i2c_p;
+  struct i2c_periph* i2c_p;
   struct i2c_transaction i2c_trans;
   Bmp085EOC eoc;                      ///< function to check End Of Conversion
   enum Bmp085Status status;           ///< state machine status
@@ -74,7 +74,7 @@ struct Bmp085 {
 };
 
 extern void bmp085_read_eeprom_calib(struct Bmp085* bmp);
-extern void bmp085_init(struct Bmp085* bmp, struct i2c_periph *i2c_p, uint8_t addr);
+extern void bmp085_init(struct Bmp085* bmp, struct i2c_periph* i2c_p, uint8_t addr);
 extern void bmp085_periodic(struct Bmp085* bmp);
 extern void bmp085_event(struct Bmp085* bmp);
 

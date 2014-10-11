@@ -50,7 +50,7 @@
 #define NVIC_USB_LP_CAN_RX0_IRQ_PRIO 1
 #endif
 
-void _can_run_rx_callback(uint32_t id, uint8_t *buf, uint8_t len);
+void _can_run_rx_callback(uint32_t id, uint8_t* buf, uint8_t len);
 
 bool can_initialized = false;
 
@@ -119,8 +119,7 @@ void can_hw_init(void)
                CAN_BTR_TS2_7TQ,
                2,               /* BRP+1: Baud rate prescaler */
                false,           /* loopback mode */
-               false))          /* silent mode */
-  {
+               false)) {        /* silent mode */
     /* TODO we need something somewhere where we can leave a note
      * that CAN was unable to initialize. Just like any other
      * driver should...
@@ -146,14 +145,14 @@ void can_hw_init(void)
   can_initialized = true;
 }
 
-int can_hw_transmit(uint32_t id, const uint8_t *buf, uint8_t len)
+int can_hw_transmit(uint32_t id, const uint8_t* buf, uint8_t len)
 {
 
   if (!can_initialized) {
     return -2;
   }
 
-  if(len > 8){
+  if (len > 8) {
     return -1;
   }
 
@@ -171,7 +170,7 @@ int can_hw_transmit(uint32_t id, const uint8_t *buf, uint8_t len)
 #endif
                       false, /* RTR: Request transmit? */
                       len,   /* DLC: Data length */
-                      (uint8_t *)buf);
+                      (uint8_t*)buf);
 }
 
 void usb_lp_can_rx0_isr(void)

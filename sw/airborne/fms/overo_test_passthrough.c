@@ -49,7 +49,8 @@ static void main_periodic(int my_sig_num);
 static void dialog_with_io_proc(void);
 
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[])
+{
 
   parse_command_line(argc, argv);
 
@@ -65,7 +66,8 @@ int main(int argc, char *argv[]) {
 
 }
 
-static void main_periodic(int my_sig_num) {
+static void main_periodic(int my_sig_num)
+{
 
   dialog_with_io_proc();
 
@@ -75,18 +77,19 @@ static void main_periodic(int my_sig_num) {
 
 
 
-static void dialog_with_io_proc() {
+static void dialog_with_io_proc()
+{
 
   struct AutopilotMessageCRCFrame msg_in;
   struct AutopilotMessageCRCFrame msg_out;
   uint8_t crc_valid;
 
-  for (uint8_t i=0; i<6; i++) msg_out.payload.msg_down.pwm_outputs_usecs[i] = otp.servos_outputs_usecs[i];
+  for (uint8_t i = 0; i < 6; i++) { msg_out.payload.msg_down.pwm_outputs_usecs[i] = otp.servos_outputs_usecs[i]; }
 //  for (uint8_t i=0; i<4; i++) msg_out.payload.msg_down.csc_servo_cmd[i] = otp.csc_servo_outputs[i];
 
   spi_link_send(&msg_out, sizeof(struct AutopilotMessageCRCFrame), &msg_in, &crc_valid);
 
-  struct AutopilotMessagePTUp *in = &msg_in.payload.msg_up;
+  struct AutopilotMessagePTUp* in = &msg_in.payload.msg_up;
   RATES_FLOAT_OF_BFP(otp.imu.gyro, in->gyro);
   ACCELS_FLOAT_OF_BFP(otp.imu.accel, in->accel);
   MAGS_FLOAT_OF_BFP(otp.imu.mag, in->mag);
@@ -102,7 +105,8 @@ static void dialog_with_io_proc() {
 }
 
 
-static void main_init(void) {
+static void main_init(void)
+{
 
   TRACE(TRACE_DEBUG, "%s", "Starting initialization\n");
 
@@ -125,20 +129,22 @@ static void main_init(void) {
   fms_gs_com_init(otp.gs_gw, 4242, 4243, FALSE);
 
   /* Initialize blaaa */
-  for (uint8_t i=0; i<6; i++) otp.servos_outputs_usecs[i] = 1500;
-  for (uint8_t i=0; i<4; i++) otp.csc_servo_outputs[i] = 1500;
+  for (uint8_t i = 0; i < 6; i++) { otp.servos_outputs_usecs[i] = 1500; }
+  for (uint8_t i = 0; i < 4; i++) { otp.csc_servo_outputs[i] = 1500; }
 
   TRACE(TRACE_DEBUG, "%s", "Initialization completed\n");
 }
 
 
 
-static void parse_command_line(int argc, char** argv) {
+static void parse_command_line(int argc, char** argv)
+{
 
-  if (argc > 1)
+  if (argc > 1) {
     otp.gs_gw = strdup(argv[1]);
-  else
+  } else {
     otp.gs_gw = strdup("10.31.4.7");
+  }
   TRACE(TRACE_DEBUG, "%s", "Parsing command line:\n");
   TRACE(TRACE_DEBUG, " gw: %s\n", otp.gs_gw);
 

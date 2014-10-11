@@ -111,7 +111,8 @@ extern void gps_impl_init(void);
 #define GPS_TIMEOUT 2
 #endif
 
-static inline bool_t GpsIsLost(void) {
+static inline bool_t GpsIsLost(void)
+{
   if (gps.fix == GPS_FIX_3D) {
     return FALSE;
   }
@@ -128,7 +129,7 @@ extern void gps_periodic_check(void);
  * @todo this still needs to call gps specific stuff
  */
 #define gps_Reset(_val) {                               \
-}
+  }
 
 
 /*

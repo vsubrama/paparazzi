@@ -67,23 +67,23 @@ uint32_t values_to_log[NBR_VALUES_TO_LOG] = {
   //That list must be pointers to the variables
   //you want to log
 
-  (uint32_t) &imu.accel_unscaled.x,
-  (uint32_t) &imu.accel_unscaled.y,
-  (uint32_t) &imu.accel_unscaled.z,
+  (uint32_t)& imu.accel_unscaled.x,
+  (uint32_t)& imu.accel_unscaled.y,
+  (uint32_t)& imu.accel_unscaled.z,
 
-  (uint32_t) &imu.gyro_unscaled.p,
-  (uint32_t) &imu.gyro_unscaled.q,
-  (uint32_t) &imu.gyro_unscaled.r,
+  (uint32_t)& imu.gyro_unscaled.p,
+  (uint32_t)& imu.gyro_unscaled.q,
+  (uint32_t)& imu.gyro_unscaled.r,
 
-  (uint32_t) &imu.mag_unscaled.x,
-  (uint32_t) &imu.mag_unscaled.y,
-  (uint32_t) &imu.mag_unscaled.z
+  (uint32_t)& imu.mag_unscaled.x,
+  (uint32_t)& imu.mag_unscaled.y,
+  (uint32_t)& imu.mag_unscaled.z
 };
 
 
 
 ///list of the names of the messages you are logging
-char **name_of_the_values = (char * [SIZE_OF_VALUES_NAMES])
+char** name_of_the_values = (char * [SIZE_OF_VALUES_NAMES])
 {
   "acc x",
   "acc y",
@@ -182,9 +182,9 @@ uint8_t logging_status_gui;
 
 
 
-static void memory_transaction_done_cb(struct spi_transaction *trans);
-static void memory_read_status_cb(struct spi_transaction *trans);
-static void memory_read_values_cb(struct spi_transaction *trans);
+static void memory_transaction_done_cb(struct spi_transaction* trans);
+static void memory_read_status_cb(struct spi_transaction* trans);
+static void memory_read_values_cb(struct spi_transaction* trans);
 
 
 /******************************************************************/
@@ -203,10 +203,10 @@ void memory_read_id(void)
   memory_ready = FALSE;
   msg[0] = 0x9F;
 
-  memory_transaction.output_buf    = (uint8_t *) msg;
+  memory_transaction.output_buf    = (uint8_t*) msg;
   memory_transaction.output_length = 1;
 
-  memory_transaction.input_buf = (uint8_t *) buff;
+  memory_transaction.input_buf = (uint8_t*) buff;
   memory_transaction.input_length = 24;
 
   memory_transaction.after_cb = memory_transaction_done_cb;
@@ -222,7 +222,7 @@ void memory_send_wren(void)
   memory_ready = FALSE;
   msg[0] = 0x06;
 
-  memory_transaction.output_buf    = (uint8_t *) msg;
+  memory_transaction.output_buf    = (uint8_t*) msg;
   memory_transaction.output_length = 1;
 
   memory_transaction.input_buf = NULL;
@@ -241,7 +241,7 @@ void memory_send_wrdi(void)
   memory_ready = FALSE;
   msg[0] = 0x04;
 
-  memory_transaction.output_buf    = (uint8_t *) msg;
+  memory_transaction.output_buf    = (uint8_t*) msg;
   memory_transaction.output_length = 1;
 
   memory_transaction.input_buf = NULL;
@@ -260,10 +260,10 @@ void memory_read_status_1(void)
   memory_ready = FALSE;
   msg[0] = 0x05;
 
-  memory_transaction.output_buf    = (uint8_t *) msg;
+  memory_transaction.output_buf    = (uint8_t*) msg;
   memory_transaction.output_length = 1;
 
-  memory_transaction.input_buf = (uint8_t *) buff;
+  memory_transaction.input_buf = (uint8_t*) buff;
   memory_transaction.input_length = 4;
 
   memory_transaction.after_cb = memory_read_status_cb;
@@ -276,7 +276,7 @@ void memory_read_status_1(void)
  * The resulting value will be setted in the global variable "memory_status_byte".
  *
  */
-static void memory_read_status_cb(struct spi_transaction *trans __attribute__((unused)))
+static void memory_read_status_cb(struct spi_transaction* trans __attribute__((unused)))
 {
 
   memory_ready = TRUE;
@@ -293,7 +293,7 @@ static void memory_read_status_cb(struct spi_transaction *trans __attribute__((u
 void memory_erase_4k(uint32_t mem_addr)
 {
 
-  uint8_t *addr = (uint8_t *) &mem_addr;
+  uint8_t* addr = (uint8_t*) &mem_addr;
 
   memory_ready = FALSE;
   msg[0] = 0x21;
@@ -302,7 +302,7 @@ void memory_erase_4k(uint32_t mem_addr)
   msg[3] = addr[1];
   msg[4] = addr[0];
 
-  memory_transaction.output_buf    = (uint8_t *) msg;
+  memory_transaction.output_buf    = (uint8_t*) msg;
   memory_transaction.output_length = 5;
 
   memory_transaction.input_buf = NULL;
@@ -322,7 +322,7 @@ void memory_completly_erase(void)
   memory_ready = FALSE;
   msg[0] = 0xC7;
 
-  memory_transaction.output_buf    = (uint8_t *) msg;
+  memory_transaction.output_buf    = (uint8_t*) msg;
   memory_transaction.output_length = 1;
 
   memory_transaction.input_buf = NULL;
@@ -340,10 +340,10 @@ void memory_completly_erase(void)
  * @param size the size of the buffer of values
  *
  */
-void memory_write_values(uint32_t mem_addr, uint8_t *values, uint8_t size)
+void memory_write_values(uint32_t mem_addr, uint8_t* values, uint8_t size)
 {
 
-  uint8_t *addr = (uint8_t *) &mem_addr;
+  uint8_t* addr = (uint8_t*) &mem_addr;
   uint8_t i;
 
   memory_ready = FALSE;
@@ -357,7 +357,7 @@ void memory_write_values(uint32_t mem_addr, uint8_t *values, uint8_t size)
     values_send_buffer[i + 5] = values[i];
   }
 
-  memory_send_value_transaction.output_buf    = (uint8_t *) values_send_buffer;
+  memory_send_value_transaction.output_buf    = (uint8_t*) values_send_buffer;
   memory_send_value_transaction.output_length = 5 + size;
 
   memory_send_value_transaction.input_buf = NULL;
@@ -377,7 +377,7 @@ void memory_write_values(uint32_t mem_addr, uint8_t *values, uint8_t size)
 void memory_read_values(uint32_t mem_addr, uint8_t size)
 {
 
-  uint8_t *addr = (uint8_t *) &mem_addr;
+  uint8_t* addr = (uint8_t*) &mem_addr;
 
   memory_ready = FALSE;
   msg[0] = 0x13;
@@ -386,11 +386,12 @@ void memory_read_values(uint32_t mem_addr, uint8_t size)
   msg[3] = addr[1];
   msg[4] = addr[0];
 
-  memory_transaction.output_buf    = (uint8_t *) msg;
+  memory_transaction.output_buf    = (uint8_t*) msg;
   memory_transaction.output_length = 5;
 
-  memory_transaction.input_buf = (uint8_t *) uart_read_buff;
-  memory_transaction.input_length = size + MEMORY_READ_LATTENCY; //the first MEMORY_READ_LATTENCY Bytes are lost because of reading to soon
+  memory_transaction.input_buf = (uint8_t*) uart_read_buff;
+  memory_transaction.input_length = size +
+                                    MEMORY_READ_LATTENCY; //the first MEMORY_READ_LATTENCY Bytes are lost because of reading to soon
 
   memory_transaction.after_cb = memory_read_values_cb;
 
@@ -402,7 +403,7 @@ void memory_read_values(uint32_t mem_addr, uint8_t size)
  * The resulting values will be sended to the UART by calling the send_buffer_to_uart function
  *
  */
-static void memory_read_values_cb(struct spi_transaction *trans __attribute__((unused)))
+static void memory_read_values_cb(struct spi_transaction* trans __attribute__((unused)))
 {
 
   uint8_t msg_size = memory_transaction.input_length;
@@ -411,7 +412,8 @@ static void memory_read_values_cb(struct spi_transaction *trans __attribute__((u
 
   if (msg_size) {
 
-    if (is_sequence_in_array(uart_read_buff, msg_size, stop_log_sequence, 6)) { //this is the end of the log
+    if (is_sequence_in_array(uart_read_buff, msg_size, stop_log_sequence,
+                             6)) { //this is the end of the log
 
       current_reading_addr = 0;
       relaunch_reading_memory = 0;
@@ -431,7 +433,7 @@ static void memory_read_values_cb(struct spi_transaction *trans __attribute__((u
  * This function will just set a flag telling that the SPI bus can be use now.
  *
  */
-static void memory_transaction_done_cb(struct spi_transaction *trans __attribute__((unused)))
+static void memory_transaction_done_cb(struct spi_transaction* trans __attribute__((unused)))
 {
   memory_ready = TRUE;
 }
@@ -458,11 +460,11 @@ static void memory_transaction_done_cb(struct spi_transaction *trans __attribute
  * @param size The size of the buffer
  * @return 0 when done, else the status of the state machine (between 1 and 3)
  */
-uint8_t ml_write_values_to_memory(uint32_t mem_addr, uint8_t *values, uint8_t size)
+uint8_t ml_write_values_to_memory(uint32_t mem_addr, uint8_t* values, uint8_t size)
 {
   static uint8_t ml_write_values_to_memory_status = 0;
   static uint32_t previus_mem_addr = 0;
-  static uint8_t *previus_values = NULL;
+  static uint8_t* previus_values = NULL;
   static uint8_t previus_size = 0;
 
 
@@ -639,7 +641,7 @@ void ml_read_log_in_memory(void)
  * @param size the size of the buffer of values to writte
  * @return 0 when done, else return 1
  */
-uint8_t append_values_to_memory(uint8_t *values, uint8_t size)
+uint8_t append_values_to_memory(uint8_t* values, uint8_t size)
 {
 
   static uint8_t append_to_memory_status = 0;
@@ -656,7 +658,8 @@ uint8_t append_values_to_memory(uint8_t *values, uint8_t size)
 
       case 0 :
         if (!ERASE_MEMORY_AT_START) {
-          if ((current_unerased_addr - current_writting_addr) > size) { //we got enough cleared space to write the value
+          if ((current_unerased_addr - current_writting_addr) >
+              size) { //we got enough cleared space to write the value
 
             append_to_memory_status = 1;
           } else {
@@ -692,7 +695,8 @@ uint8_t append_values_to_memory(uint8_t *values, uint8_t size)
 
         if (size_to_write > 0) {
 
-          if (!ml_write_values_to_memory(current_writting_addr, &values[index_value_unwritten], size_to_write)) {
+          if (!ml_write_values_to_memory(current_writting_addr, &values[index_value_unwritten],
+                                         size_to_write)) {
 
             index_value_unwritten += size_to_write;
             current_writting_addr += size_to_write;
@@ -781,7 +785,7 @@ void send_buffer_to_uart(void)
  * @param size the size of the buffer of values to writte
  * @return 0 when done, else return 1
  */
-uint8_t send_buffer_to_memory(uint8_t *buffer, uint8_t *size)
+uint8_t send_buffer_to_memory(uint8_t* buffer, uint8_t* size)
 {
 
   uint8_t return_code = 1;
@@ -849,7 +853,7 @@ void add_byte_to_buffer(uint8_t value)
  * @param size the size of the array to add to the buffer
  *
  */
-void add_array_to_buffer(uint8_t *array, uint8_t size)
+void add_array_to_buffer(uint8_t* array, uint8_t size)
 {
   uint8_t i;
 
@@ -867,7 +871,7 @@ void add_array_to_buffer(uint8_t *array, uint8_t size)
 uint8_t run_memory_management(void)
 {
   uint8_t return_code = 1;
-  uint8_t *log_value_tmp;
+  uint8_t* log_value_tmp;
 
   if (buffer_used) {
 
@@ -879,7 +883,7 @@ uint8_t run_memory_management(void)
 
         add_array_to_buffer(start_lost_values_sequence, 6);
 
-        log_value_tmp = (uint8_t *) &nbr_lost_values;
+        log_value_tmp = (uint8_t*) &nbr_lost_values;
         add_byte_to_buffer(log_value_tmp[0]);
         add_byte_to_buffer(log_value_tmp[1]);
         add_byte_to_buffer(log_value_tmp[2]);
@@ -901,7 +905,7 @@ uint8_t run_memory_management(void)
 
         add_array_to_buffer(start_lost_values_sequence, 6);
 
-        log_value_tmp = (uint8_t *) &nbr_lost_values;
+        log_value_tmp = (uint8_t*) &nbr_lost_values;
         add_byte_to_buffer(log_value_tmp[0]);
         add_byte_to_buffer(log_value_tmp[1]);
         add_byte_to_buffer(log_value_tmp[2]);
@@ -997,7 +1001,7 @@ uint8_t start_new_log(void)
       break;
 
     case 2 :
-      add_array_to_buffer((uint8_t *)msg_names, (SIZE_OF_VALUES_NAMES + 1)*NBR_VALUES_TO_LOG);
+      add_array_to_buffer((uint8_t*)msg_names, (SIZE_OF_VALUES_NAMES + 1)*NBR_VALUES_TO_LOG);
       start_log_status = 3;
       break;
 
@@ -1023,12 +1027,12 @@ uint8_t start_new_log(void)
  */
 void add_values_to_buffer(void)
 {
-  uint8_t *log_value_tmp;
+  uint8_t* log_value_tmp;
   uint8_t i, j;
 
   for (i = 0; i < NBR_VALUES_TO_LOG; i++) {
 
-    log_value_tmp = (uint8_t *) values_to_log[i];
+    log_value_tmp = (uint8_t*) values_to_log[i];
 
     for (j = 0; j < SIZE_OF_LOGGED_VALUES; j++) {
 
@@ -1212,7 +1216,8 @@ void high_speed_logger_direct_memory_periodic(void)
  * @param sequence_size the size of the tag we are searching for
  *
  */
-uint8_t is_sequence_in_array(uint8_t *array, uint8_t array_size, uint8_t *sequence, uint8_t sequence_size)
+uint8_t is_sequence_in_array(uint8_t* array, uint8_t array_size, uint8_t* sequence,
+                             uint8_t sequence_size)
 {
   uint8_t i = MEMORY_READ_LATTENCY;
   static uint8_t current_sequence_id = 0;

@@ -368,27 +368,32 @@ extern void float_quat_comp(struct FloatQuat* a2c, struct FloatQuat* a2b, struct
 /** Composition (multiplication) of two quaternions.
  * a2b = a2c comp_inv b2c , aka  a2b = a2c * inv(b2c)
  */
-extern void float_quat_comp_inv(struct FloatQuat* a2b, struct FloatQuat* a2c, struct FloatQuat* b2c);
+extern void float_quat_comp_inv(struct FloatQuat* a2b, struct FloatQuat* a2c,
+                                struct FloatQuat* b2c);
 
 /** Composition (multiplication) of two quaternions.
  * b2c = a2b inv_comp a2c , aka  b2c = inv(_a2b) * a2c
  */
-extern void float_quat_inv_comp(struct FloatQuat* b2c, struct FloatQuat* a2b, struct FloatQuat* a2c);
+extern void float_quat_inv_comp(struct FloatQuat* b2c, struct FloatQuat* a2b,
+                                struct FloatQuat* a2c);
 
 /** Composition (multiplication) of two quaternions with normalization.
  * a2c = a2b comp b2c , aka  a2c = a2b * b2c
  */
-extern void float_quat_comp_norm_shortest(struct FloatQuat* a2c, struct FloatQuat* a2b, struct FloatQuat* b2c);
+extern void float_quat_comp_norm_shortest(struct FloatQuat* a2c, struct FloatQuat* a2b,
+    struct FloatQuat* b2c);
 
 /** Composition (multiplication) of two quaternions with normalization.
  * a2b = a2c comp_inv b2c , aka  a2b = a2c * inv(b2c)
  */
-extern void float_quat_comp_inv_norm_shortest(struct FloatQuat* a2b, struct FloatQuat* a2c, struct FloatQuat* b2c);
+extern void float_quat_comp_inv_norm_shortest(struct FloatQuat* a2b, struct FloatQuat* a2c,
+    struct FloatQuat* b2c);
 
 /** Composition (multiplication) of two quaternions with normalization.
  * b2c = a2b inv_comp a2c , aka  b2c = inv(_a2b) * a2c
  */
-extern void float_quat_inv_comp_norm_shortest(struct FloatQuat* b2c, struct FloatQuat* a2b, struct FloatQuat* a2c);
+extern void float_quat_inv_comp_norm_shortest(struct FloatQuat* b2c, struct FloatQuat* a2b,
+    struct FloatQuat* a2c);
 
 /** Quaternion derivative from rotational velocity.
  * qd = -0.5*omega(r) * q
@@ -402,7 +407,8 @@ extern void float_quat_derivative(struct FloatQuat* qd, struct FloatRates* r, st
  * or equally:
  * qd = 0.5 * q * omega(r)
  */
-extern void float_quat_derivative_lagrange(struct FloatQuat* qd, struct FloatRates* r, struct FloatQuat* q);
+extern void float_quat_derivative_lagrange(struct FloatQuat* qd, struct FloatRates* r,
+    struct FloatQuat* q);
 
 /** Delta rotation quaternion with constant angular rates.
  */
@@ -417,7 +423,8 @@ extern void float_quat_integrate(struct FloatQuat* q, struct FloatRates* omega, 
 /** rotate 3D vector by quaternion.
  * vb = q_a2b * va * q_a2b^-1
  */
-extern void float_quat_vmult(struct FloatVect3* v_out, struct FloatQuat* q, struct FloatVect3* v_in);
+extern void float_quat_vmult(struct FloatVect3* v_out, struct FloatQuat* q,
+                             struct FloatVect3* v_in);
 
 /// Quaternion from Euler angles.
 extern void float_quat_of_eulers(struct FloatQuat* q, struct FloatEulers* e);

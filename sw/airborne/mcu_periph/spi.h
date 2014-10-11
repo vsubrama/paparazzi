@@ -127,7 +127,7 @@ struct spi_transaction;
  * If not NULL (or 0), call function (with transaction as parameter)
  * before or after transaction, e.g to allow execution of hardware specific actions
  */
-typedef void (*SPICallback)( struct spi_transaction *trans );
+typedef void (*SPICallback)(struct spi_transaction* trans);
 
 /** SPI transaction structure.
  * - Use this structure to store a request of SPI transaction
@@ -174,8 +174,8 @@ struct spi_periph {
   volatile enum SPIStatus status;
   volatile uint8_t tx_idx_buf;
   volatile uint8_t rx_idx_buf;
-  void *reg_addr;
-  void *init_struct;
+  void* reg_addr;
+  void* init_struct;
   enum SPIMode mode;
   /** control for stop/resume of the fifo */
   volatile uint8_t suspend;

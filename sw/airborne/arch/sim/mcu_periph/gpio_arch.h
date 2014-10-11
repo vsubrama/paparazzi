@@ -72,10 +72,15 @@
 #define GPIO30 0
 #define GPIO31 0
 
-static inline void gpio_setup_output(uint32_t port __attribute__((unused)), uint16_t pin __attribute__((unused))) {}
-static inline void gpio_setup_input(uint32_t port __attribute__((unused)), uint16_t pin __attribute__((unused))) {}
-static inline void gpio_set(uint32_t port __attribute__((unused)), uint16_t pin __attribute__((unused))) {}
-static inline void gpio_clear(uint32_t port __attribute__((unused)), uint16_t pin __attribute__((unused))) {}
-static inline void gpio_toggle(uint32_t port __attribute__((unused)), uint16_t pin __attribute__((unused))) {}
+static inline void gpio_setup_output(uint32_t port __attribute__((unused)),
+                                     uint16_t pin __attribute__((unused))) {}
+static inline void gpio_setup_input(uint32_t port __attribute__((unused)),
+                                    uint16_t pin __attribute__((unused))) {}
+static inline void gpio_set(uint32_t port __attribute__((unused)),
+                            uint16_t pin __attribute__((unused))) {}
+static inline void gpio_clear(uint32_t port __attribute__((unused)),
+                              uint16_t pin __attribute__((unused))) {}
+static inline void gpio_toggle(uint32_t port __attribute__((unused)),
+                               uint16_t pin __attribute__((unused))) {}
 
 #endif /* GPIO_ARCH_H */

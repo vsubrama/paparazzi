@@ -45,7 +45,7 @@ extern struct Int32Eulers stabilization_att_sum_err;
 extern int32_t stabilization_att_fb_cmd[COMMANDS_NB];
 extern int32_t stabilization_att_ff_cmd[COMMANDS_NB];
 
-#define stabilization_attitude_common_int_SetKiPhi(_val) {	\
+#define stabilization_attitude_common_int_SetKiPhi(_val) {  \
     stabilization_gains.i.x = _val;             \
     stabilization_att_sum_err.phi = 0;          \
   }

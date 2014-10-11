@@ -49,7 +49,7 @@ extern bool_t gps_ardrone2_available;
     }                                               \
   }
 
-void gps_ardrone2_parse(navdata_gps_t *navdata_gps);
+void gps_ardrone2_parse(navdata_gps_t* navdata_gps);
 
 /* Maybe needed?
 #define gps_nmea_Reset(_val) { }

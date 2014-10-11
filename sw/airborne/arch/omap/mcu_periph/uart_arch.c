@@ -37,7 +37,8 @@
 #define TRACE(fmt,args...)
 
 
-void uart_periph_set_baudrate(struct uart_periph* periph, uint32_t baud) {
+void uart_periph_set_baudrate(struct uart_periph* periph, uint32_t baud)
+{
   struct SerialPort* port;
   // close serial port if already open
   if (periph->reg_addr != NULL) {
@@ -53,41 +54,41 @@ void uart_periph_set_baudrate(struct uart_periph* periph, uint32_t baud) {
   //TODO: set device name in application and pass as argument
   // FIXME: paparazzi baud is 9600 for B9600 while open_raw needs 12 for B9600
   printf("opening %s on uart0 at termios.h baud value=%d\n", periph->dev, baud);
-  int ret = serial_port_open_raw(port,periph->dev, baud);
-  if (ret != 0)
-  {
-    TRACE("Error opening %s code %d\n",periph->dev,ret);
+  int ret = serial_port_open_raw(port, periph->dev, baud);
+  if (ret != 0) {
+    TRACE("Error opening %s code %d\n", periph->dev, ret);
   }
 }
 
-void uart_transmit(struct uart_periph* periph, uint8_t data) {
+void uart_transmit(struct uart_periph* periph, uint8_t data)
+{
   uint16_t temp = (periph->tx_insert_idx + 1) % UART_TX_BUFFER_SIZE;
 
-  if (temp == periph->tx_extract_idx)
-    return;                          // no room
+  if (temp == periph->tx_extract_idx) {
+    return;  // no room
+  }
 
   // check if in process of sending data
   if (periph->tx_running) { // yes, add to queue
     periph->tx_buf[periph->tx_insert_idx] = data;
     periph->tx_insert_idx = temp;
-  }
-  else { // no, set running flag and write to output register
+  } else { // no, set running flag and write to output register
     periph->tx_running = TRUE;
     struct SerialPort* port = (struct SerialPort*)(periph->reg_addr);
     int ret = write((int)(port->fd), &data, 1);
-    if (ret < 1)
-    {
-      TRACE("w %x [%d]\n",data,ret);
+    if (ret < 1) {
+      TRACE("w %x [%d]\n", data, ret);
     }
   }
 }
 
 #include <errno.h>
 
-static inline void uart_handler(struct uart_periph* periph) {
-  unsigned char c='D';
+static inline void uart_handler(struct uart_periph* periph)
+{
+  unsigned char c = 'D';
 
-  if (periph->reg_addr == NULL) return; // device not initialized ?
+  if (periph->reg_addr == NULL) { return; } // device not initialized ?
 
   struct SerialPort* port = (struct SerialPort*)(periph->reg_addr);
   int fd = port->fd;
@@ -95,38 +96,39 @@ static inline void uart_handler(struct uart_periph* periph) {
   // check if more data to send
   if (periph->tx_insert_idx != periph->tx_extract_idx) {
     int ret = write(fd, &(periph->tx_buf[periph->tx_extract_idx]), 1);
-    if (ret < 1)
-    {
+    if (ret < 1) {
       TRACE("w %x [%d: %s]\n", periph->tx_buf[periph->tx_extract_idx], ret, strerror(errno));
     }
     periph->tx_extract_idx++;
     periph->tx_extract_idx %= UART_TX_BUFFER_SIZE;
-  }
-  else {
+  } else {
     periph->tx_running = FALSE;   // clear running flag
   }
 
-  if(read(fd,&c,1) > 0){
+  if (read(fd, &c, 1) > 0) {
     //printf("r %x %c\n",c,c);
     uint16_t temp = (periph->rx_insert_idx + 1) % UART_RX_BUFFER_SIZE;
     periph->rx_buf[periph->rx_insert_idx] = c;
     // check for more room in queue
-    if (temp != periph->rx_extract_idx)
-      periph->rx_insert_idx = temp; // update insert index
+    if (temp != periph->rx_extract_idx) {
+      periph->rx_insert_idx = temp;  // update insert index
+    }
   }
 
 }
 
 #if USE_UART0
 
-void uart0_init( void ) {
+void uart0_init(void)
+{
   uart_periph_init(&uart0);
   strcpy(uart0.dev, UART0_DEV);
   uart_periph_set_baudrate(&uart0, UART0_BAUD);
 }
 
 
-void uart0_handler(void) {
+void uart0_handler(void)
+{
   uart_handler(&uart0);
 }
 
@@ -134,13 +136,15 @@ void uart0_handler(void) {
 
 #if USE_UART1
 
-void uart1_init( void ) {
+void uart1_init(void)
+{
   uart_periph_init(&uart1);
   strcpy(uart1.dev, UART1_DEV);
   uart_periph_set_baudrate(&uart1, UART1_BAUD);
 }
 
-void uart1_handler(void) {
+void uart1_handler(void)
+{
   uart_handler(&uart1);
 }
 

@@ -37,7 +37,7 @@
 
 
 struct Lis302dl_Spi {
-  struct spi_periph *spi_p;
+  struct spi_periph* spi_p;
   struct spi_transaction spi_trans;
   volatile uint8_t tx_buf[2];
   volatile uint8_t rx_buf[8];
@@ -52,17 +52,19 @@ struct Lis302dl_Spi {
 };
 
 // Functions
-extern void lis302dl_spi_init(struct Lis302dl_Spi *lis, struct spi_periph *spi_p, uint8_t addr);
-extern void lis302dl_spi_start_configure(struct Lis302dl_Spi *lis);
-extern void lis302dl_spi_read(struct Lis302dl_Spi *lis);
-extern void lis302dl_spi_event(struct Lis302dl_Spi *lis);
+extern void lis302dl_spi_init(struct Lis302dl_Spi* lis, struct spi_periph* spi_p, uint8_t addr);
+extern void lis302dl_spi_start_configure(struct Lis302dl_Spi* lis);
+extern void lis302dl_spi_read(struct Lis302dl_Spi* lis);
+extern void lis302dl_spi_event(struct Lis302dl_Spi* lis);
 
 /// convenience function: read or start configuration if not already initialized
-static inline void lis302dl_spi_periodic(struct Lis302dl_Spi *lis) {
-  if (lis->initialized)
+static inline void lis302dl_spi_periodic(struct Lis302dl_Spi* lis)
+{
+  if (lis->initialized) {
     lis302dl_spi_read(lis);
-  else
+  } else {
     lis302dl_spi_start_configure(lis);
+  }
 }
 
 #endif // LIS302DL_SPI_H

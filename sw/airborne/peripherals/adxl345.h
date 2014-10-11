@@ -53,7 +53,7 @@ struct Adxl345Config {
   enum Adxl345Rates rate;   ///< Data Output Rate
 };
 
-static inline void adxl345_set_default_config(struct Adxl345Config *c)
+static inline void adxl345_set_default_config(struct Adxl345Config* c)
 {
   c->drdy_int_enable = FALSE;
   c->int_invert = TRUE;
@@ -66,7 +66,7 @@ static inline void adxl345_set_default_config(struct Adxl345Config *c)
   c->range = ADXL345_RANGE_16G;
 }
 
-static inline uint8_t adxl345_data_format(struct Adxl345Config *c)
+static inline uint8_t adxl345_data_format(struct Adxl345Config* c)
 {
   return ((c->self_test << 7) | (c->spi_3_wire << 6) | (c->int_invert << 5) |
           (c->full_res << 3) | (c->justify_msb << 2) | (c->range));

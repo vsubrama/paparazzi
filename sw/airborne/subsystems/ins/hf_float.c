@@ -38,9 +38,9 @@
 #ifdef SITL
 #include <stdio.h>
 #define DBG_LEVEL 1
-#define PRINT_DBG(_l, _p) {						\
-    if (DBG_LEVEL >= _l)						\
-      printf _p;								\
+#define PRINT_DBG(_l, _p) {           \
+    if (DBG_LEVEL >= _l)            \
+      printf _p;                \
   }
 #else
 #define PRINT_DBG(_l, _p) {}
@@ -162,7 +162,7 @@ static int b2_hff_ps_counter;
 
 /* variables for mean accel buffer */
 #define ACC_BUF_MAXN (GPS_LAG_N+10)
-#define INC_ACC_IDX(idx) {	idx = (idx + 1) < ACC_BUF_MAXN ? (idx + 1) : 0;	}
+#define INC_ACC_IDX(idx) {  idx = (idx + 1) < ACC_BUF_MAXN ? (idx + 1) : 0; }
 
 /** buffer with past mean accel values for redoing the propagation */
 struct FloatVect2 past_accel[ACC_BUF_MAXN];
@@ -176,19 +176,19 @@ static unsigned int acc_buf_n; ///< number of elements in buffer
  * stuff for ringbuffer to store past filter states
  */
 #define HFF_RB_MAXN ((int) (GPS_LAG * 4))
-#define INC_RB_POINTER(ptr) {					\
-    if (ptr == &b2_hff_rb[HFF_RB_MAXN-1])		\
-      ptr = b2_hff_rb;							\
-    else										\
-      ptr++;									\
+#define INC_RB_POINTER(ptr) {         \
+    if (ptr == &b2_hff_rb[HFF_RB_MAXN-1])   \
+      ptr = b2_hff_rb;              \
+    else                    \
+      ptr++;                  \
   }
 
 /** ringbuffer with state and covariance when GPS was valid */
 struct HfilterFloat b2_hff_rb[HFF_RB_MAXN];
-struct HfilterFloat *b2_hff_rb_put; ///< ringbuffer write pointer
+struct HfilterFloat* b2_hff_rb_put; ///< ringbuffer write pointer
 #endif /* GPS_LAG */
 
-struct HfilterFloat *b2_hff_rb_last; ///< ringbuffer read pointer
+struct HfilterFloat* b2_hff_rb_last; ///< ringbuffer read pointer
 static int b2_hff_rb_n; ///< ringbuffer fill count
 
 
@@ -229,7 +229,8 @@ static void b2_hff_update_ydot(struct HfilterFloat* hff_work, float vel, float R
 #if PERIODIC_TELEMETRY
 #include "subsystems/datalink/telemetry.h"
 
-static void send_hff(void) {
+static void send_hff(void)
+{
   DOWNLINK_SEND_HFF(DefaultChannel, DefaultDevice,
                     &b2_hff_state.x,
                     &b2_hff_state.y,
@@ -239,7 +240,8 @@ static void send_hff(void) {
                     &b2_hff_state.ydotdot);
 }
 
-static void send_hff_debug(void) {
+static void send_hff_debug(void)
+{
   DOWNLINK_SEND_HFF_DBG(DefaultChannel, DefaultDevice,
                         &b2_hff_x_meas,
                         &b2_hff_y_meas,
@@ -252,7 +254,8 @@ static void send_hff_debug(void) {
 }
 
 #ifdef GPS_LAG
-static void send_hff_gps(void) {
+static void send_hff_gps(void)
+{
   DOWNLINK_SEND_HFF_GPS(DefaultChannel, DefaultDevice,
                         &(b2_hff_rb_last->lag_counter),
                         &lag_counter_err,
@@ -262,7 +265,8 @@ static void send_hff_gps(void) {
 
 #endif
 
-void b2_hff_init(float init_x, float init_xdot, float init_y, float init_ydot) {
+void b2_hff_init(float init_x, float init_xdot, float init_y, float init_ydot)
+{
   Rgps_pos = HFF_R_POS;
   Rgps_vel = HFF_R_SPEED;
   b2_hff_init_x(init_x, init_xdot);
@@ -305,35 +309,43 @@ void b2_hff_init(float init_x, float init_xdot, float init_y, float init_ydot) {
 #endif
 #endif
 
-  init_butterworth_2_low_pass_int(&filter_x, HFF_LOWPASS_CUTOFF_FREQUENCY, (1. /AHRS_PROPAGATE_FREQUENCY), 0);
-  init_butterworth_2_low_pass_int(&filter_y, HFF_LOWPASS_CUTOFF_FREQUENCY, (1. /AHRS_PROPAGATE_FREQUENCY), 0);
-  init_butterworth_2_low_pass_int(&filter_z, HFF_LOWPASS_CUTOFF_FREQUENCY, (1. /AHRS_PROPAGATE_FREQUENCY), 0);
+  init_butterworth_2_low_pass_int(&filter_x, HFF_LOWPASS_CUTOFF_FREQUENCY,
+                                  (1. / AHRS_PROPAGATE_FREQUENCY), 0);
+  init_butterworth_2_low_pass_int(&filter_y, HFF_LOWPASS_CUTOFF_FREQUENCY,
+                                  (1. / AHRS_PROPAGATE_FREQUENCY), 0);
+  init_butterworth_2_low_pass_int(&filter_z, HFF_LOWPASS_CUTOFF_FREQUENCY,
+                                  (1. / AHRS_PROPAGATE_FREQUENCY), 0);
 }
 
-static void b2_hff_init_x(float init_x, float init_xdot) {
+static void b2_hff_init_x(float init_x, float init_xdot)
+{
   b2_hff_state.x     = init_x;
   b2_hff_state.xdot  = init_xdot;
   int i, j;
-  for (i=0; i<HFF_STATE_SIZE; i++) {
-    for (j=0; j<HFF_STATE_SIZE; j++)
+  for (i = 0; i < HFF_STATE_SIZE; i++) {
+    for (j = 0; j < HFF_STATE_SIZE; j++) {
       b2_hff_state.xP[i][j] = 0.;
+    }
     b2_hff_state.xP[i][i] = INIT_PXX;
   }
 }
 
-static void b2_hff_init_y(float init_y, float init_ydot) {
+static void b2_hff_init_y(float init_y, float init_ydot)
+{
   b2_hff_state.y     = init_y;
   b2_hff_state.ydot  = init_ydot;
   int i, j;
-  for (i=0; i<HFF_STATE_SIZE; i++) {
-    for (j=0; j<HFF_STATE_SIZE; j++)
+  for (i = 0; i < HFF_STATE_SIZE; i++) {
+    for (j = 0; j < HFF_STATE_SIZE; j++) {
       b2_hff_state.yP[i][j] = 0.;
+    }
     b2_hff_state.yP[i][i] = INIT_PXX;
   }
 }
 
 #ifdef GPS_LAG
-static void b2_hff_store_accel_ltp(float x, float y) {
+static void b2_hff_store_accel_ltp(float x, float y)
+{
   past_accel[acc_buf_w].x = x;
   past_accel[acc_buf_w].y = y;
   INC_ACC_IDX(acc_buf_w);
@@ -346,7 +358,8 @@ static void b2_hff_store_accel_ltp(float x, float y) {
 }
 
 /* get the accel values from back_n steps ago */
-static void b2_hff_get_past_accel(unsigned int back_n) {
+static void b2_hff_get_past_accel(unsigned int back_n)
+{
   int i;
   if (back_n > acc_buf_n) {
     PRINT_DBG(1, ("Cannot go back %d steps, going back only %d instead!\n", back_n, acc_buf_n));
@@ -355,16 +368,20 @@ static void b2_hff_get_past_accel(unsigned int back_n) {
     PRINT_DBG(1, ("Cannot go back zero steps!\n"));
     return;
   }
-  if ((int)(acc_buf_w - back_n) < 0)
+  if ((int)(acc_buf_w - back_n) < 0) {
     i = acc_buf_w - back_n  + ACC_BUF_MAXN;
-  else
+  } else {
     i = acc_buf_w - back_n;
+  }
   b2_hff_xdd_meas = past_accel[i].x;
   b2_hff_ydd_meas = past_accel[i].y;
-  PRINT_DBG(3, ("get past accel. buf_n: %2d \tbuf_w: %2d \tback_n: %2d \ti: %2d \txdd: %f \tydd: %f\n", acc_buf_n, acc_buf_w, back_n, i, b2_hff_xdd_meas, b2_hff_ydd_meas));
+  PRINT_DBG(3,
+            ("get past accel. buf_n: %2d \tbuf_w: %2d \tback_n: %2d \ti: %2d \txdd: %f \tydd: %f\n", acc_buf_n,
+             acc_buf_w, back_n, i, b2_hff_xdd_meas, b2_hff_ydd_meas));
 }
 
-static void b2_hff_rb_put_state(struct HfilterFloat* source) {
+static void b2_hff_rb_put_state(struct HfilterFloat* source)
+{
   /* copy state from source into buffer */
   b2_hff_set_state(b2_hff_rb_put, source);
   b2_hff_rb_put->lag_counter = 0;
@@ -382,7 +399,8 @@ static void b2_hff_rb_put_state(struct HfilterFloat* source) {
   PRINT_DBG(2, ("put state. fill count now: %d\n", b2_hff_rb_n));
 }
 
-static void b2_hff_rb_drop_last(void) {
+static void b2_hff_rb_drop_last(void)
+{
   if (b2_hff_rb_n > 0) {
     INC_RB_POINTER(b2_hff_rb_last);
     b2_hff_rb_n--;
@@ -395,25 +413,27 @@ static void b2_hff_rb_drop_last(void) {
 }
 
 /* copy source state to dest state */
-static void b2_hff_set_state(struct HfilterFloat* dest, struct HfilterFloat* source) {
+static void b2_hff_set_state(struct HfilterFloat* dest, struct HfilterFloat* source)
+{
   dest->x       = source->x;
   dest->xdot    = source->xdot;
   dest->xdotdot = source->xdotdot;
   dest->y       = source->y;
   dest->ydot    = source->ydot;
   dest->ydotdot = source->ydotdot;
-  for (int i=0; i < HFF_STATE_SIZE; i++) {
-    for (int j=0; j < HFF_STATE_SIZE; j++) {
+  for (int i = 0; i < HFF_STATE_SIZE; i++) {
+    for (int j = 0; j < HFF_STATE_SIZE; j++) {
       dest->xP[i][j] = source->xP[i][j];
       dest->yP[i][j] = source->yP[i][j];
     }
   }
 }
 
-static void b2_hff_propagate_past(struct HfilterFloat* hff_past) {
+static void b2_hff_propagate_past(struct HfilterFloat* hff_past)
+{
   PRINT_DBG(1, ("enter propagate past: %d\n", hff_past->lag_counter));
   /* run max MAX_PP_STEPS propagation steps */
-  for (int i=0; i < MAX_PP_STEPS; i++) {
+  for (int i = 0; i < MAX_PP_STEPS; i++) {
     if (hff_past->lag_counter > 0) {
       b2_hff_get_past_accel(hff_past->lag_counter);
       PRINT_DBG(2, ("propagate past: %d\n", hff_past->lag_counter));
@@ -431,10 +451,11 @@ static void b2_hff_propagate_past(struct HfilterFloat* hff_past) {
         past_save_counter = SAVING;
       } else if (past_save_counter == SAVING) {
         /* increase lag counter on if next state is already saved */
-        if (hff_past == &b2_hff_rb[HFF_RB_MAXN-1])
+        if (hff_past == &b2_hff_rb[HFF_RB_MAXN - 1]) {
           b2_hff_rb[0].lag_counter++;
-        else
-          (hff_past+1)->lag_counter++;
+        } else {
+          (hff_past + 1)->lag_counter++;
+        }
       }
     }
 
@@ -450,9 +471,11 @@ static void b2_hff_propagate_past(struct HfilterFloat* hff_past) {
 #endif /* GPS_LAG */
 
 
-void b2_hff_propagate(void) {
-  if (b2_hff_lost_counter < b2_hff_lost_limit)
+void b2_hff_propagate(void)
+{
+  if (b2_hff_lost_counter < b2_hff_lost_limit) {
     b2_hff_lost_counter++;
+  }
 
 #ifdef GPS_LAG
   /* continue re-propagating to catch up with the present */
@@ -463,7 +486,7 @@ void b2_hff_propagate(void) {
 
   /* rotate imu accel measurement to body frame and filter */
   struct Int32Vect3 acc_meas_body;
-  struct Int32RMat *body_to_imu_rmat = orientationGetRMat_i(&imu.body_to_imu);
+  struct Int32RMat* body_to_imu_rmat = orientationGetRMat_i(&imu.body_to_imu);
   int32_rmat_transp_vmult(&acc_meas_body, body_to_imu_rmat, &imu.accel);
 
   struct Int32Vect3 acc_body_filtered;
@@ -491,8 +514,9 @@ void b2_hff_propagate(void) {
 
 #ifdef GPS_LAG
       /* increase lag counter on last saved state */
-      if (b2_hff_rb_n > 0)
+      if (b2_hff_rb_n > 0) {
         b2_hff_rb_last->lag_counter++;
+      }
 
       /* save filter state if needed */
       if (save_counter == 0) {
@@ -509,17 +533,20 @@ void b2_hff_propagate(void) {
   }
 }
 
-void b2_hff_update_gps(struct FloatVect2* pos_ned, struct FloatVect2* speed_ned) {
+void b2_hff_update_gps(struct FloatVect2* pos_ned, struct FloatVect2* speed_ned)
+{
   b2_hff_lost_counter = 0;
 
 #if USE_GPS_ACC4R
   Rgps_pos = (float) gps.pacc / 100.;
-  if (Rgps_pos < HFF_R_POS_MIN)
+  if (Rgps_pos < HFF_R_POS_MIN) {
     Rgps_pos = HFF_R_POS_MIN;
+  }
 
   Rgps_vel = (float) gps.sacc / 100.;
-  if (Rgps_vel < HFF_R_SPEED_MIN)
+  if (Rgps_vel < HFF_R_SPEED_MIN) {
     Rgps_vel = HFF_R_SPEED_MIN;
+  }
 #endif
 
 #ifdef GPS_LAG
@@ -539,7 +566,8 @@ void b2_hff_update_gps(struct FloatVect2* pos_ned, struct FloatVect2* speed_ned)
   } else if (b2_hff_rb_n > 0) {
     /* roll back if state was saved approx when GPS was valid */
     lag_counter_err = b2_hff_rb_last->lag_counter - GPS_LAG_N;
-    PRINT_DBG(2, ("update. rb_n: %d  lag_counter: %d  lag_cnt_err: %d\n", b2_hff_rb_n, b2_hff_rb_last->lag_counter, lag_counter_err));
+    PRINT_DBG(2, ("update. rb_n: %d  lag_counter: %d  lag_cnt_err: %d\n", b2_hff_rb_n,
+                  b2_hff_rb_last->lag_counter, lag_counter_err));
     if (abs(lag_counter_err) <= GPS_LAG_TOL_N) {
       b2_hff_rb_last->rollback = TRUE;
       b2_hff_update_x(b2_hff_rb_last, pos_ned->x, Rgps_pos);
@@ -548,10 +576,10 @@ void b2_hff_update_gps(struct FloatVect2* pos_ned, struct FloatVect2* speed_ned)
       b2_hff_update_xdot(b2_hff_rb_last, speed_ned->x, Rgps_vel);
       b2_hff_update_ydot(b2_hff_rb_last, speed_ned->y, Rgps_vel);
 #endif
-      past_save_counter = GPS_DT_N-1;// + lag_counter_err;
+      past_save_counter = GPS_DT_N - 1; // + lag_counter_err;
       PRINT_DBG(2, ("gps updated. past_save_counter: %d\n", past_save_counter));
       b2_hff_propagate_past(b2_hff_rb_last);
-    } else if (lag_counter_err >= GPS_DT_N - (GPS_LAG_TOL_N+1)) {
+    } else if (lag_counter_err >= GPS_DT_N - (GPS_LAG_TOL_N + 1)) {
       /* apparently missed a GPS update, try next saved state */
       PRINT_DBG(2, ("try next saved state\n"));
       b2_hff_rb_drop_last();
@@ -559,7 +587,7 @@ void b2_hff_update_gps(struct FloatVect2* pos_ned, struct FloatVect2* speed_ned)
     }
   } else if (save_counter < 0) {
     /* ringbuffer empty -> save output filter state at next GPS validity point in time */
-    save_counter = GPS_DT_N-1 - (GPS_LAG_N % GPS_DT_N);
+    save_counter = GPS_DT_N - 1 - (GPS_LAG_N % GPS_DT_N);
     PRINT_DBG(2, ("rb empty, save counter set: %d\n", save_counter));
   }
 
@@ -567,7 +595,8 @@ void b2_hff_update_gps(struct FloatVect2* pos_ned, struct FloatVect2* speed_ned)
 }
 
 
-void b2_hff_realign(struct FloatVect2 pos, struct FloatVect2 vel) {
+void b2_hff_realign(struct FloatVect2 pos, struct FloatVect2 vel)
+{
   b2_hff_state.x = pos.x;
   b2_hff_state.y = pos.y;
   b2_hff_state.xdot = vel.x;
@@ -601,13 +630,15 @@ void b2_hff_realign(struct FloatVect2 pos, struct FloatVect2 vel) {
  Pk1 = F * Pk0 * F' + Q;
 
 */
-static void b2_hff_propagate_x(struct HfilterFloat* hff_work, float dt) {
+static void b2_hff_propagate_x(struct HfilterFloat* hff_work, float dt)
+{
   /* update state */
   hff_work->xdotdot = b2_hff_xdd_meas;
-  hff_work->x = hff_work->x + dt * hff_work->xdot + dt*dt/2 * hff_work->xdotdot;
+  hff_work->x = hff_work->x + dt * hff_work->xdot + dt * dt / 2 * hff_work->xdotdot;
   hff_work->xdot = hff_work->xdot + dt * hff_work->xdotdot;
   /* update covariance */
-  const float FPF00 = hff_work->xP[0][0] + dt * ( hff_work->xP[1][0] + hff_work->xP[0][1] + dt * hff_work->xP[1][1] );
+  const float FPF00 = hff_work->xP[0][0] + dt * (hff_work->xP[1][0] + hff_work->xP[0][1] + dt *
+                      hff_work->xP[1][1]);
   const float FPF01 = hff_work->xP[0][1] + dt * hff_work->xP[1][1];
   const float FPF10 = hff_work->xP[1][0] + dt * hff_work->xP[1][1];
   const float FPF11 = hff_work->xP[1][1];
@@ -618,13 +649,15 @@ static void b2_hff_propagate_x(struct HfilterFloat* hff_work, float dt) {
   hff_work->xP[1][1] = FPF11 + Qdotdot;
 }
 
-static void b2_hff_propagate_y(struct HfilterFloat* hff_work, float dt) {
+static void b2_hff_propagate_y(struct HfilterFloat* hff_work, float dt)
+{
   /* update state */
   hff_work->ydotdot = b2_hff_ydd_meas;
-  hff_work->y = hff_work->y + dt * hff_work->ydot + dt*dt/2 * hff_work->ydotdot;
+  hff_work->y = hff_work->y + dt * hff_work->ydot + dt * dt / 2 * hff_work->ydotdot;
   hff_work->ydot = hff_work->ydot + dt * hff_work->ydotdot;
   /* update covariance */
-  const float FPF00 = hff_work->yP[0][0] + dt * ( hff_work->yP[1][0] + hff_work->yP[0][1] + dt * hff_work->yP[1][1] );
+  const float FPF00 = hff_work->yP[0][0] + dt * (hff_work->yP[1][0] + hff_work->yP[0][1] + dt *
+                      hff_work->yP[1][1]);
   const float FPF01 = hff_work->yP[0][1] + dt * hff_work->yP[1][1];
   const float FPF10 = hff_work->yP[1][0] + dt * hff_work->yP[1][1];
   const float FPF11 = hff_work->yP[1][1];
@@ -655,18 +688,20 @@ static void b2_hff_propagate_y(struct HfilterFloat* hff_work, float dt) {
  // update covariance
  Pp = Pm - K*H*Pm;
 */
-void b2_hff_update_pos (struct FloatVect2 pos, struct FloatVect2 Rpos) {
+void b2_hff_update_pos(struct FloatVect2 pos, struct FloatVect2 Rpos)
+{
   b2_hff_update_x(&b2_hff_state, pos.x, Rpos.x);
   b2_hff_update_y(&b2_hff_state, pos.y, Rpos.y);
 }
 
-static void b2_hff_update_x(struct HfilterFloat* hff_work, float x_meas, float Rpos) {
+static void b2_hff_update_x(struct HfilterFloat* hff_work, float x_meas, float Rpos)
+{
   b2_hff_x_meas = x_meas;
 
   const float y  = x_meas - hff_work->x;
   const float S  = hff_work->xP[0][0] + Rpos;
-  const float K1 = hff_work->xP[0][0] * 1/S;
-  const float K2 = hff_work->xP[1][0] * 1/S;
+  const float K1 = hff_work->xP[0][0] * 1 / S;
+  const float K2 = hff_work->xP[1][0] * 1 / S;
 
   hff_work->x     = hff_work->x     + K1 * y;
   hff_work->xdot  = hff_work->xdot  + K2 * y;
@@ -682,13 +717,14 @@ static void b2_hff_update_x(struct HfilterFloat* hff_work, float x_meas, float R
   hff_work->xP[1][1] = P22;
 }
 
-static void b2_hff_update_y(struct HfilterFloat* hff_work, float y_meas, float Rpos) {
+static void b2_hff_update_y(struct HfilterFloat* hff_work, float y_meas, float Rpos)
+{
   b2_hff_y_meas = y_meas;
 
   const float y  = y_meas - hff_work->y;
   const float S  = hff_work->yP[0][0] + Rpos;
-  const float K1 = hff_work->yP[0][0] * 1/S;
-  const float K2 = hff_work->yP[1][0] * 1/S;
+  const float K1 = hff_work->yP[0][0] * 1 / S;
+  const float K2 = hff_work->yP[1][0] * 1 / S;
 
   hff_work->y     = hff_work->y     + K1 * y;
   hff_work->ydot  = hff_work->ydot  + K2 * y;
@@ -724,18 +760,20 @@ static void b2_hff_update_y(struct HfilterFloat* hff_work, float y_meas, float R
  // update covariance
  Pp = Pm - K*H*Pm;
 */
-void b2_hff_update_vel(struct FloatVect2 vel, struct FloatVect2 Rvel) {
+void b2_hff_update_vel(struct FloatVect2 vel, struct FloatVect2 Rvel)
+{
   b2_hff_update_xdot(&b2_hff_state, vel.x, Rvel.x);
   b2_hff_update_ydot(&b2_hff_state, vel.y, Rvel.y);
 }
 
-static void b2_hff_update_xdot(struct HfilterFloat* hff_work, float vel, float Rvel) {
+static void b2_hff_update_xdot(struct HfilterFloat* hff_work, float vel, float Rvel)
+{
   b2_hff_xd_meas = vel;
 
   const float yd = vel - hff_work->xdot;
   const float S  = hff_work->xP[1][1] + Rvel;
-  const float K1 = hff_work->xP[0][1] * 1/S;
-  const float K2 = hff_work->xP[1][1] * 1/S;
+  const float K1 = hff_work->xP[0][1] * 1 / S;
+  const float K2 = hff_work->xP[1][1] * 1 / S;
 
   hff_work->x     = hff_work->x     + K1 * yd;
   hff_work->xdot  = hff_work->xdot  + K2 * yd;
@@ -751,13 +789,14 @@ static void b2_hff_update_xdot(struct HfilterFloat* hff_work, float vel, float R
   hff_work->xP[1][1] = P22;
 }
 
-static void b2_hff_update_ydot(struct HfilterFloat* hff_work, float vel, float Rvel) {
+static void b2_hff_update_ydot(struct HfilterFloat* hff_work, float vel, float Rvel)
+{
   b2_hff_yd_meas = vel;
 
   const float yd = vel - hff_work->ydot;
   const float S  = hff_work->yP[1][1] + Rvel;
-  const float K1 = hff_work->yP[0][1] * 1/S;
-  const float K2 = hff_work->yP[1][1] * 1/S;
+  const float K1 = hff_work->yP[0][1] * 1 / S;
+  const float K2 = hff_work->yP[1][1] * 1 / S;
 
   hff_work->y     = hff_work->y     + K1 * yd;
   hff_work->ydot  = hff_work->ydot  + K2 * yd;

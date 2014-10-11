@@ -32,7 +32,7 @@
 #include "peripherals/adxl345_spi.h"
 
 
-void adxl345_spi_init(struct Adxl345_Spi *adxl, struct spi_periph *spi_p, uint8_t slave_idx)
+void adxl345_spi_init(struct Adxl345_Spi* adxl, struct spi_periph* spi_p, uint8_t slave_idx)
 {
   /* set spi_peripheral */
   adxl->spi_p = spi_p;
@@ -66,7 +66,8 @@ void adxl345_spi_init(struct Adxl345_Spi *adxl, struct spi_periph *spi_p, uint8_
 }
 
 
-static void adxl345_spi_write_to_reg(struct Adxl345_Spi *adxl, uint8_t _reg, uint8_t _val) {
+static void adxl345_spi_write_to_reg(struct Adxl345_Spi* adxl, uint8_t _reg, uint8_t _val)
+{
   adxl->spi_trans.output_length = 2;
   adxl->spi_trans.input_length = 0;
   adxl->tx_buf[0] = _reg;
@@ -75,7 +76,7 @@ static void adxl345_spi_write_to_reg(struct Adxl345_Spi *adxl, uint8_t _reg, uin
 }
 
 // Configuration function called once before normal use
-static void adxl345_spi_send_config(struct Adxl345_Spi *adxl)
+static void adxl345_spi_send_config(struct Adxl345_Spi* adxl)
 {
   switch (adxl->init_status) {
     case ADXL_CONF_RATE:
@@ -92,7 +93,7 @@ static void adxl345_spi_send_config(struct Adxl345_Spi *adxl)
       break;
     case ADXL_CONF_ENABLE:
       /* enable measurement, is in standby after power up */
-      adxl345_spi_write_to_reg(adxl, ADXL345_REG_POWER_CTL, (0x1<<3));
+      adxl345_spi_write_to_reg(adxl, ADXL345_REG_POWER_CTL, (0x1 << 3));
       adxl->init_status++;
       break;
     case ADXL_CONF_DONE:
@@ -104,7 +105,7 @@ static void adxl345_spi_send_config(struct Adxl345_Spi *adxl)
   }
 }
 
-void adxl345_spi_start_configure(struct Adxl345_Spi *adxl)
+void adxl345_spi_start_configure(struct Adxl345_Spi* adxl)
 {
   if (adxl->init_status == ADXL_CONF_UNINIT) {
     adxl->init_status++;
@@ -114,35 +115,33 @@ void adxl345_spi_start_configure(struct Adxl345_Spi *adxl)
   }
 }
 
-void adxl345_spi_read(struct Adxl345_Spi *adxl)
+void adxl345_spi_read(struct Adxl345_Spi* adxl)
 {
   if (adxl->initialized && adxl->spi_trans.status == SPITransDone) {
     adxl->spi_trans.output_length = 1;
     adxl->spi_trans.input_length = 7;
     /* set read bit and multiple byte bit, then address */
-    adxl->tx_buf[0] = (1<<7|1<<6|ADXL345_REG_DATA_X0);
+    adxl->tx_buf[0] = (1 << 7 | 1 << 6 | ADXL345_REG_DATA_X0);
     spi_submit(adxl->spi_p, &(adxl->spi_trans));
   }
 }
 
 #define Int16FromBuf(_buf,_idx) ((int16_t)((_buf[_idx+1]<<8) | _buf[_idx]))
 
-void adxl345_spi_event(struct Adxl345_Spi *adxl)
+void adxl345_spi_event(struct Adxl345_Spi* adxl)
 {
   if (adxl->initialized) {
     if (adxl->spi_trans.status == SPITransFailed) {
       adxl->spi_trans.status = SPITransDone;
-    }
-    else if (adxl->spi_trans.status == SPITransSuccess) {
+    } else if (adxl->spi_trans.status == SPITransSuccess) {
       // Successfull reading
-      adxl->data.vect.x = Int16FromBuf(adxl->rx_buf,1);
-      adxl->data.vect.y = Int16FromBuf(adxl->rx_buf,3);
-      adxl->data.vect.z = Int16FromBuf(adxl->rx_buf,5);
+      adxl->data.vect.x = Int16FromBuf(adxl->rx_buf, 1);
+      adxl->data.vect.y = Int16FromBuf(adxl->rx_buf, 3);
+      adxl->data.vect.z = Int16FromBuf(adxl->rx_buf, 5);
       adxl->data_available = TRUE;
       adxl->spi_trans.status = SPITransDone;
     }
-  }
-  else if (adxl->init_status != ADXL_CONF_UNINIT) { // Configuring but not yet initialized
+  } else if (adxl->init_status != ADXL_CONF_UNINIT) { // Configuring but not yet initialized
     switch (adxl->spi_trans.status) {
       case SPITransFailed:
         adxl->init_status--; // Retry config (TODO max retry)

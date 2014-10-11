@@ -80,8 +80,9 @@ void lla_of_ecef_d(struct LlaCoor_d* lla, struct EcefCoor_d* ecef)
   const double s1 = 1 + s + 1 / s;
   const double P = F / (3 * s1 * s1 * G * G);
   const double Q = sqrt(1 + 2 * e2 * e2 * P);
-  const double ro = -(e2 * P * r) / (1 + Q) + sqrt((a * a / 2) * (1 + 1 / Q) - ((1 - e2) * P * z2) / (Q *
-                    (1 + Q)) - P * r2 / 2);
+  const double ro = -(e2 * P * r) / (1 + Q) + sqrt((a * a / 2) * (1 + 1 / Q) - ((1 - e2) * P * z2) /
+                    (Q *
+                     (1 + Q)) - P * r2 / 2);
   const double tmp = (r - e2 * ro) * (r - e2 * ro);
   const double U = sqrt(tmp + z2);
   const double V = sqrt(tmp + (1 - e2) * z2);

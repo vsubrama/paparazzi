@@ -46,8 +46,9 @@ enum Cyrf6936Status {
 
 /* The structure for the cyrf6936 chip that handles all the buffers and requests */
 struct Cyrf6936 {
-  struct spi_periph *spi_p;                 /**< The SPI peripheral for the connection */
-  struct spi_transaction spi_t;             /**< The SPI transaction used for the writing and reading of registers */
+  struct spi_periph* spi_p;                 /**< The SPI peripheral for the connection */
+  struct spi_transaction
+      spi_t;             /**< The SPI transaction used for the writing and reading of registers */
   volatile enum Cyrf6936Status status;      /**< The status of the CYRF6936 chip */
   uint8_t input_buf[17];                    /**< The input buffer for the SPI transaction */
   uint8_t output_buf[17];                   /**< The output buffer for the SPI transaction */
@@ -65,13 +66,15 @@ struct Cyrf6936 {
   uint8_t rx_packet[16];                    /**< The last received packet */
 };
 
-extern void cyrf6936_init(struct Cyrf6936 *cyrf, struct spi_periph *spi_p, const uint8_t slave_idx, const uint32_t rst_port, const uint16_t rst_pin);
-void cyrf6936_event(struct Cyrf6936 *cyrf);
+extern void cyrf6936_init(struct Cyrf6936* cyrf, struct spi_periph* spi_p, const uint8_t slave_idx,
+                          const uint32_t rst_port, const uint16_t rst_pin);
+void cyrf6936_event(struct Cyrf6936* cyrf);
 
-bool_t cyrf6936_write(struct Cyrf6936 *cyrf, const uint8_t addr, const uint8_t data);
-bool_t cyrf6936_multi_write(struct Cyrf6936 *cyrf, const uint8_t data[][2], const uint8_t length);
-bool_t cyrf6936_write_chan_sop_data_crc(struct Cyrf6936 *cyrf, const uint8_t chan, const uint8_t sop_code[], const uint8_t data_code[], const uint16_t crc_seed);
-bool_t cyrf6936_read_rx_irq_status_packet(struct Cyrf6936 *cyrf);
-bool_t cyrf6936_send(struct Cyrf6936 *cyrf, const uint8_t data[], const uint8_t length);
+bool_t cyrf6936_write(struct Cyrf6936* cyrf, const uint8_t addr, const uint8_t data);
+bool_t cyrf6936_multi_write(struct Cyrf6936* cyrf, const uint8_t data[][2], const uint8_t length);
+bool_t cyrf6936_write_chan_sop_data_crc(struct Cyrf6936* cyrf, const uint8_t chan,
+                                        const uint8_t sop_code[], const uint8_t data_code[], const uint16_t crc_seed);
+bool_t cyrf6936_read_rx_irq_status_packet(struct Cyrf6936* cyrf);
+bool_t cyrf6936_send(struct Cyrf6936* cyrf, const uint8_t data[], const uint8_t length);
 
 #endif /* CYRF6936_H */

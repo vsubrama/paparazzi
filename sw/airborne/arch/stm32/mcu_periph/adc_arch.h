@@ -93,7 +93,8 @@ typedef void (*adc_watchdog_callback)(void);
  * @param low low threshhold for callback trigger
  * @param high high threshhold for callback trigger
  */
-extern void register_adc_watchdog(uint32_t adc, uint8_t chan, uint16_t low, uint16_t high, adc_watchdog_callback cb);
+extern void register_adc_watchdog(uint32_t adc, uint8_t chan, uint16_t low, uint16_t high,
+                                  adc_watchdog_callback cb);
 
 #endif
 

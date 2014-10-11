@@ -58,7 +58,7 @@ enum Hmc58xxType {
 };
 
 struct Hmc58xx {
-  struct i2c_periph *i2c_p;
+  struct i2c_periph* i2c_p;
   struct i2c_transaction i2c_trans;
   bool_t initialized;                 ///< config done flag
   enum Hmc58xxConfStatus init_status; ///< init status
@@ -75,17 +75,19 @@ struct Hmc58xx {
 // TODO IRQ handling
 
 // Functions
-extern void hmc58xx_init(struct Hmc58xx *hmc, struct i2c_periph *i2c_p, uint8_t addr);
-extern void hmc58xx_start_configure(struct Hmc58xx *hmc);
-extern void hmc58xx_read(struct Hmc58xx *hmc);
-extern void hmc58xx_event(struct Hmc58xx *hmc);
+extern void hmc58xx_init(struct Hmc58xx* hmc, struct i2c_periph* i2c_p, uint8_t addr);
+extern void hmc58xx_start_configure(struct Hmc58xx* hmc);
+extern void hmc58xx_read(struct Hmc58xx* hmc);
+extern void hmc58xx_event(struct Hmc58xx* hmc);
 
 /// convenience function: read or start configuration if not already initialized
-static inline void hmc58xx_periodic(struct Hmc58xx *hmc) {
-  if (hmc->initialized)
+static inline void hmc58xx_periodic(struct Hmc58xx* hmc)
+{
+  if (hmc->initialized) {
     hmc58xx_read(hmc);
-  else
+  } else {
     hmc58xx_start_configure(hmc);
+  }
 }
 
 #endif /* HMC58XX_H */

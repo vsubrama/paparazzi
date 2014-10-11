@@ -52,7 +52,7 @@ enum Mpu60x0I2cSlaveInitStatus {
 };
 
 struct Mpu60x0_I2c {
-  struct i2c_periph *i2c_p;
+  struct i2c_periph* i2c_p;
   struct i2c_transaction i2c_trans;
   volatile bool_t data_available;     ///< data ready flag
   union {
@@ -69,17 +69,19 @@ struct Mpu60x0_I2c {
 };
 
 // Functions
-extern void mpu60x0_i2c_init(struct Mpu60x0_I2c *mpu, struct i2c_periph *i2c_p, uint8_t addr);
-extern void mpu60x0_i2c_start_configure(struct Mpu60x0_I2c *mpu);
-extern void mpu60x0_i2c_read(struct Mpu60x0_I2c *mpu);
-extern void mpu60x0_i2c_event(struct Mpu60x0_I2c *mpu);
+extern void mpu60x0_i2c_init(struct Mpu60x0_I2c* mpu, struct i2c_periph* i2c_p, uint8_t addr);
+extern void mpu60x0_i2c_start_configure(struct Mpu60x0_I2c* mpu);
+extern void mpu60x0_i2c_read(struct Mpu60x0_I2c* mpu);
+extern void mpu60x0_i2c_event(struct Mpu60x0_I2c* mpu);
 
 /// convenience function: read or start configuration if not already initialized
-static inline void mpu60x0_i2c_periodic(struct Mpu60x0_I2c *mpu) {
-  if (mpu->config.initialized)
+static inline void mpu60x0_i2c_periodic(struct Mpu60x0_I2c* mpu)
+{
+  if (mpu->config.initialized) {
     mpu60x0_i2c_read(mpu);
-  else
+  } else {
     mpu60x0_i2c_start_configure(mpu);
+  }
 }
 
 #endif // MPU60X0_I2C_H

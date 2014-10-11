@@ -51,9 +51,9 @@ extern float airspeed_ets;
 
 extern struct i2c_transaction airspeed_ets_i2c_trans;
 
-extern void airspeed_ets_init( void );
-extern void airspeed_ets_read_periodic( void );
-extern void airspeed_ets_read_event( void );
+extern void airspeed_ets_init(void);
+extern void airspeed_ets_read_periodic(void);
+extern void airspeed_ets_read_event(void);
 
 #define AirspeedEtsEvent() { if (airspeed_ets_i2c_trans.status == I2CTransSuccess) airspeed_ets_read_event(); }
 

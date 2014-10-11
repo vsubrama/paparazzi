@@ -92,7 +92,7 @@ struct Mpu60x0Config {
   uint8_t i2c_mst_delay;                ///< MPU I2C slaves delayed sample rate
 };
 
-extern void mpu60x0_set_default_config(struct Mpu60x0Config *c);
+extern void mpu60x0_set_default_config(struct Mpu60x0Config* c);
 
 /// Configuration sequence called once before normal use
 extern void mpu60x0_send_config(Mpu60x0ConfigSet mpu_set, void* mpu, struct Mpu60x0Config* config);

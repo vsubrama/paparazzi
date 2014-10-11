@@ -40,13 +40,13 @@ extern int ivy_dl_enabled;
 #define IvyTransportPutDoubleByAddr(_dev,x) IvyTransportPutOneFloatByAddr(_dev,x) Space()
 
 #define IvyTransportPutArray(_dev,_put, _n, _x) { \
-  int __i; \
-  DelimStart(); \
-  for(__i = 0; __i < _n; __i++) { \
-    _put(_dev,&_x[__i]); \
-    Comma(); \
-  } DelimEnd(); Space(); \
-}
+    int __i; \
+    DelimStart(); \
+    for(__i = 0; __i < _n; __i++) { \
+      _put(_dev,&_x[__i]); \
+      Comma(); \
+    } DelimEnd(); Space(); \
+  }
 
 #define IvyTransportPutInt8Array(_dev,_n, _x) IvyTransportPutArray(_dev,IvyTransportPutIntByAddr, _n, _x)
 #define IvyTransportPutUint8Array(_dev,_n, _x) IvyTransportPutArray(_dev,IvyTransportPutUintByAddr, _n, _x)

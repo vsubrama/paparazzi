@@ -80,9 +80,9 @@ extern struct GpsNmea gps_nmea;
     }                                                   \
   }
 
-#define ReadGpsBuffer() {					\
-    while (GpsLink(ChAvailable())&&!gps_nmea.msg_available)	\
-      nmea_parse_char(GpsLink(Getch()));			\
+#define ReadGpsBuffer() {         \
+    while (GpsLink(ChAvailable())&&!gps_nmea.msg_available) \
+      nmea_parse_char(GpsLink(Getch()));      \
   }
 
 

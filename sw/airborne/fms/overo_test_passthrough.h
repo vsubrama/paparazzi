@@ -21,7 +21,7 @@ struct OveroTestPassthrough {
   /* the io proc status */
   uint32_t io_proc_msg_cnt;
   uint32_t io_proc_err_cnt;
-  };
+};
 
 extern struct OveroTestPassthrough otp;
 

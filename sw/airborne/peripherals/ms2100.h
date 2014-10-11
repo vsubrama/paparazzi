@@ -42,7 +42,7 @@ enum Ms2100Status {
 };
 
 struct Ms2100 {
-  struct spi_periph *spi_p;
+  struct spi_periph* spi_p;
   struct spi_transaction req_trans;
   struct spi_transaction read_trans;
   volatile uint8_t req_buf[1];        ///< SPI buffer for the command byte
@@ -58,11 +58,12 @@ struct Ms2100 {
 // keep gobal var for now...
 extern struct Ms2100 ms2100;
 
-extern void ms2100_init(struct Ms2100 *ms, struct spi_periph *spi_p, uint8_t slave_idx);
-extern void ms2100_read(struct Ms2100 *ms);
-extern void ms2100_event(struct Ms2100 *ms);
+extern void ms2100_init(struct Ms2100* ms, struct spi_periph* spi_p, uint8_t slave_idx);
+extern void ms2100_read(struct Ms2100* ms);
+extern void ms2100_event(struct Ms2100* ms);
 
-static inline void ms2100_periodic(struct Ms2100 *ms) {
+static inline void ms2100_periodic(struct Ms2100* ms)
+{
   if (ms->status == MS2100_IDLE) {
     ms2100_read(ms);
   }
@@ -71,6 +72,6 @@ static inline void ms2100_periodic(struct Ms2100 *ms) {
 /* underlying architecture */
 #include "peripherals/ms2100_arch.h"
 /* must be implemented by underlying architecture */
-extern void ms2100_arch_init( void );
+extern void ms2100_arch_init(void);
 
 #endif /* MS2100_H */

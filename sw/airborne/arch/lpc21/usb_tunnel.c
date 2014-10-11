@@ -46,9 +46,10 @@
 #endif
 #endif
 
-int main( void ) {
+int main(void)
+{
   unsigned char inc;
-  unsigned int rx_time=0, tx_time=0;
+  unsigned int rx_time = 0, tx_time = 0;
 
   mcu_init();
   sys_time_init();
@@ -65,13 +66,13 @@ int main( void ) {
   LED_ON(3);
 #endif
 
-  while(1) {
+  while (1) {
 
 #if USE_LED_1
-    if (T0TC > (rx_time+((PCLK / T0_PCLK_DIV) / BLINK_MIN))) LED_OFF(1);
+    if (T0TC > (rx_time + ((PCLK / T0_PCLK_DIV) / BLINK_MIN))) { LED_OFF(1); }
 #endif
 #if USE_LED_2
-    if (T0TC > (tx_time+((PCLK / T0_PCLK_DIV) / BLINK_MIN))) LED_OFF(2);
+    if (T0TC > (tx_time + ((PCLK / T0_PCLK_DIV) / BLINK_MIN))) { LED_OFF(2); }
 #endif
 
     if (uart_char_available(&USB_TUNNEL_UART) && VCOM_check_free_space(1)) {

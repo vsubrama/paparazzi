@@ -58,15 +58,24 @@ int32_t int32_sqrt(int32_t in)
  */
 void int32_rmat_comp(struct Int32RMat* m_a2c, struct Int32RMat* m_a2b, struct Int32RMat* m_b2c)
 {
-  m_a2c->m[0] = (m_b2c->m[0] * m_a2b->m[0] + m_b2c->m[1] * m_a2b->m[3] + m_b2c->m[2] * m_a2b->m[6]) >> INT32_TRIG_FRAC;
-  m_a2c->m[1] = (m_b2c->m[0] * m_a2b->m[1] + m_b2c->m[1] * m_a2b->m[4] + m_b2c->m[2] * m_a2b->m[7]) >> INT32_TRIG_FRAC;
-  m_a2c->m[2] = (m_b2c->m[0] * m_a2b->m[2] + m_b2c->m[1] * m_a2b->m[5] + m_b2c->m[2] * m_a2b->m[8]) >> INT32_TRIG_FRAC;
-  m_a2c->m[3] = (m_b2c->m[3] * m_a2b->m[0] + m_b2c->m[4] * m_a2b->m[3] + m_b2c->m[5] * m_a2b->m[6]) >> INT32_TRIG_FRAC;
-  m_a2c->m[4] = (m_b2c->m[3] * m_a2b->m[1] + m_b2c->m[4] * m_a2b->m[4] + m_b2c->m[5] * m_a2b->m[7]) >> INT32_TRIG_FRAC;
-  m_a2c->m[5] = (m_b2c->m[3] * m_a2b->m[2] + m_b2c->m[4] * m_a2b->m[5] + m_b2c->m[5] * m_a2b->m[8]) >> INT32_TRIG_FRAC;
-  m_a2c->m[6] = (m_b2c->m[6] * m_a2b->m[0] + m_b2c->m[7] * m_a2b->m[3] + m_b2c->m[8] * m_a2b->m[6]) >> INT32_TRIG_FRAC;
-  m_a2c->m[7] = (m_b2c->m[6] * m_a2b->m[1] + m_b2c->m[7] * m_a2b->m[4] + m_b2c->m[8] * m_a2b->m[7]) >> INT32_TRIG_FRAC;
-  m_a2c->m[8] = (m_b2c->m[6] * m_a2b->m[2] + m_b2c->m[7] * m_a2b->m[5] + m_b2c->m[8] * m_a2b->m[8]) >> INT32_TRIG_FRAC;
+  m_a2c->m[0] = (m_b2c->m[0] * m_a2b->m[0] + m_b2c->m[1] * m_a2b->m[3] + m_b2c->m[2] * m_a2b->m[6]) >>
+                INT32_TRIG_FRAC;
+  m_a2c->m[1] = (m_b2c->m[0] * m_a2b->m[1] + m_b2c->m[1] * m_a2b->m[4] + m_b2c->m[2] * m_a2b->m[7]) >>
+                INT32_TRIG_FRAC;
+  m_a2c->m[2] = (m_b2c->m[0] * m_a2b->m[2] + m_b2c->m[1] * m_a2b->m[5] + m_b2c->m[2] * m_a2b->m[8]) >>
+                INT32_TRIG_FRAC;
+  m_a2c->m[3] = (m_b2c->m[3] * m_a2b->m[0] + m_b2c->m[4] * m_a2b->m[3] + m_b2c->m[5] * m_a2b->m[6]) >>
+                INT32_TRIG_FRAC;
+  m_a2c->m[4] = (m_b2c->m[3] * m_a2b->m[1] + m_b2c->m[4] * m_a2b->m[4] + m_b2c->m[5] * m_a2b->m[7]) >>
+                INT32_TRIG_FRAC;
+  m_a2c->m[5] = (m_b2c->m[3] * m_a2b->m[2] + m_b2c->m[4] * m_a2b->m[5] + m_b2c->m[5] * m_a2b->m[8]) >>
+                INT32_TRIG_FRAC;
+  m_a2c->m[6] = (m_b2c->m[6] * m_a2b->m[0] + m_b2c->m[7] * m_a2b->m[3] + m_b2c->m[8] * m_a2b->m[6]) >>
+                INT32_TRIG_FRAC;
+  m_a2c->m[7] = (m_b2c->m[6] * m_a2b->m[1] + m_b2c->m[7] * m_a2b->m[4] + m_b2c->m[8] * m_a2b->m[7]) >>
+                INT32_TRIG_FRAC;
+  m_a2c->m[8] = (m_b2c->m[6] * m_a2b->m[2] + m_b2c->m[7] * m_a2b->m[5] + m_b2c->m[8] * m_a2b->m[8]) >>
+                INT32_TRIG_FRAC;
 }
 
 /** Composition (multiplication) of two rotation matrices.
@@ -74,15 +83,24 @@ void int32_rmat_comp(struct Int32RMat* m_a2c, struct Int32RMat* m_a2b, struct In
  */
 void int32_rmat_comp_inv(struct Int32RMat* m_a2b, struct Int32RMat* m_a2c, struct Int32RMat* m_b2c)
 {
-  m_a2b->m[0] = (m_b2c->m[0] * m_a2c->m[0] + m_b2c->m[3] * m_a2c->m[3] + m_b2c->m[6] * m_a2c->m[6]) >> INT32_TRIG_FRAC;
-  m_a2b->m[1] = (m_b2c->m[0] * m_a2c->m[1] + m_b2c->m[3] * m_a2c->m[4] + m_b2c->m[6] * m_a2c->m[7]) >> INT32_TRIG_FRAC;
-  m_a2b->m[2] = (m_b2c->m[0] * m_a2c->m[2] + m_b2c->m[3] * m_a2c->m[5] + m_b2c->m[6] * m_a2c->m[8]) >> INT32_TRIG_FRAC;
-  m_a2b->m[3] = (m_b2c->m[1] * m_a2c->m[0] + m_b2c->m[4] * m_a2c->m[3] + m_b2c->m[7] * m_a2c->m[6]) >> INT32_TRIG_FRAC;
-  m_a2b->m[4] = (m_b2c->m[1] * m_a2c->m[1] + m_b2c->m[4] * m_a2c->m[4] + m_b2c->m[7] * m_a2c->m[7]) >> INT32_TRIG_FRAC;
-  m_a2b->m[5] = (m_b2c->m[1] * m_a2c->m[2] + m_b2c->m[4] * m_a2c->m[5] + m_b2c->m[7] * m_a2c->m[8]) >> INT32_TRIG_FRAC;
-  m_a2b->m[6] = (m_b2c->m[2] * m_a2c->m[0] + m_b2c->m[5] * m_a2c->m[3] + m_b2c->m[8] * m_a2c->m[6]) >> INT32_TRIG_FRAC;
-  m_a2b->m[7] = (m_b2c->m[2] * m_a2c->m[1] + m_b2c->m[5] * m_a2c->m[4] + m_b2c->m[8] * m_a2c->m[7]) >> INT32_TRIG_FRAC;
-  m_a2b->m[8] = (m_b2c->m[2] * m_a2c->m[2] + m_b2c->m[5] * m_a2c->m[5] + m_b2c->m[8] * m_a2c->m[8]) >> INT32_TRIG_FRAC;
+  m_a2b->m[0] = (m_b2c->m[0] * m_a2c->m[0] + m_b2c->m[3] * m_a2c->m[3] + m_b2c->m[6] * m_a2c->m[6]) >>
+                INT32_TRIG_FRAC;
+  m_a2b->m[1] = (m_b2c->m[0] * m_a2c->m[1] + m_b2c->m[3] * m_a2c->m[4] + m_b2c->m[6] * m_a2c->m[7]) >>
+                INT32_TRIG_FRAC;
+  m_a2b->m[2] = (m_b2c->m[0] * m_a2c->m[2] + m_b2c->m[3] * m_a2c->m[5] + m_b2c->m[6] * m_a2c->m[8]) >>
+                INT32_TRIG_FRAC;
+  m_a2b->m[3] = (m_b2c->m[1] * m_a2c->m[0] + m_b2c->m[4] * m_a2c->m[3] + m_b2c->m[7] * m_a2c->m[6]) >>
+                INT32_TRIG_FRAC;
+  m_a2b->m[4] = (m_b2c->m[1] * m_a2c->m[1] + m_b2c->m[4] * m_a2c->m[4] + m_b2c->m[7] * m_a2c->m[7]) >>
+                INT32_TRIG_FRAC;
+  m_a2b->m[5] = (m_b2c->m[1] * m_a2c->m[2] + m_b2c->m[4] * m_a2c->m[5] + m_b2c->m[7] * m_a2c->m[8]) >>
+                INT32_TRIG_FRAC;
+  m_a2b->m[6] = (m_b2c->m[2] * m_a2c->m[0] + m_b2c->m[5] * m_a2c->m[3] + m_b2c->m[8] * m_a2c->m[6]) >>
+                INT32_TRIG_FRAC;
+  m_a2b->m[7] = (m_b2c->m[2] * m_a2c->m[1] + m_b2c->m[5] * m_a2c->m[4] + m_b2c->m[8] * m_a2c->m[7]) >>
+                INT32_TRIG_FRAC;
+  m_a2b->m[8] = (m_b2c->m[2] * m_a2c->m[2] + m_b2c->m[5] * m_a2c->m[5] + m_b2c->m[8] * m_a2c->m[8]) >>
+                INT32_TRIG_FRAC;
 }
 
 /** rotate 3D vector by rotation matrix.
@@ -90,9 +108,9 @@ void int32_rmat_comp_inv(struct Int32RMat* m_a2b, struct Int32RMat* m_a2c, struc
  */
 void int32_rmat_vmult(struct Int32Vect3* vb, struct Int32RMat* m_a2b, struct Int32Vect3* va)
 {
-  vb->x = (m_a2b->m[0] * va->x + m_a2b->m[1] * va->y + m_a2b->m[2] * va->z)>>INT32_TRIG_FRAC;
-  vb->y = (m_a2b->m[3] * va->x + m_a2b->m[4] * va->y + m_a2b->m[5] * va->z)>>INT32_TRIG_FRAC;
-  vb->z = (m_a2b->m[6] * va->x + m_a2b->m[7] * va->y + m_a2b->m[8] * va->z)>>INT32_TRIG_FRAC;
+  vb->x = (m_a2b->m[0] * va->x + m_a2b->m[1] * va->y + m_a2b->m[2] * va->z) >> INT32_TRIG_FRAC;
+  vb->y = (m_a2b->m[3] * va->x + m_a2b->m[4] * va->y + m_a2b->m[5] * va->z) >> INT32_TRIG_FRAC;
+  vb->z = (m_a2b->m[6] * va->x + m_a2b->m[7] * va->y + m_a2b->m[8] * va->z) >> INT32_TRIG_FRAC;
 }
 
 /** rotate 3D vector by transposed rotation matrix.
@@ -100,9 +118,9 @@ void int32_rmat_vmult(struct Int32Vect3* vb, struct Int32RMat* m_a2b, struct Int
  */
 void int32_rmat_transp_vmult(struct Int32Vect3* vb, struct Int32RMat* m_b2a, struct Int32Vect3* va)
 {
-  vb->x = (m_b2a->m[0] * va->x + m_b2a->m[3] * va->y + m_b2a->m[6] * va->z)>>INT32_TRIG_FRAC;
-  vb->y = (m_b2a->m[1] * va->x + m_b2a->m[4] * va->y + m_b2a->m[7] * va->z)>>INT32_TRIG_FRAC;
-  vb->z = (m_b2a->m[2] * va->x + m_b2a->m[5] * va->y + m_b2a->m[8] * va->z)>>INT32_TRIG_FRAC;
+  vb->x = (m_b2a->m[0] * va->x + m_b2a->m[3] * va->y + m_b2a->m[6] * va->z) >> INT32_TRIG_FRAC;
+  vb->y = (m_b2a->m[1] * va->x + m_b2a->m[4] * va->y + m_b2a->m[7] * va->z) >> INT32_TRIG_FRAC;
+  vb->z = (m_b2a->m[2] * va->x + m_b2a->m[5] * va->y + m_b2a->m[8] * va->z) >> INT32_TRIG_FRAC;
 }
 
 /** rotate anglular rates by rotation matrix.
@@ -110,19 +128,20 @@ void int32_rmat_transp_vmult(struct Int32Vect3* vb, struct Int32RMat* m_b2a, str
  */
 void int32_rmat_ratemult(struct Int32Rates* rb, struct Int32RMat* m_a2b, struct Int32Rates* ra)
 {
-  rb->p = (m_a2b->m[0] * ra->p + m_a2b->m[1] * ra->q + m_a2b->m[2] * ra->r)>>INT32_TRIG_FRAC;
-  rb->q = (m_a2b->m[3] * ra->p + m_a2b->m[4] * ra->q + m_a2b->m[5] * ra->r)>>INT32_TRIG_FRAC;
-  rb->r = (m_a2b->m[6] * ra->p + m_a2b->m[7] * ra->q + m_a2b->m[8] * ra->r)>>INT32_TRIG_FRAC;
+  rb->p = (m_a2b->m[0] * ra->p + m_a2b->m[1] * ra->q + m_a2b->m[2] * ra->r) >> INT32_TRIG_FRAC;
+  rb->q = (m_a2b->m[3] * ra->p + m_a2b->m[4] * ra->q + m_a2b->m[5] * ra->r) >> INT32_TRIG_FRAC;
+  rb->r = (m_a2b->m[6] * ra->p + m_a2b->m[7] * ra->q + m_a2b->m[8] * ra->r) >> INT32_TRIG_FRAC;
 }
 
 /** rotate anglular rates by transposed rotation matrix.
  * rb = m_b2a^T * ra
  */
-void int32_rmat_transp_ratemult(struct Int32Rates* rb, struct Int32RMat* m_b2a, struct Int32Rates* ra)
+void int32_rmat_transp_ratemult(struct Int32Rates* rb, struct Int32RMat* m_b2a,
+                                struct Int32Rates* ra)
 {
-  rb->p = (m_b2a->m[0] * ra->p + m_b2a->m[3] * ra->q + m_b2a->m[6] * ra->r)>>INT32_TRIG_FRAC;
-  rb->q = (m_b2a->m[1] * ra->p + m_b2a->m[4] * ra->q + m_b2a->m[7] * ra->r)>>INT32_TRIG_FRAC;
-  rb->r = (m_b2a->m[2] * ra->p + m_b2a->m[5] * ra->q + m_b2a->m[8] * ra->r)>>INT32_TRIG_FRAC;
+  rb->p = (m_b2a->m[0] * ra->p + m_b2a->m[3] * ra->q + m_b2a->m[6] * ra->r) >> INT32_TRIG_FRAC;
+  rb->q = (m_b2a->m[1] * ra->p + m_b2a->m[4] * ra->q + m_b2a->m[7] * ra->r) >> INT32_TRIG_FRAC;
+  rb->r = (m_b2a->m[2] * ra->p + m_b2a->m[5] * ra->q + m_b2a->m[8] * ra->r) >> INT32_TRIG_FRAC;
 }
 
 
@@ -137,9 +156,12 @@ void int32_rmat_of_quat(struct Int32RMat* rm, struct Int32Quat* q)
   rm->m[4] = INT_MULT_RSHIFT(q->qy, q->qy, INT32_QUAT_FRAC + INT32_QUAT_FRAC - INT32_TRIG_FRAC - 1);
   rm->m[8] = INT_MULT_RSHIFT(q->qz, q->qz, INT32_QUAT_FRAC + INT32_QUAT_FRAC - INT32_TRIG_FRAC - 1);
 
-  const int32_t _2qiqx = INT_MULT_RSHIFT(q->qi, q->qx, INT32_QUAT_FRAC + INT32_QUAT_FRAC - INT32_TRIG_FRAC - 1);
-  const int32_t _2qiqy = INT_MULT_RSHIFT(q->qi, q->qy, INT32_QUAT_FRAC + INT32_QUAT_FRAC - INT32_TRIG_FRAC - 1);
-  const int32_t _2qiqz = INT_MULT_RSHIFT(q->qi, q->qz, INT32_QUAT_FRAC + INT32_QUAT_FRAC - INT32_TRIG_FRAC - 1);
+  const int32_t _2qiqx = INT_MULT_RSHIFT(q->qi, q->qx,
+                                         INT32_QUAT_FRAC + INT32_QUAT_FRAC - INT32_TRIG_FRAC - 1);
+  const int32_t _2qiqy = INT_MULT_RSHIFT(q->qi, q->qy,
+                                         INT32_QUAT_FRAC + INT32_QUAT_FRAC - INT32_TRIG_FRAC - 1);
+  const int32_t _2qiqz = INT_MULT_RSHIFT(q->qi, q->qz,
+                                         INT32_QUAT_FRAC + INT32_QUAT_FRAC - INT32_TRIG_FRAC - 1);
   rm->m[1] = INT_MULT_RSHIFT(q->qx, q->qy, INT32_QUAT_FRAC + INT32_QUAT_FRAC - INT32_TRIG_FRAC - 1);
   rm->m[2] = INT_MULT_RSHIFT(q->qx, q->qz, INT32_QUAT_FRAC + INT32_QUAT_FRAC - INT32_TRIG_FRAC - 1);
   rm->m[5] = INT_MULT_RSHIFT(q->qy, q->qz, INT32_QUAT_FRAC + INT32_QUAT_FRAC - INT32_TRIG_FRAC - 1);
@@ -252,43 +274,58 @@ void int32_rmat_of_eulers_312(struct Int32RMat* rm, struct Int32Eulers* e)
 
 void int32_quat_comp(struct Int32Quat* a2c, struct Int32Quat* a2b, struct Int32Quat* b2c)
 {
-  a2c->qi = (a2b->qi * b2c->qi - a2b->qx * b2c->qx - a2b->qy * b2c->qy - a2b->qz * b2c->qz) >> INT32_QUAT_FRAC;
-  a2c->qx = (a2b->qi * b2c->qx + a2b->qx * b2c->qi + a2b->qy * b2c->qz - a2b->qz * b2c->qy) >> INT32_QUAT_FRAC;
-  a2c->qy = (a2b->qi * b2c->qy - a2b->qx * b2c->qz + a2b->qy * b2c->qi + a2b->qz * b2c->qx) >> INT32_QUAT_FRAC;
-  a2c->qz = (a2b->qi * b2c->qz + a2b->qx * b2c->qy - a2b->qy * b2c->qx + a2b->qz * b2c->qi) >> INT32_QUAT_FRAC;
+  a2c->qi = (a2b->qi * b2c->qi - a2b->qx * b2c->qx - a2b->qy * b2c->qy - a2b->qz * b2c->qz) >>
+            INT32_QUAT_FRAC;
+  a2c->qx = (a2b->qi * b2c->qx + a2b->qx * b2c->qi + a2b->qy * b2c->qz - a2b->qz * b2c->qy) >>
+            INT32_QUAT_FRAC;
+  a2c->qy = (a2b->qi * b2c->qy - a2b->qx * b2c->qz + a2b->qy * b2c->qi + a2b->qz * b2c->qx) >>
+            INT32_QUAT_FRAC;
+  a2c->qz = (a2b->qi * b2c->qz + a2b->qx * b2c->qy - a2b->qy * b2c->qx + a2b->qz * b2c->qi) >>
+            INT32_QUAT_FRAC;
 }
 
 void int32_quat_comp_inv(struct Int32Quat* a2b, struct Int32Quat* a2c, struct Int32Quat* b2c)
 {
-  a2b->qi = (a2c->qi * b2c->qi + a2c->qx * b2c->qx + a2c->qy * b2c->qy + a2c->qz * b2c->qz) >> INT32_QUAT_FRAC;
-  a2b->qx = (-a2c->qi * b2c->qx + a2c->qx * b2c->qi - a2c->qy * b2c->qz + a2c->qz * b2c->qy) >> INT32_QUAT_FRAC;
-  a2b->qy = (-a2c->qi * b2c->qy + a2c->qx * b2c->qz + a2c->qy * b2c->qi - a2c->qz * b2c->qx) >> INT32_QUAT_FRAC;
-  a2b->qz = (-a2c->qi * b2c->qz - a2c->qx * b2c->qy + a2c->qy * b2c->qx + a2c->qz * b2c->qi) >> INT32_QUAT_FRAC;
+  a2b->qi = (a2c->qi * b2c->qi + a2c->qx * b2c->qx + a2c->qy * b2c->qy + a2c->qz * b2c->qz) >>
+            INT32_QUAT_FRAC;
+  a2b->qx = (-a2c->qi * b2c->qx + a2c->qx * b2c->qi - a2c->qy * b2c->qz + a2c->qz * b2c->qy) >>
+            INT32_QUAT_FRAC;
+  a2b->qy = (-a2c->qi * b2c->qy + a2c->qx * b2c->qz + a2c->qy * b2c->qi - a2c->qz * b2c->qx) >>
+            INT32_QUAT_FRAC;
+  a2b->qz = (-a2c->qi * b2c->qz - a2c->qx * b2c->qy + a2c->qy * b2c->qx + a2c->qz * b2c->qi) >>
+            INT32_QUAT_FRAC;
 }
 
 void int32_quat_inv_comp(struct Int32Quat* b2c, struct Int32Quat* a2b, struct Int32Quat* a2c)
 {
-  b2c->qi = (a2b->qi * a2c->qi + a2b->qx * a2c->qx + a2b->qy * a2c->qy + a2b->qz * a2c->qz) >> INT32_QUAT_FRAC;
-  b2c->qx = (a2b->qi * a2c->qx - a2b->qx * a2c->qi - a2b->qy * a2c->qz + a2b->qz * a2c->qy) >> INT32_QUAT_FRAC;
-  b2c->qy = (a2b->qi * a2c->qy + a2b->qx * a2c->qz - a2b->qy * a2c->qi - a2b->qz * a2c->qx) >> INT32_QUAT_FRAC;
-  b2c->qz = (a2b->qi * a2c->qz - a2b->qx * a2c->qy + a2b->qy * a2c->qx - a2b->qz * a2c->qi) >> INT32_QUAT_FRAC;
+  b2c->qi = (a2b->qi * a2c->qi + a2b->qx * a2c->qx + a2b->qy * a2c->qy + a2b->qz * a2c->qz) >>
+            INT32_QUAT_FRAC;
+  b2c->qx = (a2b->qi * a2c->qx - a2b->qx * a2c->qi - a2b->qy * a2c->qz + a2b->qz * a2c->qy) >>
+            INT32_QUAT_FRAC;
+  b2c->qy = (a2b->qi * a2c->qy + a2b->qx * a2c->qz - a2b->qy * a2c->qi - a2b->qz * a2c->qx) >>
+            INT32_QUAT_FRAC;
+  b2c->qz = (a2b->qi * a2c->qz - a2b->qx * a2c->qy + a2b->qy * a2c->qx - a2b->qz * a2c->qi) >>
+            INT32_QUAT_FRAC;
 }
 
-void int32_quat_comp_norm_shortest(struct Int32Quat* a2c, struct Int32Quat* a2b, struct Int32Quat* b2c)
+void int32_quat_comp_norm_shortest(struct Int32Quat* a2c, struct Int32Quat* a2b,
+                                   struct Int32Quat* b2c)
 {
   int32_quat_comp(a2c, a2b, b2c);
   int32_quat_wrap_shortest(a2c);
   int32_quat_normalize(a2c);
 }
 
-void int32_quat_comp_inv_norm_shortest(struct Int32Quat* a2b, struct Int32Quat* a2c, struct Int32Quat* b2c)
+void int32_quat_comp_inv_norm_shortest(struct Int32Quat* a2b, struct Int32Quat* a2c,
+                                       struct Int32Quat* b2c)
 {
   int32_quat_comp_inv(a2b, a2c, b2c);
   int32_quat_wrap_shortest(a2b);
   int32_quat_normalize(a2b);
 }
 
-void int32_quat_inv_comp_norm_shortest(struct Int32Quat* b2c, struct Int32Quat* a2b, struct Int32Quat* a2c)
+void int32_quat_inv_comp_norm_shortest(struct Int32Quat* b2c, struct Int32Quat* a2b,
+                                       struct Int32Quat* a2c)
 {
   int32_quat_inv_comp(b2c, a2b, a2c);
   int32_quat_wrap_shortest(b2c);
@@ -310,12 +347,17 @@ void int32_quat_derivative(struct Int32Quat* qd, const struct Int32Rates* r, str
 }
 
 /** in place quaternion first order integration with constant rotational velocity. */
-void int32_quat_integrate_fi(struct Int32Quat* q, struct Int64Quat* hr, struct Int32Rates* omega, int freq)
+void int32_quat_integrate_fi(struct Int32Quat* q, struct Int64Quat* hr, struct Int32Rates* omega,
+                             int freq)
 {
-  hr->qi += - ((int64_t) omega->p) * q->qx - ((int64_t) omega->q) * q->qy - ((int64_t) omega->r) * q->qz;
-  hr->qx += ((int64_t) omega->p) * q->qi + ((int64_t) omega->r) * q->qy - ((int64_t) omega->q) * q->qz;
-  hr->qy += ((int64_t) omega->q) * q->qi - ((int64_t) omega->r) * q->qx + ((int64_t) omega->p) * q->qz;
-  hr->qz += ((int64_t) omega->r) * q->qi + ((int64_t) omega->q) * q->qx - ((int64_t) omega->p) * q->qy;
+  hr->qi += - ((int64_t) omega->p) * q->qx - ((int64_t) omega->q) * q->qy - ((
+              int64_t) omega->r) * q->qz;
+  hr->qx += ((int64_t) omega->p) * q->qi + ((int64_t) omega->r) * q->qy - ((
+              int64_t) omega->q) * q->qz;
+  hr->qy += ((int64_t) omega->q) * q->qi - ((int64_t) omega->r) * q->qx + ((
+              int64_t) omega->p) * q->qz;
+  hr->qz += ((int64_t) omega->r) * q->qi + ((int64_t) omega->q) * q->qx - ((
+              int64_t) omega->p) * q->qy;
 
   lldiv_t _div = lldiv(hr->qi, ((1 << INT32_RATE_FRAC) * freq * 2));
   q->qi += (int32_t) _div.quot;
@@ -346,10 +388,13 @@ void int32_quat_vmult(struct Int32Vect3* v_out, struct Int32Quat* q, struct Int3
   const int32_t m01 = ((q->qx * q->qy) >> (INT32_QUAT_FRAC - 1)) + _2qiqz;
   const int32_t m02 = ((q->qx * q->qz) >> (INT32_QUAT_FRAC - 1)) - _2qiqy;
   const int32_t m12 = ((q->qy * q->qz) >> (INT32_QUAT_FRAC - 1)) + _2qiqx;
-  v_out->x = (_2qi2_m1 * v_in->x + _2qx2 * v_in->x + m01 * v_in->y +  m02 * v_in->z) >> INT32_QUAT_FRAC;
-  v_out->y = (_2qi2_m1 * v_in->y + m01 * v_in->x - 2 * _2qiqz * v_in->x + _2qy2 * v_in->y + m12 * v_in->z) >>
+  v_out->x = (_2qi2_m1 * v_in->x + _2qx2 * v_in->x + m01 * v_in->y +  m02 * v_in->z) >>
              INT32_QUAT_FRAC;
-  v_out->z = (_2qi2_m1 * v_in->z + m02 * v_in->x + 2 * _2qiqy * v_in->x + m12 * v_in->y - 2 * _2qiqx * v_in->y + _2qz2 *
+  v_out->y = (_2qi2_m1 * v_in->y + m01 * v_in->x - 2 * _2qiqz * v_in->x + _2qy2 * v_in->y + m12 *
+              v_in->z) >>
+             INT32_QUAT_FRAC;
+  v_out->z = (_2qi2_m1 * v_in->z + m02 * v_in->x + 2 * _2qiqy * v_in->x + m12 * v_in->y - 2 * _2qiqx *
+              v_in->y + _2qz2 *
               v_in->z) >> INT32_QUAT_FRAC;
 }
 
@@ -542,7 +587,8 @@ void int32_eulers_of_quat(struct Int32Eulers* e, struct Int32Quat* q)
  *
  */
 
-void int32_rates_of_eulers_dot_321(struct Int32Rates* r, struct Int32Eulers* e, struct Int32Eulers* ed)
+void int32_rates_of_eulers_dot_321(struct Int32Rates* r, struct Int32Eulers* e,
+                                   struct Int32Eulers* ed)
 {
   int32_t sphi;
   PPRZ_ITRIG_SIN(sphi, e->phi);
@@ -557,11 +603,14 @@ void int32_rates_of_eulers_dot_321(struct Int32Rates* r, struct Int32Eulers* e, 
   int32_t sphi_ctheta = INT_MULT_RSHIFT(sphi,   ctheta, INT32_TRIG_FRAC);
 
   r->p = - INT_MULT_RSHIFT(stheta, ed->psi, INT32_TRIG_FRAC) + ed->phi;
-  r->q = INT_MULT_RSHIFT(sphi_ctheta, ed->psi, INT32_TRIG_FRAC) + INT_MULT_RSHIFT(cphi, ed->theta, INT32_TRIG_FRAC);
-  r->r = INT_MULT_RSHIFT(cphi_ctheta, ed->psi, INT32_TRIG_FRAC) - INT_MULT_RSHIFT(sphi, ed->theta, INT32_TRIG_FRAC);
+  r->q = INT_MULT_RSHIFT(sphi_ctheta, ed->psi, INT32_TRIG_FRAC) + INT_MULT_RSHIFT(cphi, ed->theta,
+         INT32_TRIG_FRAC);
+  r->r = INT_MULT_RSHIFT(cphi_ctheta, ed->psi, INT32_TRIG_FRAC) - INT_MULT_RSHIFT(sphi, ed->theta,
+         INT32_TRIG_FRAC);
 }
 
-void int32_eulers_dot_321_of_rates(struct Int32Eulers* ed, struct Int32Eulers* e, struct Int32Rates* r)
+void int32_eulers_dot_321_of_rates(struct Int32Eulers* ed, struct Int32Eulers* e,
+                                   struct Int32Rates* r)
 {
   int32_t sphi;
   PPRZ_ITRIG_SIN(sphi, e->phi);
@@ -576,9 +625,12 @@ void int32_eulers_dot_321_of_rates(struct Int32Eulers* ed, struct Int32Eulers* e
     int64_t cphi_stheta = INT_MULT_RSHIFT(cphi, stheta, INT32_TRIG_FRAC);
     int64_t sphi_stheta = INT_MULT_RSHIFT(sphi, stheta, INT32_TRIG_FRAC);
 
-    ed->phi = r->p + (int32_t)((sphi_stheta * (int64_t)r->q) / ctheta) + (int32_t)((cphi_stheta * (int64_t)r->r) / ctheta);
-    ed->theta = INT_MULT_RSHIFT(cphi, r->q, INT32_TRIG_FRAC) - INT_MULT_RSHIFT(sphi, r->r, INT32_TRIG_FRAC);
-    ed->psi = (int32_t)(((int64_t)sphi * (int64_t)r->q) / ctheta) + (int32_t)(((int64_t)cphi * (int64_t)r->r) / ctheta);
+    ed->phi = r->p + (int32_t)((sphi_stheta * (int64_t)r->q) / ctheta) + (int32_t)((cphi_stheta *
+              (int64_t)r->r) / ctheta);
+    ed->theta = INT_MULT_RSHIFT(cphi, r->q, INT32_TRIG_FRAC) - INT_MULT_RSHIFT(sphi, r->r,
+                INT32_TRIG_FRAC);
+    ed->psi = (int32_t)(((int64_t)sphi * (int64_t)r->q) / ctheta) + (int32_t)(((int64_t)cphi *
+              (int64_t)r->r) / ctheta);
   }
   /* FIXME: What do you wanna do when you hit the singularity ? */
   /* probably not return an uninitialized variable, or ?        */

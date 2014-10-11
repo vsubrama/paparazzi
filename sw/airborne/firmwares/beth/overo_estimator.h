@@ -23,6 +23,7 @@ extern struct OveroEstimator estimator;
 
 extern void estimator_init(void);
 extern void estimator_send_messages(void);
-extern void estimator_run(uint16_t tilt_measure, uint16_t elevation_measure, uint16_t azimuth_measure);
+extern void estimator_run(uint16_t tilt_measure, uint16_t elevation_measure,
+                          uint16_t azimuth_measure);
 
 #endif /* OVERO_CONTROLLER_H */

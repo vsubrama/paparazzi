@@ -10,14 +10,14 @@
 
 #define ONBOARD_BUFFER_LEN 1500
 
-struct DownlinkTransport *onboard_transport_new(char *path, uint32_t *timestamp);
+struct DownlinkTransport* onboard_transport_new(char* path, uint32_t* timestamp);
 
 struct onboard_transport {
   int fd;
   char buffer[ONBOARD_BUFFER_LEN];
   uint32_t buffer_idx;
   uint32_t array_length;
-  uint32_t *timestamp;
+  uint32_t* timestamp;
   uint32_t overrun;
 };
 

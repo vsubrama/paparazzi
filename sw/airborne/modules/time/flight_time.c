@@ -35,12 +35,15 @@ uint16_t time_until_land;
 #define FLIGHT_TIME_LEFT 10000
 #endif
 
-void flight_time_init(void) {
+void flight_time_init(void)
+{
   time_until_land = FLIGHT_TIME_LEFT;
 }
 
-void flight_time_periodic( void ) {
+void flight_time_periodic(void)
+{
   // Count downwards
-  if(time_until_land > 0)
+  if (time_until_land > 0) {
     time_until_land--;
+  }
 }

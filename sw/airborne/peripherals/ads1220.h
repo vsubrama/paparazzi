@@ -150,7 +150,7 @@ struct Ads1220Config {
 
 struct Ads1220 {
   // SPI
-  struct spi_periph *spi_p;                     ///< spi peripheral
+  struct spi_periph* spi_p;                     ///< spi peripheral
   struct spi_transaction spi_trans;             ///< spi transaction
   volatile uint8_t tx_buf[ADS1220_BUFFER_LEN];  ///< transmit buffer
   volatile uint8_t rx_buf[ADS1220_BUFFER_LEN];  ///< receive buffer
@@ -162,17 +162,19 @@ struct Ads1220 {
 };
 
 // Functions
-extern void ads1220_init(struct Ads1220 *ads, struct spi_periph *spi_p, uint8_t slave_idx);
-extern void ads1220_configure(struct Ads1220 *ads);
-extern void ads1220_read(struct Ads1220 *ads);
-extern void ads1220_event(struct Ads1220 *ads);
+extern void ads1220_init(struct Ads1220* ads, struct spi_periph* spi_p, uint8_t slave_idx);
+extern void ads1220_configure(struct Ads1220* ads);
+extern void ads1220_read(struct Ads1220* ads);
+extern void ads1220_event(struct Ads1220* ads);
 
 /// convenience function: read or start configuration if not already initialized
-static inline void ads1220_periodic(struct Ads1220 *ads) {
-  if (ads->config.status == ADS1220_INITIALIZED)
+static inline void ads1220_periodic(struct Ads1220* ads)
+{
+  if (ads->config.status == ADS1220_INITIALIZED) {
     ads1220_read(ads);
-  else
+  } else {
     ads1220_configure(ads);
+  }
 }
 
 #endif // ADS1220_H

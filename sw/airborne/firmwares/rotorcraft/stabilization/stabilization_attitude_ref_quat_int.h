@@ -47,12 +47,12 @@ struct FloatRefModel {
 
 extern struct FloatRefModel stab_att_ref_model;
 
-extern void stabilization_attitude_ref_set_omega(struct FloatRates *omega);
+extern void stabilization_attitude_ref_set_omega(struct FloatRates* omega);
 extern void stabilization_attitude_ref_set_omega_p(float omega_p);
 extern void stabilization_attitude_ref_set_omega_q(float omega_q);
 extern void stabilization_attitude_ref_set_omega_r(float omega_r);
 
-extern void stabilization_attitude_ref_set_zeta(struct FloatRates *zeta);
+extern void stabilization_attitude_ref_set_zeta(struct FloatRates* zeta);
 extern void stabilization_attitude_ref_set_zeta_p(float zeta_p);
 extern void stabilization_attitude_ref_set_zeta_q(float zeta_q);
 extern void stabilization_attitude_ref_set_zeta_r(float zeta_r);

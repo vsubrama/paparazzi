@@ -87,7 +87,9 @@ extern void imu_drotek2_event(void);
 extern bool_t imu_drotek2_configure_mag_slave(Mpu60x0ConfigSet mpu_set, void* mpu);
 
 
-static inline void ImuEvent(void (* _gyro_handler)(void), void (* _accel_handler)(void), void (* _mag_handler)(void)) {
+static inline void ImuEvent(void (* _gyro_handler)(void), void (* _accel_handler)(void),
+                            void (* _mag_handler)(void))
+{
   imu_drotek2_event();
   if (imu_drotek2.gyro_valid) {
     imu_drotek2.gyro_valid = FALSE;

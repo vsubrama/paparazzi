@@ -74,7 +74,8 @@ enum GX3Status {
 
 //AHRS
 struct AhrsFloatQuat {
-  struct FloatQuat   ltp_to_imu_quat;  ///< Rotation from LocalTangentPlane to IMU frame as quaternions
+  struct FloatQuat
+      ltp_to_imu_quat;  ///< Rotation from LocalTangentPlane to IMU frame as quaternions
   float mag_offset;                    ///< Difference between true and magnetic north
 
   struct GX3Packet gx3_packet;       ///< Packet struct
@@ -90,12 +91,16 @@ struct AhrsFloatQuat {
 
 extern struct AhrsFloatQuat ahrs_impl;
 
-static inline void ReadGX3Buffer(void) {
-  while (uart_char_available(&GX3_PORT) && !ahrs_impl.gx3_packet.msg_available)
+static inline void ReadGX3Buffer(void)
+{
+  while (uart_char_available(&GX3_PORT) && !ahrs_impl.gx3_packet.msg_available) {
     gx3_packet_parse(uart_getch(&GX3_PORT));
+  }
 }
 
-static inline void ImuEvent(void (* _gyro_handler)(void), void (* _accel_handler)(void), void (* _mag_handler)(void)) {
+static inline void ImuEvent(void (* _gyro_handler)(void), void (* _accel_handler)(void),
+                            void (* _mag_handler)(void))
+{
   if (uart_char_available(&GX3_PORT)) {
     ReadGX3Buffer();
   }

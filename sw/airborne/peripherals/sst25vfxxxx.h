@@ -64,7 +64,8 @@ struct SST25VFxxxx {
   volatile enum SST25VFxxxxStatus status;   /**< The status of the SST25VFxxxx flash chip */
   uint8_t status_idx;                       /**< The counter of substatuses */
   struct spi_periph* spi_p;                 /**< The SPI peripheral for the connection */
-  struct spi_transaction spi_t;             /**< The SPI transaction used for the writing and reading of registers */
+  struct spi_transaction
+      spi_t;             /**< The SPI transaction used for the writing and reading of registers */
   uint8_t input_buf[16];                    /**< The input buffer for the SPI transaction */
   uint8_t output_buf[16];                   /**< The output buffer for the SPI transaction */
   uint32_t flash_addr;                      /**< The flash address to write at */
@@ -74,7 +75,8 @@ struct SST25VFxxxx {
   uint8_t transfer_length;                  /**< The transfer buffer length */
 };
 
-void sst25vfxxxx_init(struct SST25VFxxxx* sst, struct spi_periph* spi_p, const uint8_t slave_idx, SPICallback spi_cb);
+void sst25vfxxxx_init(struct SST25VFxxxx* sst, struct spi_periph* spi_p, const uint8_t slave_idx,
+                      SPICallback spi_cb);
 void sst25vfxxxx_after_cb(struct SST25VFxxxx* sst);
 void sst25vfxxxx_read_id(struct SST25VFxxxx* sst);
 void sst25vfxxxx_block_write_en(struct SST25VFxxxx* sst);

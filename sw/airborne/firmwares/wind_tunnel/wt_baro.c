@@ -48,7 +48,8 @@ uint8_t buf_output[3];
 #define Uint24(buf_input) (((uint32_t)buf_input[0]) << 16 |((uint16_t)buf_input[1]) << 8 | buf_input[2])
 
 
-static void send1_on_spi(uint8_t d) {
+static void send1_on_spi(uint8_t d)
+{
   buf_output[0] = d;
   spi_buffer_length = 1;
 
@@ -58,7 +59,8 @@ static void send1_on_spi(uint8_t d) {
 }
 
 
-void wt_baro_init( void ) {
+void wt_baro_init(void)
+{
 
   wt_baro_pressure = 0;
 
@@ -74,7 +76,8 @@ void wt_baro_init( void ) {
 
 }
 
-void wt_baro_periodic(void) {
+void wt_baro_periodic(void)
+{
   if (!SpiCheckAvailable()) {
     SpiOverRun();
     return;
@@ -83,8 +86,7 @@ void wt_baro_periodic(void) {
   if (status_read_data) {
     buf_output[0] = buf_output[1] = buf_output[2] = 0;
     spi_buffer_length = 3;
-  }
-  else {
+  } else {
     buf_output[0] = CMD_MEASUREMENT;
     spi_buffer_length = 1;
   }
@@ -101,7 +103,8 @@ void wt_baro_periodic(void) {
 static uint32_t data;
 
 /* Handle the SPI message, i.e. store the received values in variables */
-void wt_baro_event( void ) {
+void wt_baro_event(void)
+{
 
   if (status_read_data) {
     data = Uint24(buf_input);

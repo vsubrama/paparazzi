@@ -44,67 +44,78 @@
 
 #if USE_IMU_FLOAT
 
-static void send_accel(void) {
+static void send_accel(void)
+{
   DOWNLINK_SEND_IMU_ACCEL(DefaultChannel, DefaultDevice,
-      &imuf.accel.x, &imuf.accel.y, &imuf.accel.z);
+                          &imuf.accel.x, &imuf.accel.y, &imuf.accel.z);
 }
 
-static void send_gyro(void) {
+static void send_gyro(void)
+{
   DOWNLINK_SEND_IMU_GYRO(DefaultChannel, DefaultDevice,
-      &imuf.gyro.p, &imuf.gyro.q, &imuf.gyro.r);
+                         &imuf.gyro.p, &imuf.gyro.q, &imuf.gyro.r);
 }
 
 #else // !USE_IMU_FLOAT
 
-static void send_accel_raw(void) {
+static void send_accel_raw(void)
+{
   DOWNLINK_SEND_IMU_ACCEL_RAW(DefaultChannel, DefaultDevice,
-      &imu.accel_unscaled.x, &imu.accel_unscaled.y, &imu.accel_unscaled.z);
+                              &imu.accel_unscaled.x, &imu.accel_unscaled.y, &imu.accel_unscaled.z);
 }
 
-static void send_accel_scaled(void) {
+static void send_accel_scaled(void)
+{
   DOWNLINK_SEND_IMU_ACCEL_SCALED(DefaultChannel, DefaultDevice,
-      &imu.accel.x, &imu.accel.y, &imu.accel.z);
+                                 &imu.accel.x, &imu.accel.y, &imu.accel.z);
 }
 
-static void send_accel(void) {
+static void send_accel(void)
+{
   struct FloatVect3 accel_float;
   ACCELS_FLOAT_OF_BFP(accel_float, imu.accel);
   DOWNLINK_SEND_IMU_ACCEL(DefaultChannel, DefaultDevice,
-      &accel_float.x, &accel_float.y, &accel_float.z);
+                          &accel_float.x, &accel_float.y, &accel_float.z);
 }
 
-static void send_gyro_raw(void) {
+static void send_gyro_raw(void)
+{
   DOWNLINK_SEND_IMU_GYRO_RAW(DefaultChannel, DefaultDevice,
-      &imu.gyro_unscaled.p, &imu.gyro_unscaled.q, &imu.gyro_unscaled.r);
+                             &imu.gyro_unscaled.p, &imu.gyro_unscaled.q, &imu.gyro_unscaled.r);
 }
 
-static void send_gyro_scaled(void) {
+static void send_gyro_scaled(void)
+{
   DOWNLINK_SEND_IMU_GYRO_SCALED(DefaultChannel, DefaultDevice,
-      &imu.gyro.p, &imu.gyro.q, &imu.gyro.r);
+                                &imu.gyro.p, &imu.gyro.q, &imu.gyro.r);
 }
 
-static void send_gyro(void) {
+static void send_gyro(void)
+{
   struct FloatRates gyro_float;
   RATES_FLOAT_OF_BFP(gyro_float, imu.gyro);
   DOWNLINK_SEND_IMU_GYRO(DefaultChannel, DefaultDevice,
-      &gyro_float.p, &gyro_float.q, &gyro_float.r);
+                         &gyro_float.p, &gyro_float.q, &gyro_float.r);
 }
 
-static void send_mag_raw(void) {
+static void send_mag_raw(void)
+{
   DOWNLINK_SEND_IMU_MAG_RAW(DefaultChannel, DefaultDevice,
-      &imu.mag_unscaled.x, &imu.mag_unscaled.y, &imu.mag_unscaled.z);
+                            &imu.mag_unscaled.x, &imu.mag_unscaled.y, &imu.mag_unscaled.z);
 }
 
-static void send_mag_scaled(void) {
+static void send_mag_scaled(void)
+{
   DOWNLINK_SEND_IMU_MAG_SCALED(DefaultChannel, DefaultDevice,
-      &imu.mag.x, &imu.mag.y, &imu.mag.z);
+                               &imu.mag.x, &imu.mag.y, &imu.mag.z);
 }
 
-static void send_mag(void) {
+static void send_mag(void)
+{
   struct FloatVect3 mag_float;
   MAGS_FLOAT_OF_BFP(mag_float, imu.mag);
   DOWNLINK_SEND_IMU_MAG(DefaultChannel, DefaultDevice,
-      &mag_float.x, &mag_float.y, &mag_float.z);
+                        &mag_float.x, &mag_float.y, &mag_float.z);
 }
 #endif // !USE_IMU_FLOAT
 
@@ -113,7 +124,8 @@ static void send_mag(void) {
 struct Imu imu;
 struct ImuFloat imuf;
 
-void imu_init(void) {
+void imu_init(void)
+{
 
 #ifdef IMU_POWER_GPIO
   gpio_setup_output(IMU_POWER_GPIO);
@@ -129,13 +141,13 @@ void imu_init(void) {
   VECT3_ASSIGN(imu.mag_neutral,   IMU_MAG_X_NEUTRAL,   IMU_MAG_Y_NEUTRAL,   IMU_MAG_Z_NEUTRAL);
 #else
 #if USE_MAGNETOMETER
-INFO("Magnetometer neutrals are set to zero, you should calibrate!")
+  INFO("Magnetometer neutrals are set to zero, you should calibrate!")
 #endif
   INT_VECT3_ZERO(imu.mag_neutral);
 #endif
 
   struct FloatEulers body_to_imu_eulers =
-    {IMU_BODY_TO_IMU_PHI, IMU_BODY_TO_IMU_THETA, IMU_BODY_TO_IMU_PSI};
+  {IMU_BODY_TO_IMU_PHI, IMU_BODY_TO_IMU_THETA, IMU_BODY_TO_IMU_PSI};
   orientationSetEulers_f(&imu.body_to_imu, &body_to_imu_eulers);
 #if USE_IMU_FLOAT
   orientationSetEulers_f(&imuf.body_to_imu, &body_to_imu_eulers);
@@ -161,7 +173,8 @@ INFO("Magnetometer neutrals are set to zero, you should calibrate!")
 }
 
 
-void imu_SetBodyToImuPhi(float phi) {
+void imu_SetBodyToImuPhi(float phi)
+{
   struct FloatEulers body_to_imu_eulers;
   memcpy(&body_to_imu_eulers, orientationGetEulers_f(&imu.body_to_imu), sizeof(struct FloatEulers));
   body_to_imu_eulers.phi = phi;
@@ -171,7 +184,8 @@ void imu_SetBodyToImuPhi(float phi) {
 #endif
 }
 
-void imu_SetBodyToImuTheta(float theta) {
+void imu_SetBodyToImuTheta(float theta)
+{
   struct FloatEulers body_to_imu_eulers;
   memcpy(&body_to_imu_eulers, orientationGetEulers_f(&imu.body_to_imu), sizeof(struct FloatEulers));
   body_to_imu_eulers.theta = theta;
@@ -181,7 +195,8 @@ void imu_SetBodyToImuTheta(float theta) {
 #endif
 }
 
-void imu_SetBodyToImuPsi(float psi) {
+void imu_SetBodyToImuPsi(float psi)
+{
   struct FloatEulers body_to_imu_eulers;
   memcpy(&body_to_imu_eulers, orientationGetEulers_f(&imu.body_to_imu), sizeof(struct FloatEulers));
   body_to_imu_eulers.psi = psi;
@@ -191,7 +206,8 @@ void imu_SetBodyToImuPsi(float psi) {
 #endif
 }
 
-void imu_SetBodyToImuCurrent(float set) {
+void imu_SetBodyToImuCurrent(float set)
+{
   imu.b2i_set_current = set;
 
   if (imu.b2i_set_current) {
@@ -206,16 +222,14 @@ void imu_SetBodyToImuCurrent(float set) {
 #if USE_IMU_FLOAT
       orientationSetEulers_f(&imuf.body_to_imu, &body_to_imu_eulers);
 #endif
-    }
-    else {
+    } else {
       // indicate that we couldn't set to current roll/pitch
       imu.b2i_set_current = FALSE;
     }
-  }
-  else {
+  } else {
     // reset to BODY_TO_IMU as defined in airframe file
     struct FloatEulers body_to_imu_eulers =
-      {IMU_BODY_TO_IMU_PHI, IMU_BODY_TO_IMU_THETA, IMU_BODY_TO_IMU_PSI};
+    {IMU_BODY_TO_IMU_PHI, IMU_BODY_TO_IMU_THETA, IMU_BODY_TO_IMU_PSI};
     orientationSetEulers_f(&imu.body_to_imu, &body_to_imu_eulers);
 #if USE_IMU_FLOAT
     orientationSetEulers_f(&imuf.body_to_imu, &body_to_imu_eulers);

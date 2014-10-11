@@ -47,7 +47,8 @@
 #include "subsystems/datalink/datalink.h"
 
 
-void sim_use_gps_pos(double lat, double lon, double alt, double course, double gspeed, double climb, double time);
+void sim_use_gps_pos(double lat, double lon, double alt, double course, double gspeed, double climb,
+                     double time);
 void sim_update_sv(void);
 
 void set_ir(double roll, double pitch);

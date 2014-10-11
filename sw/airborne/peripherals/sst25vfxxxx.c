@@ -31,7 +31,8 @@
 /**
  * Initializing the sst25vfxxxx chip
  */
-void sst25vfxxxx_init(struct SST25VFxxxx* sst, struct spi_periph* spi_p, const uint8_t slave_idx, SPICallback spi_cb)
+void sst25vfxxxx_init(struct SST25VFxxxx* sst, struct spi_periph* spi_p, const uint8_t slave_idx,
+                      SPICallback spi_cb)
 {
   /* Set spi_peripheral and start flash address */
   sst->spi_p = spi_p;

@@ -50,41 +50,42 @@ const clock_scale_t hse_25mhz_3v3_168mhz = { /* 168MHz */
   .ppre1 = RCC_CFGR_PPRE_DIV_4,
   .ppre2 = RCC_CFGR_PPRE_DIV_2,
   .flash_config = FLASH_ACR_ICE | FLASH_ACR_DCE |
-                 FLASH_ACR_LATENCY_5WS,
+  FLASH_ACR_LATENCY_5WS,
   .apb1_frequency = 42000000,
   .apb2_frequency = 84000000,
 };
 #endif
 
-void mcu_arch_init(void) {
+void mcu_arch_init(void)
+{
 #if LUFTBOOT
-PRINT_CONFIG_MSG("We are running luftboot, the interrupt vector is being relocated.")
+  PRINT_CONFIG_MSG("We are running luftboot, the interrupt vector is being relocated.")
   SCB_VTOR = 0x00002000;
 #endif
 #if EXT_CLK == 8000000
 #if defined(STM32F1)
-PRINT_CONFIG_MSG("Using 8MHz external clock to PLL it to 72MHz.")
+  PRINT_CONFIG_MSG("Using 8MHz external clock to PLL it to 72MHz.")
   rcc_clock_setup_in_hse_8mhz_out_72mhz();
 #elif defined(STM32F4)
-PRINT_CONFIG_MSG("Using 8MHz external clock to PLL it to 168MHz.")
+  PRINT_CONFIG_MSG("Using 8MHz external clock to PLL it to 168MHz.")
   rcc_clock_setup_hse_3v3(&hse_8mhz_3v3[CLOCK_3V3_168MHZ]);
 #endif
 #elif EXT_CLK == 12000000
 #if defined(STM32F1)
-PRINT_CONFIG_MSG("Using 12MHz external clock to PLL it to 72MHz.")
+  PRINT_CONFIG_MSG("Using 12MHz external clock to PLL it to 72MHz.")
   rcc_clock_setup_in_hse_12mhz_out_72mhz();
 #elif defined(STM32F4)
-PRINT_CONFIG_MSG("Using 12MHz external clock to PLL it to 168MHz.")
+  PRINT_CONFIG_MSG("Using 12MHz external clock to PLL it to 168MHz.")
   rcc_clock_setup_hse_3v3(&hse_12mhz_3v3[CLOCK_3V3_168MHZ]);
 #endif
 #elif EXT_CLK == 16000000
 #if defined(STM32F4)
-PRINT_CONFIG_MSG("Using 16MHz external clock to PLL it to 168MHz.")
+  PRINT_CONFIG_MSG("Using 16MHz external clock to PLL it to 168MHz.")
   rcc_clock_setup_hse_3v3(&hse_16mhz_3v3[CLOCK_3V3_168MHZ]);
 #endif
 #elif EXT_CLK == 25000000
 #if defined(STM32F4)
-PRINT_CONFIG_MSG("Using 25MHz external clock to PLL it to 168MHz.")
+  PRINT_CONFIG_MSG("Using 25MHz external clock to PLL it to 168MHz.")
   rcc_clock_setup_hse_3v3(&hse_25mhz_3v3_168mhz);
 #endif
 #else
@@ -102,11 +103,11 @@ PRINT_CONFIG_MSG("Using 25MHz external clock to PLL it to 168MHz.")
 }
 
 #if defined(STM32F1)
-#define RCC_CFGR_PPRE2_SHIFT			11
-#define RCC_CFGR_PPRE2				(7 << RCC_CFGR_PPRE2_SHIFT)
+#define RCC_CFGR_PPRE2_SHIFT      11
+#define RCC_CFGR_PPRE2        (7 << RCC_CFGR_PPRE2_SHIFT)
 
-#define RCC_CFGR_PPRE1_SHIFT			8
-#define RCC_CFGR_PPRE1				(7 << RCC_CFGR_PPRE1_SHIFT)
+#define RCC_CFGR_PPRE1_SHIFT      8
+#define RCC_CFGR_PPRE1        (7 << RCC_CFGR_PPRE1_SHIFT)
 
 static inline uint32_t rcc_get_ppre1(void)
 {
@@ -120,12 +121,12 @@ static inline uint32_t rcc_get_ppre2(void)
 #elif defined(STM32F4)
 static inline uint32_t rcc_get_ppre1(void)
 {
-  return RCC_CFGR &((1 << 10) | (1 << 11) | (1 << 12));
+  return RCC_CFGR & ((1 << 10) | (1 << 11) | (1 << 12));
 }
 
 static inline uint32_t rcc_get_ppre2(void)
 {
-  return RCC_CFGR &((1 << 13) | (1 << 14) | (1 << 15));
+  return RCC_CFGR & ((1 << 13) | (1 << 14) | (1 << 15));
 }
 #endif
 
@@ -139,7 +140,7 @@ static inline uint32_t rcc_get_ppre2(void)
 uint32_t timer_get_frequency(uint32_t timer_peripheral)
 {
   switch (timer_peripheral) {
-    // Timers on APB1
+      // Timers on APB1
     case TIM1:
     case TIM8:
 #ifdef TIM9
@@ -153,11 +154,13 @@ uint32_t timer_get_frequency(uint32_t timer_peripheral)
 #endif
       if (!rcc_get_ppre2())
         // no APB2 prescaler
+      {
         return rcc_ppre2_frequency;
-      else
+      } else {
         return rcc_ppre2_frequency * 2;
+      }
 
-    // timers on APB2
+      // timers on APB2
     case TIM2:
     case TIM3:
     case TIM4:
@@ -175,9 +178,11 @@ uint32_t timer_get_frequency(uint32_t timer_peripheral)
 #endif
       if (!rcc_get_ppre1())
         // no APB2 prescaler
+      {
         return rcc_ppre1_frequency;
-      else
+      } else {
         return rcc_ppre1_frequency * 2;
+      }
     default:
       // other timers currently not supported
       break;

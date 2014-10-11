@@ -36,24 +36,24 @@ extern void memory_send_wren(void);
 extern void memory_send_wrdi(void);
 extern void memory_read_status_1(void);
 extern void memory_read_values(uint32_t mem_addr, uint8_t size);
-extern void memory_write_values(uint32_t mem_addr, uint8_t *values, uint8_t size);
+extern void memory_write_values(uint32_t mem_addr, uint8_t* values, uint8_t size);
 extern void memory_completly_erase(void);
 extern void memory_erase_4k(uint32_t mem_addr);
 
 //Mid low level functions, abstracting the low SPI layer
-extern uint8_t ml_write_values_to_memory(uint32_t mem_addr, uint8_t *values, uint8_t size);
+extern uint8_t ml_write_values_to_memory(uint32_t mem_addr, uint8_t* values, uint8_t size);
 extern uint8_t ml_erase_4k_on_memory(uint32_t mem_addr);
 extern uint8_t ml_erase_completely_memory(void);
 extern void ml_read_log_in_memory(void);
 
 //Mid high level function : memory management
-extern uint8_t append_values_to_memory(uint8_t *values, uint8_t size);
-extern uint8_t send_buffer_to_memory(uint8_t *buffer, uint8_t *size);
+extern uint8_t append_values_to_memory(uint8_t* values, uint8_t size);
+extern uint8_t send_buffer_to_memory(uint8_t* buffer, uint8_t* size);
 extern void send_buffer_to_uart(void);
 
 //High level function : local buffer management
 extern void add_byte_to_buffer(uint8_t value);
-extern void add_array_to_buffer(uint8_t *array, uint8_t size);
+extern void add_array_to_buffer(uint8_t* array, uint8_t size);
 extern uint8_t run_memory_management(void);
 extern uint8_t are_buffers_empty(void);
 
@@ -68,7 +68,8 @@ extern void high_speed_logger_direct_memory_init(void);
 extern void high_speed_logger_direct_memory_periodic(void);
 
 //Other functions
-extern uint8_t is_sequence_in_array(uint8_t *array, uint8_t array_size, uint8_t *sequence, uint8_t sequence_size);
+extern uint8_t is_sequence_in_array(uint8_t* array, uint8_t array_size, uint8_t* sequence,
+                                    uint8_t sequence_size);
 
 extern void high_speed_logger_direct_memory_handler(uint8_t val);
 

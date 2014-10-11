@@ -27,7 +27,7 @@
 
 can_rx_callback_t can_rx_callback;
 
-void _can_run_rx_callback(uint32_t id, uint8_t *buf, uint8_t len);
+void _can_run_rx_callback(uint32_t id, uint8_t* buf, uint8_t len);
 
 void ppz_can_init(can_rx_callback_t callback)
 {
@@ -35,13 +35,14 @@ void ppz_can_init(can_rx_callback_t callback)
   can_hw_init();
 }
 
-int ppz_can_transmit(uint32_t id, const uint8_t *buf, uint8_t len)
+int ppz_can_transmit(uint32_t id, const uint8_t* buf, uint8_t len)
 {
   return can_hw_transmit(id, buf, len);
 }
 
-void _can_run_rx_callback(uint32_t id, uint8_t *buf, uint8_t len)
+void _can_run_rx_callback(uint32_t id, uint8_t* buf, uint8_t len)
 {
-  if(can_rx_callback)
+  if (can_rx_callback) {
     can_rx_callback(id, buf, len);
+  }
 }

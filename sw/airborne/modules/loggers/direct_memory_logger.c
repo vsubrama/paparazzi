@@ -32,7 +32,8 @@
 
 struct DirectMemoryLogger dml;
 static void direct_memory_spi_cb(struct spi_transaction* trans);
-static int32_t seq_in_array(uint8_t* array, uint16_t array_size, uint8_t* sequence, uint16_t sequence_size);
+static int32_t seq_in_array(uint8_t* array, uint16_t array_size, uint8_t* sequence,
+                            uint16_t sequence_size);
 
 // Different sequences
 static uint8_t start_log_sequence[6] = {0xAA, 0x55, 0xFF, 0x00, 0x55, 0xAA};
@@ -55,7 +56,8 @@ struct LogStruct {
 static struct LogStruct log_struct;
 static uint32_t dm_counter = 0;
 
-static int32_t seq_in_array(uint8_t* array, uint16_t array_size, uint8_t* sequence, uint16_t sequence_size)
+static int32_t seq_in_array(uint8_t* array, uint16_t array_size, uint8_t* sequence,
+                            uint16_t sequence_size)
 {
   uint16_t i;
   static uint16_t current_sequence_id = 0;

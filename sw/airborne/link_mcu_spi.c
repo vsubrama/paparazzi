@@ -39,17 +39,18 @@ static uint16_t crc = 0;
 #define LINK_MCU_FRAME_LENGTH sizeof(struct link_mcu_msg)
 
 #define ComputeChecksum(_buf) { \
-  uint8_t i; \
-  crc = CRC_INIT; \
-  for(i = 0; i < PAYLOAD_LENGTH; i++) { \
-    uint8_t _byte = ((uint8_t*)&_buf)[i]; \
-    crc = CrcUpdate(crc, _byte); \
-  } \
-}
+    uint8_t i; \
+    crc = CRC_INIT; \
+    for(i = 0; i < PAYLOAD_LENGTH; i++) { \
+      uint8_t _byte = ((uint8_t*)&_buf)[i]; \
+      crc = CrcUpdate(crc, _byte); \
+    } \
+  }
 
 #ifdef FBW
 
-void link_mcu_init(void) {
+void link_mcu_init(void)
+{
 
   link_mcu_trans.cpol = SPICpolIdleLow;
   link_mcu_trans.cpha = SPICphaEdge2;
@@ -61,7 +62,8 @@ void link_mcu_init(void) {
   spi_slave_register(&(LINK_MCU_SPI_DEV), &link_mcu_trans);
 }
 
-void link_mcu_restart(void) {
+void link_mcu_restart(void)
+{
   ComputeChecksum(link_mcu_from_fbw_msg);
   link_mcu_from_fbw_msg.checksum = crc;
 
@@ -69,7 +71,8 @@ void link_mcu_restart(void) {
   spi_slave_wait(&(LINK_MCU_SPI_DEV));
 }
 
-void link_mcu_event_task( void ) {
+void link_mcu_event_task(void)
+{
   if (link_mcu_trans.status == SPITransSuccess) {
     /* Got a message on SPI. */
     link_mcu_trans.status = SPITransDone;
@@ -77,10 +80,11 @@ void link_mcu_event_task( void ) {
     /* A message has been received */
     ComputeChecksum(link_mcu_from_ap_msg);
     link_mcu_received = TRUE;
-    if (link_mcu_from_ap_msg.checksum == crc)
+    if (link_mcu_from_ap_msg.checksum == crc) {
       inter_mcu_received_ap = TRUE;
-    else
+    } else {
       fbw_state->nb_err++;
+    }
   }
   if (link_mcu_trans.status == SPITransFailed) {
     link_mcu_trans.status = SPITransDone;
@@ -106,14 +110,16 @@ uint8_t link_mcu_fbw_nb_err;
 #if PERIODIC_TELEMETRY
 #include "subsystems/datalink/telemetry.h"
 
-static void send_debug_link(void) {
+static void send_debug_link(void)
+{
   uint8_t mcu1_ppm_cpt_foo = 0; //FIXME
   DOWNLINK_SEND_DEBUG_MCU_LINK(DefaultChannel, DefaultDevice,
-      &link_mcu_nb_err, &link_mcu_fbw_nb_err, &mcu1_ppm_cpt_foo);
+                               &link_mcu_nb_err, &link_mcu_fbw_nb_err, &mcu1_ppm_cpt_foo);
 }
 #endif
 
-void link_mcu_init(void) {
+void link_mcu_init(void)
+{
   link_mcu_nb_err = 0;
 
   link_mcu_trans.cpol = SPICpolIdleLow;
@@ -131,23 +137,26 @@ void link_mcu_init(void) {
 #endif
 }
 
-void link_mcu_send(void) {
+void link_mcu_send(void)
+{
 
   ComputeChecksum(link_mcu_from_ap_msg);
   link_mcu_from_ap_msg.checksum = crc;
   spi_submit(&(LINK_MCU_SPI_DEV), &link_mcu_trans);
 }
 
-void link_mcu_event_task( void ) {
+void link_mcu_event_task(void)
+{
   if (link_mcu_trans.status == SPITransSuccess) {
     /* Got a message on SPI. */
     link_mcu_trans.status = SPITransDone;
     /* A message has been received */
     ComputeChecksum(link_mcu_from_fbw_msg);
-    if (link_mcu_from_fbw_msg.checksum == crc)
+    if (link_mcu_from_fbw_msg.checksum == crc) {
       inter_mcu_received_fbw = TRUE;
-    else
+    } else {
       link_mcu_nb_err++;
+    }
   }
   if (link_mcu_trans.status == SPITransFailed) {
     link_mcu_trans.status = SPITransDone;

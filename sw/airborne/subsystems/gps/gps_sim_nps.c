@@ -34,7 +34,8 @@
 bool_t gps_available;
 bool_t gps_has_fix;
 
-void  gps_feed_value() {
+void  gps_feed_value()
+{
   // FIXME, set proper time instead of hardcoded to May 2014
   gps.week = 1794;
   gps.tow = fdm.time * 1000;
@@ -62,7 +63,8 @@ void  gps_feed_value() {
 
   /* horizontal and 3d ground speed in cm/s */
   gps.gspeed = sqrt(ned_vel_d.x * ned_vel_d.x + ned_vel_d.y * ned_vel_d.y) * 100;
-  gps.speed_3d = sqrt(ned_vel_d.x * ned_vel_d.x + ned_vel_d.y * ned_vel_d.y + ned_vel_d.z * ned_vel_d.z) * 100;
+  gps.speed_3d = sqrt(ned_vel_d.x * ned_vel_d.x + ned_vel_d.y * ned_vel_d.y + ned_vel_d.z *
+                      ned_vel_d.z) * 100;
 
   /* ground course in radians * 1e7 */
   gps.course = atan2(ned_vel_d.y, ned_vel_d.x) * 1e7;
@@ -76,20 +78,22 @@ void  gps_feed_value() {
   /* convert to utm */
   utm_of_lla_f(&utm_f, &lla_f);
   /* copy results of utm conversion */
-  gps.utm_pos.east = utm_f.east*100;
-  gps.utm_pos.north = utm_f.north*100;
+  gps.utm_pos.east = utm_f.east * 100;
+  gps.utm_pos.north = utm_f.north * 100;
   gps.utm_pos.alt = gps.lla_pos.alt;
   gps.utm_pos.zone = nav_utm_zone0;
 #endif
 
-  if (gps_has_fix)
+  if (gps_has_fix) {
     gps.fix = GPS_FIX_3D;
-  else
+  } else {
     gps.fix = GPS_FIX_NONE;
+  }
   gps_available = TRUE;
 }
 
-void gps_impl_init() {
+void gps_impl_init()
+{
   gps_available = FALSE;
   gps_has_fix = TRUE;
 }

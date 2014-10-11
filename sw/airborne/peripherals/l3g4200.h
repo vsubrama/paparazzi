@@ -65,7 +65,7 @@ enum L3g4200ConfStatus {
 };
 
 struct L3g4200 {
-  struct i2c_periph *i2c_p;
+  struct i2c_periph* i2c_p;
   struct i2c_transaction i2c_trans;
   bool_t initialized;                 ///< config done flag
   enum L3g4200ConfStatus init_status; ///< init status
@@ -78,18 +78,20 @@ struct L3g4200 {
 };
 
 // Functions
-extern void l3g4200_init(struct L3g4200 *l3g, struct i2c_periph *i2c_p, uint8_t i2c_address);
-extern void l3g4200_set_default_config(struct L3g4200Config *conf);
-extern void l3g4200_start_configure(struct L3g4200 *l3g);
-extern void l3g4200_read(struct L3g4200 *l3g);
-extern void l3g4200_event(struct L3g4200 *l3g);
+extern void l3g4200_init(struct L3g4200* l3g, struct i2c_periph* i2c_p, uint8_t i2c_address);
+extern void l3g4200_set_default_config(struct L3g4200Config* conf);
+extern void l3g4200_start_configure(struct L3g4200* l3g);
+extern void l3g4200_read(struct L3g4200* l3g);
+extern void l3g4200_event(struct L3g4200* l3g);
 
 /// convenience function: read or start configuration if not already initialized
-static inline void l3g4200_periodic(struct L3g4200 *l3g) {
-  if (l3g->initialized)
+static inline void l3g4200_periodic(struct L3g4200* l3g)
+{
+  if (l3g->initialized) {
     l3g4200_read(l3g);
-  else
+  } else {
     l3g4200_start_configure(l3g);
+  }
 }
 
 #endif // L3G4200_H

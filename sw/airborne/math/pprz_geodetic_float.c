@@ -226,8 +226,9 @@ void lla_of_ecef_f(struct LlaCoor_f* out, struct EcefCoor_f* in)
   const float s1 = 1 + s + 1 / s;
   const float P = F / (3 * s1 * s1 * G * G);
   const float Q = sqrtf(1 + 2 * e2 * e2 * P);
-  const float ro = -(e2 * P * r) / (1 + Q) + sqrtf((a * a / 2) * (1 + 1 / Q) - ((1 - e2) * P * z2) / (Q *
-                   (1 + Q)) - P * r2 / 2);
+  const float ro = -(e2 * P * r) / (1 + Q) + sqrtf((a * a / 2) * (1 + 1 / Q) - ((1 - e2) * P * z2) /
+                   (Q *
+                    (1 + Q)) - P * r2 / 2);
   const float tmp = (r - e2 * ro) * (r - e2 * ro);
   const float U = sqrtf(tmp + z2);
   const float V = sqrtf(tmp + (1 - e2) * z2);

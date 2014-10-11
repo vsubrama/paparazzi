@@ -30,13 +30,14 @@
 struct uart_periph uart0;
 
 #if PERIODIC_TELEMETRY
-static void send_uart0_err(void) {
+static void send_uart0_err(void)
+{
   uint16_t ore    = uart0.ore;
   uint16_t ne_err = uart0.ne_err;
   uint16_t fe_err = uart0.fe_err;
   const uint8_t _bus0 = 0;
   DOWNLINK_SEND_UART_ERRORS(DefaultChannel, DefaultDevice,
-      &ore, &ne_err, &fe_err, &_bus0);
+                            &ore, &ne_err, &fe_err, &_bus0);
 }
 #endif
 
@@ -46,13 +47,14 @@ static void send_uart0_err(void) {
 struct uart_periph uart1;
 
 #if PERIODIC_TELEMETRY
-static void send_uart1_err(void) {
+static void send_uart1_err(void)
+{
   uint16_t ore    = uart1.ore;
   uint16_t ne_err = uart1.ne_err;
   uint16_t fe_err = uart1.fe_err;
   const uint8_t _bus1 = 1;
   DOWNLINK_SEND_UART_ERRORS(DefaultChannel, DefaultDevice,
-      &ore, &ne_err, &fe_err, &_bus1);
+                            &ore, &ne_err, &fe_err, &_bus1);
 }
 #endif
 
@@ -62,13 +64,14 @@ static void send_uart1_err(void) {
 struct uart_periph uart2;
 
 #if PERIODIC_TELEMETRY
-static void send_uart2_err(void) {
+static void send_uart2_err(void)
+{
   uint16_t ore    = uart2.ore;
   uint16_t ne_err = uart2.ne_err;
   uint16_t fe_err = uart2.fe_err;
   const uint8_t _bus2 = 2;
   DOWNLINK_SEND_UART_ERRORS(DefaultChannel, DefaultDevice,
-      &ore, &ne_err, &fe_err, &_bus2);
+                            &ore, &ne_err, &fe_err, &_bus2);
 }
 #endif
 
@@ -78,13 +81,14 @@ static void send_uart2_err(void) {
 struct uart_periph uart3;
 
 #if PERIODIC_TELEMETRY
-static void send_uart3_err(void) {
+static void send_uart3_err(void)
+{
   uint16_t ore    = uart3.ore;
   uint16_t ne_err = uart3.ne_err;
   uint16_t fe_err = uart3.fe_err;
   const uint8_t _bus3 = 3;
   DOWNLINK_SEND_UART_ERRORS(DefaultChannel, DefaultDevice,
-      &ore, &ne_err, &fe_err, &_bus3);
+                            &ore, &ne_err, &fe_err, &_bus3);
 }
 #endif
 
@@ -94,13 +98,14 @@ static void send_uart3_err(void) {
 struct uart_periph uart4;
 
 #if PERIODIC_TELEMETRY
-static void send_uart4_err(void) {
+static void send_uart4_err(void)
+{
   uint16_t ore    = uart4.ore;
   uint16_t ne_err = uart4.ne_err;
   uint16_t fe_err = uart4.fe_err;
   const uint8_t _bus4 = 4;
   DOWNLINK_SEND_UART_ERRORS(DefaultChannel, DefaultDevice,
-      &ore, &ne_err, &fe_err, &_bus4);
+                            &ore, &ne_err, &fe_err, &_bus4);
 }
 #endif
 
@@ -110,13 +115,14 @@ static void send_uart4_err(void) {
 struct uart_periph uart5;
 
 #if PERIODIC_TELEMETRY
-static void send_uart5_err(void) {
+static void send_uart5_err(void)
+{
   uint16_t ore    = uart5.ore;
   uint16_t ne_err = uart5.ne_err;
   uint16_t fe_err = uart5.fe_err;
   const uint8_t _bus5 = 5;
   DOWNLINK_SEND_UART_ERRORS(DefaultChannel, DefaultDevice,
-      &ore, &ne_err, &fe_err, &_bus5);
+                            &ore, &ne_err, &fe_err, &_bus5);
 }
 #endif
 
@@ -126,20 +132,22 @@ static void send_uart5_err(void) {
 struct uart_periph uart6;
 
 #if PERIODIC_TELEMETRY
-static void send_uart6_err(void) {
+static void send_uart6_err(void)
+{
   const uint8_t _bus6 = 6;
   uint16_t ore    = uart6.ore;
   uint16_t ne_err = uart6.ne_err;
   uint16_t fe_err = uart6.fe_err;
   DOWNLINK_SEND_UART_ERRORS(DefaultChannel, DefaultDevice,
-      &ore, &ne_err, &fe_err, &_bus6);
+                            &ore, &ne_err, &fe_err, &_bus6);
 }
 #endif
 
 #endif
 
 #if PERIODIC_TELEMETRY
-static void send_uart_err(void) {
+static void send_uart_err(void)
+{
   static uint8_t uart_nb_cnt = 0;
   switch (uart_nb_cnt) {
 #if USE_UART0
@@ -173,12 +181,14 @@ static void send_uart_err(void) {
     default: break;
   }
   uart_nb_cnt++;
-  if (uart_nb_cnt == 7)
+  if (uart_nb_cnt == 7) {
     uart_nb_cnt = 0;
+  }
 }
 #endif
 
-void uart_periph_init(struct uart_periph* p) {
+void uart_periph_init(struct uart_periph* p)
+{
   p->rx_insert_idx = 0;
   p->rx_extract_idx = 0;
   p->tx_insert_idx = 0;
@@ -194,14 +204,17 @@ void uart_periph_init(struct uart_periph* p) {
 #endif
 }
 
-bool_t uart_check_free_space(struct uart_periph* p, uint8_t len) {
+bool_t uart_check_free_space(struct uart_periph* p, uint8_t len)
+{
   int16_t space = p->tx_extract_idx - p->tx_insert_idx;
-  if (space <= 0)
+  if (space <= 0) {
     space += UART_TX_BUFFER_SIZE;
+  }
   return (uint16_t)(space - 1) >= len;
 }
 
-uint8_t uart_getch(struct uart_periph* p) {
+uint8_t uart_getch(struct uart_periph* p)
+{
   uint8_t ret = p->rx_buf[p->rx_extract_idx];
   p->rx_extract_idx = (p->rx_extract_idx + 1) % UART_RX_BUFFER_SIZE;
   return ret;

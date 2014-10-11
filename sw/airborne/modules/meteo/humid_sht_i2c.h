@@ -9,7 +9,7 @@
 #define SHT2_TRIGGER_HUMID       0xF5
 #define SHT2_SOFT_RESET          0xFE
 
-enum sht_stat_i2c{
+enum sht_stat_i2c {
   SHT2_UNINIT,
   SHT2_IDLE,
   SHT2_RESET,

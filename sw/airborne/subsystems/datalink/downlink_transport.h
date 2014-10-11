@@ -45,20 +45,19 @@ enum DownlinkDataType {
   DL_TYPE_TIMESTAMP,
 };
 
-struct DownlinkTransport
-{
-  uint8_t (*SizeOf)(void *impl, uint8_t size);
-  int (*CheckFreeSpace)(void *impl, uint8_t size);
+struct DownlinkTransport {
+  uint8_t (*SizeOf)(void* impl, uint8_t size);
+  int (*CheckFreeSpace)(void* impl, uint8_t size);
 
-  void (*PutBytes)(void *impl, enum DownlinkDataType data_type, uint8_t len, const void *bytes);
+  void (*PutBytes)(void* impl, enum DownlinkDataType data_type, uint8_t len, const void* bytes);
 
-  void (*StartMessage)(void *impl, char *name, uint8_t msg_id, uint8_t payload_len);
-  void (*EndMessage)(void *impl);
-  void (*Overrun)(void *impl);
-  void (*CountBytes)(void *impl, uint8_t len);
-  void (*Periodic)(void *impl);
+  void (*StartMessage)(void* impl, char* name, uint8_t msg_id, uint8_t payload_len);
+  void (*EndMessage)(void* impl);
+  void (*Overrun)(void* impl);
+  void (*CountBytes)(void* impl, uint8_t len);
+  void (*Periodic)(void* impl);
 
-  void *impl;
+  void* impl;
 };
 
 #endif /* DOWNLINK_TRANSPORT_H */

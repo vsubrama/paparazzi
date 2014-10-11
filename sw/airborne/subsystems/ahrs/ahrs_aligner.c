@@ -45,21 +45,23 @@ static uint32_t samples_idx;
 #if PERIODIC_TELEMETRY
 #include "subsystems/datalink/telemetry.h"
 
-static void send_aligner(void) {
+static void send_aligner(void)
+{
   DOWNLINK_SEND_FILTER_ALIGNER(DefaultChannel, DefaultDevice,
-      &ahrs_aligner.lp_gyro.p,
-      &ahrs_aligner.lp_gyro.q,
-      &ahrs_aligner.lp_gyro.r,
-      &imu.gyro.p,
-      &imu.gyro.q,
-      &imu.gyro.r,
-      &ahrs_aligner.noise,
-      &ahrs_aligner.low_noise_cnt,
-      &ahrs_aligner.status);
+                               &ahrs_aligner.lp_gyro.p,
+                               &ahrs_aligner.lp_gyro.q,
+                               &ahrs_aligner.lp_gyro.r,
+                               &imu.gyro.p,
+                               &imu.gyro.q,
+                               &imu.gyro.r,
+                               &ahrs_aligner.noise,
+                               &ahrs_aligner.low_noise_cnt,
+                               &ahrs_aligner.status);
 }
 #endif
 
-void ahrs_aligner_init(void) {
+void ahrs_aligner_init(void)
+{
 
   ahrs_aligner.status = AHRS_ALIGNER_RUNNING;
   INT_RATES_ZERO(gyro_sum);
@@ -81,7 +83,8 @@ void ahrs_aligner_init(void) {
 #define LOW_NOISE_TIME          5
 #endif
 
-void ahrs_aligner_run(void) {
+void ahrs_aligner_run(void)
+{
 
   RATES_ADD(gyro_sum,  imu.gyro);
   VECT3_ADD(accel_sum, imu.accel);
@@ -96,15 +99,16 @@ void ahrs_aligner_run(void) {
 
   if (samples_idx >= SAMPLES_NB) {
     int32_t avg_ref_sensor = accel_sum.z;
-    if ( avg_ref_sensor >= 0)
+    if (avg_ref_sensor >= 0) {
       avg_ref_sensor += SAMPLES_NB / 2;
-    else
+    } else {
       avg_ref_sensor -= SAMPLES_NB / 2;
+    }
     avg_ref_sensor /= SAMPLES_NB;
 
     ahrs_aligner.noise = 0;
     int i;
-    for (i=0; i<SAMPLES_NB; i++) {
+    for (i = 0; i < SAMPLES_NB; i++) {
       int32_t diff = ref_sensor_samples[i] - avg_ref_sensor;
       ahrs_aligner.noise += abs(diff);
     }
@@ -118,11 +122,11 @@ void ahrs_aligner_run(void) {
     INT_VECT3_ZERO(mag_sum);
     samples_idx = 0;
 
-    if (ahrs_aligner.noise < LOW_NOISE_THRESHOLD)
+    if (ahrs_aligner.noise < LOW_NOISE_THRESHOLD) {
       ahrs_aligner.low_noise_cnt++;
-    else
-      if ( ahrs_aligner.low_noise_cnt > 0)
-        ahrs_aligner.low_noise_cnt--;
+    } else if (ahrs_aligner.low_noise_cnt > 0) {
+      ahrs_aligner.low_noise_cnt--;
+    }
 
     if (ahrs_aligner.low_noise_cnt > LOW_NOISE_TIME) {
       ahrs_aligner.status = AHRS_ALIGNER_LOCKED;

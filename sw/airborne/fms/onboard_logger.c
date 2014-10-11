@@ -8,7 +8,7 @@ static const char filter_exp[] = "dst port 4242 && udp";
 
 #define MIN_MSG_LENGTH 3
 
-static void got_pprz_message(const u_char *buf, const struct timeval *ts)
+static void got_pprz_message(const u_char* buf, const struct timeval* ts)
 {
   int i = 0;
   u_char length;
@@ -21,52 +21,50 @@ static void got_pprz_message(const u_char *buf, const struct timeval *ts)
 
   length = buf[i];
 
-  for (i = 0; i < length - 3; i++)
-  {
+  for (i = 0; i < length - 3; i++) {
     ck_A += buf[i];
     ck_B += ck_A;
   }
 
-  if (ck_A != buf[length - 3] || ck_B != buf[length -2]) {
+  if (ck_A != buf[length - 3] || ck_B != buf[length - 2]) {
     printf("checksum mismatch\n");
     return;
   }
   // printf("Got pprz msg len %i, ckA %02x, ckB %02x (%02x %02x)\n", length, ck_A, ck_B, buf[length - 3], buf[length - 2]);
   printf("%i.%06i ", (unsigned) ts->tv_sec - start_secs, (unsigned) ts->tv_usec);
-  printf("%d ", (uint32_t) buf[1]); 	   // paparazzi timestamp; see udp_transport.h
-  printf("%i %i ", buf[5], buf[6]);	   // AC_ID MSG_ID
-  for(i = 6; i < length - 3; i++)
-  {
+  printf("%d ", (uint32_t) buf[1]);      // paparazzi timestamp; see udp_transport.h
+  printf("%i %i ", buf[5], buf[6]);    // AC_ID MSG_ID
+  for (i = 6; i < length - 3; i++) {
     printf("%02x ", buf[i]);
   }
 
   printf("\n");
 }
 
-static void got_packet (u_char *args, const struct pcap_pkthdr *header,
-  const u_char *packet)
+static void got_packet(u_char* args, const struct pcap_pkthdr* header,
+                       const u_char* packet)
 {
-  const u_char *payload;
-  const struct ethernet_header *ethernet;
-  const struct ip_header *ip;
-  const struct udp_header *udp;
+  const u_char* payload;
+  const struct ethernet_header* ethernet;
+  const struct ip_header* ip;
+  const struct udp_header* udp;
   unsigned int msg_length;
 
   u_short udp_length;
   u_int size_ip;
   int i;
 
-  ethernet = (struct ethernet_header *) packet;
-  ip = (struct ip_header *) (packet + ETHERNET_HEADER_LENGTH);
+  ethernet = (struct ethernet_header*) packet;
+  ip = (struct ip_header*)(packet + ETHERNET_HEADER_LENGTH);
   size_ip = IP_HL_WORDS(ip) * 4;
   if (size_ip < 20) {
     printf("invalid IP hdr length: %u bytes\n", size_ip);
     return;
   }
 
-  udp = (struct udp_header *) ((u_char *)ip + size_ip);
+  udp = (struct udp_header*)((u_char*)ip + size_ip);
 
-  payload = (u_char *) ((u_char *)udp + sizeof(struct udp_header));
+  payload = (u_char*)((u_char*)udp + sizeof(struct udp_header));
 
   udp_length = htons(udp->uh_len);
   //printf ("Got udp packet length %i\n", udp_length);
@@ -88,7 +86,7 @@ static void got_packet (u_char *args, const struct pcap_pkthdr *header,
   }
 }
 
-static int init_capture(char *device, pcap_t **handle)
+static int init_capture(char* device, pcap_t** handle)
 {
   char errbuf[PCAP_ERRBUF_SIZE];
 
@@ -122,14 +120,14 @@ static int init_capture(char *device, pcap_t **handle)
   return 0;
 }
 
-static void print_usage(char *appname)
+static void print_usage(char* appname)
 {
   printf("Usage: %s INTERFACE\n", appname);
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-  pcap_t *handle;
+  pcap_t* handle;
 
   if (argc != 2) {
     print_usage(argv[0]);

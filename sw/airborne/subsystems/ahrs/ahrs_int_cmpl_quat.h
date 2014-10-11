@@ -112,12 +112,14 @@ void ahrs_realign_heading(int32_t heading);
 /// update pre-computed inv_kp and inv_ki gains from acc_omega and acc_zeta
 extern void ahrs_set_accel_gains(void);
 
-static inline void ahrs_int_cmpl_quat_SetAccelOmega(float omega) {
+static inline void ahrs_int_cmpl_quat_SetAccelOmega(float omega)
+{
   ahrs_impl.accel_omega = omega;
   ahrs_set_accel_gains();
 }
 
-static inline void ahrs_int_cmpl_quat_SetAccelZeta(float zeta) {
+static inline void ahrs_int_cmpl_quat_SetAccelZeta(float zeta)
+{
   ahrs_impl.accel_zeta = zeta;
   ahrs_set_accel_gains();
 }
@@ -125,12 +127,14 @@ static inline void ahrs_int_cmpl_quat_SetAccelZeta(float zeta) {
 /// update pre-computed kp and ki gains from mag_omega and mag_zeta
 extern void ahrs_set_mag_gains(void);
 
-static inline void ahrs_int_cmpl_quat_SetMagOmega(float omega) {
+static inline void ahrs_int_cmpl_quat_SetMagOmega(float omega)
+{
   ahrs_impl.mag_omega = omega;
   ahrs_set_mag_gains();
 }
 
-static inline void ahrs_int_cmpl_quat_SetMagZeta(float zeta) {
+static inline void ahrs_int_cmpl_quat_SetMagZeta(float zeta)
+{
   ahrs_impl.mag_zeta = zeta;
   ahrs_set_mag_gains();
 }

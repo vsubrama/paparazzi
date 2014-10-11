@@ -79,7 +79,8 @@ float pbn_airspeed;
 float airspeed_filter;
 uint16_t startup_delay;
 
-void pbn_init( void ) {
+void pbn_init(void)
+{
   startup_delay = PBN_START_DELAY;
   altitude_offset = 0;
   airspeed_offset = 0;
@@ -93,9 +94,10 @@ void pbn_init( void ) {
 }
 
 
-void pbn_periodic( void ) {
+void pbn_periodic(void)
+{
 
-  if ( startup_delay > 0 ) {
+  if (startup_delay > 0) {
     --startup_delay;
     return;
   }
@@ -106,7 +108,8 @@ void pbn_periodic( void ) {
 
 }
 
-void pbn_read_event( void ) {
+void pbn_read_event(void)
+{
 
   pbn_trans.status = I2CTransDone;
 
@@ -117,8 +120,7 @@ void pbn_read_event( void ) {
   // Consider 0 as a wrong value
   if (airspeed_adc == 0 || altitude_adc == 0) {
     data_valid = FALSE;
-  }
-  else {
+  } else {
     data_valid = TRUE;
 
     if (offset_cnt > 0) {
@@ -136,18 +138,17 @@ void pbn_read_event( void ) {
 
       // decrease init counter
       --offset_cnt;
-    }
-    else {
+    } else {
       // Compute pressure
       float pressure = PBN_ALTITUDE_SCALE * (float) altitude_adc + PBN_PRESSURE_OFFSET;
       AbiSendMsgBARO_ABS(BARO_PBN_SENDER_ID, &pressure);
       // Compute airspeed and altitude
       //pbn_airspeed = (-4.45 + sqrtf(19.84-0.57*(float)(airspeed_offset-airspeed_adc)))/0.28;
-      uint16_t diff = Max(airspeed_adc-airspeed_offset, 0);
+      uint16_t diff = Max(airspeed_adc - airspeed_offset, 0);
       float tmp_airspeed = sqrtf((float)diff * PBN_AIRSPEED_SCALE);
-      pbn_altitude = PBN_ALTITUDE_SCALE*(float)(altitude_adc-altitude_offset);
+      pbn_altitude = PBN_ALTITUDE_SCALE * (float)(altitude_adc - altitude_offset);
 
-      pbn_airspeed = (airspeed_filter*pbn_airspeed + tmp_airspeed) / (airspeed_filter + 1.);
+      pbn_airspeed = (airspeed_filter * pbn_airspeed + tmp_airspeed) / (airspeed_filter + 1.);
 #if USE_AIRSPEED
       stateSetAirspeed_f(&pbn_airspeed);
 #endif

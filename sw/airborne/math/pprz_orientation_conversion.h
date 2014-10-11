@@ -154,7 +154,8 @@ static inline void orientationSetRMat_i(struct OrientationReps* orientation, str
 }
 
 /// Set vehicle body attitude from euler angles (int).
-static inline void orientationSetEulers_i(struct OrientationReps* orientation, struct Int32Eulers* eulers)
+static inline void orientationSetEulers_i(struct OrientationReps* orientation,
+    struct Int32Eulers* eulers)
 {
   EULERS_COPY(orientation->eulers_i, *eulers);
   /* clear bits for all attitude representations and only set the new one */
@@ -178,7 +179,8 @@ static inline void orientationSetRMat_f(struct OrientationReps* orientation, str
 }
 
 /// Set vehicle body attitude from euler angles (float).
-static inline void orientationSetEulers_f(struct OrientationReps* orientation, struct FloatEulers* eulers)
+static inline void orientationSetEulers_f(struct OrientationReps* orientation,
+    struct FloatEulers* eulers)
 {
   EULERS_COPY(orientation->eulers_f, *eulers);
   /* clear bits for all attitude representations and only set the new one */

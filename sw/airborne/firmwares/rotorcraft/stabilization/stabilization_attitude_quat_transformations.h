@@ -29,10 +29,10 @@
 #include "math/pprz_algebra_float.h"
 #include "math/pprz_algebra_int.h"
 
-extern void quat_from_rpy_cmd_i(struct Int32Quat *quat, struct Int32Eulers *rpy);
-extern void quat_from_rpy_cmd_f(struct FloatQuat *quat, struct FloatEulers *rpy);
+extern void quat_from_rpy_cmd_i(struct Int32Quat* quat, struct Int32Eulers* rpy);
+extern void quat_from_rpy_cmd_f(struct FloatQuat* quat, struct FloatEulers* rpy);
 
-extern void quat_from_earth_cmd_i(struct Int32Quat *quat, struct Int32Vect2 *cmd, int32_t heading);
-extern void quat_from_earth_cmd_f(struct FloatQuat *quat, struct FloatVect2 *cmd, float heading);
+extern void quat_from_earth_cmd_i(struct Int32Quat* quat, struct Int32Vect2* cmd, int32_t heading);
+extern void quat_from_earth_cmd_f(struct FloatQuat* quat, struct FloatVect2* cmd, float heading);
 
 #endif

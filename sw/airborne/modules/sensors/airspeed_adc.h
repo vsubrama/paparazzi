@@ -27,7 +27,7 @@
 
 extern uint16_t adc_airspeed_val;
 
-void airspeed_adc_init( void );
-void airspeed_adc_update( void );
+void airspeed_adc_init(void);
+void airspeed_adc_update(void);
 
 #endif /* AIRSPEED_ADC_H */

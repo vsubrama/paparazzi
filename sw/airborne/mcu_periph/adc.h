@@ -70,6 +70,6 @@ struct adc_buf {
 void adc_buf_channel(uint8_t adc_channel, struct adc_buf* s, uint8_t av_nb_sample);
 
 /** Starts conversions */
-void adc_init( void );
+void adc_init(void);
 
 #endif

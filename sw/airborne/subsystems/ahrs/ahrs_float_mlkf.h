@@ -36,8 +36,10 @@
 #include "math/pprz_algebra_float.h"
 
 struct AhrsMlkf {
-  struct FloatQuat   ltp_to_imu_quat;  ///< Rotation from LocalTangentPlane to IMU frame as unit quaternion
-  struct FloatQuat   ltp_to_body_quat; ///< Rotation from LocalTangentPlane to body frame as unit quaternion
+  struct FloatQuat
+      ltp_to_imu_quat;  ///< Rotation from LocalTangentPlane to IMU frame as unit quaternion
+  struct FloatQuat
+      ltp_to_body_quat; ///< Rotation from LocalTangentPlane to body frame as unit quaternion
   struct FloatRates  imu_rate;         ///< Rotational velocity in IMU frame
   struct FloatRates  gyro_bias;
 

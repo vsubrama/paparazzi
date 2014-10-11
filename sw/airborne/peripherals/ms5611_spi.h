@@ -34,7 +34,7 @@
 #include "peripherals/ms5611.h"
 
 struct Ms5611_Spi {
-  struct spi_periph *spi_p;
+  struct spi_periph* spi_p;
   struct spi_transaction spi_trans;
   volatile uint8_t tx_buf[1];
   volatile uint8_t rx_buf[4];
@@ -56,15 +56,18 @@ extern void ms5611_spi_event(struct Ms5611_Spi* ms);
  * (or start configuration if not already initialized)
  * Still need to regularly run ms5611_spi_periodic_check to complete the measurement.
  */
-static inline void ms5611_spi_read(struct Ms5611_Spi* ms) {
-  if (ms->initialized)
+static inline void ms5611_spi_read(struct Ms5611_Spi* ms)
+{
+  if (ms->initialized) {
     ms5611_spi_start_conversion(ms);
-  else
+  } else {
     ms5611_spi_start_configure(ms);
+  }
 }
 
 /// convenience function
-static inline void ms5611_spi_periodic(struct Ms5611_Spi* ms) {
+static inline void ms5611_spi_periodic(struct Ms5611_Spi* ms)
+{
   ms5611_spi_read(ms);
   ms5611_spi_periodic_check(ms);
 }

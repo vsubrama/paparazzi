@@ -88,7 +88,8 @@ static inline void ImuMagEvent(void (* _mag_handler)(void))
   }
 }
 
-static inline void ImuEvent(void (* _gyro_handler)(void), void (* _accel_handler)(void), void (* _mag_handler)(void))
+static inline void ImuEvent(void (* _gyro_handler)(void), void (* _accel_handler)(void),
+                            void (* _mag_handler)(void))
 {
   if (imu_nps.accel_available) {
     imu_nps.accel_available = FALSE;

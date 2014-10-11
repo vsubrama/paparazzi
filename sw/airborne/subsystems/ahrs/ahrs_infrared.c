@@ -42,20 +42,23 @@ float heading;
 #if PERIODIC_TELEMETRY
 #include "subsystems/datalink/telemetry.h"
 
-static void send_infrared(void) {
+static void send_infrared(void)
+{
   DOWNLINK_SEND_IR_SENSORS(DefaultChannel, DefaultDevice,
-      &infrared.value.ir1, &infrared.value.ir2, &infrared.pitch, &infrared.roll, &infrared.top);
+                           &infrared.value.ir1, &infrared.value.ir2, &infrared.pitch, &infrared.roll, &infrared.top);
 }
 
-static void send_status(void) {
+static void send_status(void)
+{
   uint16_t contrast = abs(infrared.roll) + abs(infrared.pitch) + abs(infrared.top);
   uint8_t mde = 3;
-  if (contrast < 50) mde = 7;
+  if (contrast < 50) { mde = 7; }
   DOWNLINK_SEND_STATE_FILTER_STATUS(DefaultChannel, DefaultDevice, &mde, &contrast);
 }
 #endif
 
-void ahrs_init(void) {
+void ahrs_init(void)
+{
   ahrs.status = AHRS_UNINIT;
 
   heading = 0.;
@@ -66,14 +69,16 @@ void ahrs_init(void) {
 #endif
 }
 
-void ahrs_align(void) {
+void ahrs_align(void)
+{
 
   //TODO set gyro bias if used
 
   ahrs.status = AHRS_RUNNING;
 }
 
-void ahrs_propagate(float dt __attribute__((unused))) {
+void ahrs_propagate(float dt __attribute__((unused)))
+{
   struct FloatRates body_rate = { 0., 0., 0. };
 #ifdef ADC_CHANNEL_GYRO_P
   body_rate.p = RATE_FLOAT_OF_BFP(imu.gyro.p);
@@ -88,7 +93,8 @@ void ahrs_propagate(float dt __attribute__((unused))) {
 }
 
 
-void ahrs_update_gps(void) {
+void ahrs_update_gps(void)
+{
 
   float hspeed_mod_f = gps.gspeed / 100.;
   float course_f = gps.course / 1e7;
@@ -98,23 +104,25 @@ void ahrs_update_gps(void) {
   float w_vn = cosf(course_f) * hspeed_mod_f - stateGetHorizontalWindspeed_f()->x;
   float w_ve = sinf(course_f) * hspeed_mod_f - stateGetHorizontalWindspeed_f()->y;
   heading = atan2f(w_ve, w_vn);
-  if (heading < 0.)
+  if (heading < 0.) {
     heading += 2 * M_PI;
+  }
 
 }
 
-void ahrs_update_infrared(void) {
+void ahrs_update_infrared(void)
+{
   float phi  = atan2(infrared.roll, infrared.top) - infrared.roll_neutral;
   float theta  = atan2(infrared.pitch, infrared.top) - infrared.pitch_neutral;
 
-  if (theta < -M_PI_2) theta += M_PI;
-  else if (theta > M_PI_2) theta -= M_PI;
+  if (theta < -M_PI_2) { theta += M_PI; }
+  else if (theta > M_PI_2) { theta -= M_PI; }
 
-  if (phi >= 0) phi *= infrared.correction_right;
-  else phi *= infrared.correction_left;
+  if (phi >= 0) { phi *= infrared.correction_right; }
+  else { phi *= infrared.correction_left; }
 
-  if (theta >= 0) theta *= infrared.correction_up;
-  else theta *= infrared.correction_down;
+  if (theta >= 0) { theta *= infrared.correction_up; }
+  else { theta *= infrared.correction_down; }
 
   struct FloatEulers att = { phi, theta, heading };
   stateSetNedToBodyEulers_f(&att);

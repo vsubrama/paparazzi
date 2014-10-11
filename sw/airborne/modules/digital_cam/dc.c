@@ -57,10 +57,10 @@ uint16_t dc_buffer = 0;
 
 void dc_send_shot_position(void)
 {
-  int16_t phi = DegOfRad(stateGetNedToBodyEulers_f()->phi*10.0f);
-  int16_t theta = DegOfRad(stateGetNedToBodyEulers_f()->theta*10.0f);
+  int16_t phi = DegOfRad(stateGetNedToBodyEulers_f()->phi * 10.0f);
+  int16_t theta = DegOfRad(stateGetNedToBodyEulers_f()->theta * 10.0f);
   float gps_z = ((float)gps.hmsl) / 1000.0f;
-  int16_t course = (DegOfRad(gps.course)/((int32_t)1e6));
+  int16_t course = (DegOfRad(gps.course) / ((int32_t)1e6));
   int16_t photo_nr = -1;
 
   if (dc_buffer < DC_IMAGE_BUFFER) {
@@ -83,7 +83,8 @@ void dc_send_shot_position(void)
 }
 #endif /* SENSOR_SYNC_SEND */
 
-uint8_t dc_info(void) {
+uint8_t dc_info(void)
+{
 #ifdef DOWNLINK_SEND_DC_INFO
   float course = DegOfRad(stateGetNedToBodyEulers_f()->psi);
   DOWNLINK_SEND_DC_INFO(DefaultChannel, DefaultDevice,
@@ -106,28 +107,31 @@ uint8_t dc_info(void) {
 }
 
 /* shoot on circle */
-uint8_t dc_circle(float interval, float start) {
+uint8_t dc_circle(float interval, float start)
+{
   dc_autoshoot = DC_AUTOSHOOT_CIRCLE;
   dc_gps_count = 0;
   dc_circle_interval = fmodf(fmaxf(interval, 1.), 360.);
 
-  if(start == DC_IGNORE) {
+  if (start == DC_IGNORE) {
     start = DegOfRad(stateGetNedToBodyEulers_f()->psi);
   }
 
   dc_circle_start_angle = fmodf(start, 360.);
-  if (start < 0.)
+  if (start < 0.) {
     start += 360.;
+  }
   //dc_circle_last_block = floorf(dc_circle_start_angle/dc_circle_interval);
   dc_circle_last_block = 0;
-  dc_circle_max_blocks = floorf(360./dc_circle_interval);
+  dc_circle_max_blocks = floorf(360. / dc_circle_interval);
   dc_probing = TRUE;
   dc_info();
   return 0;
 }
 
 /* shoot on survey */
-uint8_t dc_survey(float interval, float x, float y) {
+uint8_t dc_survey(float interval, float x, float y)
+{
   dc_autoshoot = DC_AUTOSHOOT_SURVEY;
   dc_gps_count = 0;
   dc_gps_dist = interval;
@@ -147,7 +151,8 @@ uint8_t dc_survey(float interval, float x, float y) {
   return 0;
 }
 
-uint8_t dc_stop(void) {
+uint8_t dc_stop(void)
+{
   dc_autoshoot = DC_AUTOSHOOT_STOP;
   dc_info();
   return 0;

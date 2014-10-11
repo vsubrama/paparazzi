@@ -47,7 +47,7 @@ struct L3gd20Config {
   enum L3gd20DRBW drbw;   ///< Data rate and bandwidth
 };
 
-static inline void l3gd20_set_default_config(struct L3gd20Config *c)
+static inline void l3gd20_set_default_config(struct L3gd20Config* c)
 {
   c->spi_3_wire = FALSE;
 

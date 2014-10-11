@@ -58,67 +58,67 @@ extern uint8_t log_ck;
 #define PprzLogTransportSendMessage(_dev) TransportLink(_dev, SendMessage())
 
 #define PprzLogTransportHeader(_dev, payload_len) {             \
-  PprzLogTransportPut1Byte(_dev, STX_LOG);				              \
-  uint8_t msg_len = PprzLogTransportSizeOf(_dev, payload_len);	\
-  PprzLogTransportPut1Byte(_dev, msg_len);			                \
-  log_ck = msg_len;			                                        \
-  PprzLogTransportPutUint8(_dev, 0);			                      \
-  uint32_t ts = get_sys_time_usec()/100;                        \
-  PprzLogTransportPut4ByteByAddr(_dev, &ts);                    \
-}
+    PprzLogTransportPut1Byte(_dev, STX_LOG);                      \
+    uint8_t msg_len = PprzLogTransportSizeOf(_dev, payload_len);  \
+    PprzLogTransportPut1Byte(_dev, msg_len);                      \
+    log_ck = msg_len;                                             \
+    PprzLogTransportPutUint8(_dev, 0);                            \
+    uint32_t ts = get_sys_time_usec()/100;                        \
+    PprzLogTransportPut4ByteByAddr(_dev, &ts);                    \
+  }
 
 #define PprzLogTransportTrailer(_dev) {  \
-  PprzLogTransportPut1Byte(_dev, log_ck);	\
-  PprzLogTransportSendMessage(_dev);     \
-}
+    PprzLogTransportPut1Byte(_dev, log_ck); \
+    PprzLogTransportSendMessage(_dev);     \
+  }
 
 #define PprzLogTransportPutUint8(_dev, _byte) { \
-    log_ck += _byte;			  \
-    PprzLogTransportPut1Byte(_dev, _byte);		  \
- }
+    log_ck += _byte;        \
+    PprzLogTransportPut1Byte(_dev, _byte);      \
+  }
 
 #define PprzLogTransportPutNamedUint8(_dev, _name, _byte) PprzLogTransportPutUint8(_dev, _byte)
 
-#define PprzLogTransportPut1ByteByAddr(_dev, _byte) {	 \
-    uint8_t _x = *(_byte);		 \
-    PprzLogTransportPutUint8(_dev, _x);	 \
+#define PprzLogTransportPut1ByteByAddr(_dev, _byte) {  \
+    uint8_t _x = *(_byte);     \
+    PprzLogTransportPutUint8(_dev, _x);  \
   }
 
 #define PprzLogTransportPut2ByteByAddr(_dev, _byte) { \
-    PprzLogTransportPut1ByteByAddr(_dev, _byte);	\
-    PprzLogTransportPut1ByteByAddr(_dev, (const uint8_t*)_byte+1);	\
+    PprzLogTransportPut1ByteByAddr(_dev, _byte);  \
+    PprzLogTransportPut1ByteByAddr(_dev, (const uint8_t*)_byte+1);  \
   }
 
 #define PprzLogTransportPut4ByteByAddr(_dev, _byte) { \
-    PprzLogTransportPut2ByteByAddr(_dev, _byte);	\
-    PprzLogTransportPut2ByteByAddr(_dev, (const uint8_t*)_byte+2);	\
+    PprzLogTransportPut2ByteByAddr(_dev, _byte);  \
+    PprzLogTransportPut2ByteByAddr(_dev, (const uint8_t*)_byte+2);  \
   }
 
 #ifdef __IEEE_BIG_ENDIAN /* From machine/ieeefp.h */
 #define PprzLogTransportPutDoubleByAddr(_dev, _byte) { \
-    PprzLogTransportPut4ByteByAddr(_dev, (const uint8_t*)_byte+4);	\
-    PprzLogTransportPut4ByteByAddr(_dev, (const uint8_t*)_byte);	\
+    PprzLogTransportPut4ByteByAddr(_dev, (const uint8_t*)_byte+4);  \
+    PprzLogTransportPut4ByteByAddr(_dev, (const uint8_t*)_byte);  \
   }
 #define PprzLogTransportPutUint64ByAddr(_dev, _byte) { \
-    PprzLogTransportPut4ByteByAddr(_dev, (const uint8_t*)_byte+4);	\
-    PprzLogTransportPut4ByteByAddr(_dev, (const uint8_t*)_byte);	\
+    PprzLogTransportPut4ByteByAddr(_dev, (const uint8_t*)_byte+4);  \
+    PprzLogTransportPut4ByteByAddr(_dev, (const uint8_t*)_byte);  \
   }
 #define PprzLogTransportPutInt64ByAddr(_dev, _byte) { \
-    PprzLogTransportPut4ByteByAddr(_dev, (const uint8_t*)_byte+4);	\
-    PprzLogTransportPut4ByteByAddr(_dev, (const uint8_t*)_byte);	\
+    PprzLogTransportPut4ByteByAddr(_dev, (const uint8_t*)_byte+4);  \
+    PprzLogTransportPut4ByteByAddr(_dev, (const uint8_t*)_byte);  \
   }
 #else
 #define PprzLogTransportPutDoubleByAddr(_dev, _byte) { \
-    PprzLogTransportPut4ByteByAddr(_dev, (const uint8_t*)_byte);	\
-    PprzLogTransportPut4ByteByAddr(_dev, (const uint8_t*)_byte+4);	\
+    PprzLogTransportPut4ByteByAddr(_dev, (const uint8_t*)_byte);  \
+    PprzLogTransportPut4ByteByAddr(_dev, (const uint8_t*)_byte+4);  \
   }
 #define PprzLogTransportPutUint64ByAddr(_dev, _byte) { \
-    PprzLogTransportPut4ByteByAddr(_dev, (const uint8_t*)_byte);	\
-    PprzLogTransportPut4ByteByAddr(_dev, (const uint8_t*)_byte+4);	\
+    PprzLogTransportPut4ByteByAddr(_dev, (const uint8_t*)_byte);  \
+    PprzLogTransportPut4ByteByAddr(_dev, (const uint8_t*)_byte+4);  \
   }
 #define PprzLogTransportPutInt64ByAddr(_dev, _byte) { \
-    PprzLogTransportPut4ByteByAddr(_dev, (const uint8_t*)_byte);	\
-    PprzLogTransportPut4ByteByAddr(_dev, (const uint8_t*)_byte+4);	\
+    PprzLogTransportPut4ByteByAddr(_dev, (const uint8_t*)_byte);  \
+    PprzLogTransportPut4ByteByAddr(_dev, (const uint8_t*)_byte+4);  \
   }
 #endif
 
@@ -133,12 +133,12 @@ extern uint8_t log_ck;
 #define PprzLogTransportPutCharByAddr(_dev, _x) PprzLogTransportPut1ByteByAddr(_dev, (const uint8_t*)_x)
 
 #define PprzLogTransportPutArray(_dev, _put, _n, _x) { \
-  uint8_t _i; \
-  PprzLogTransportPutUint8(_dev, _n); \
-  for(_i = 0; _i < _n; _i++) { \
-    _put(_dev, &_x[_i]); \
-  } \
-}
+    uint8_t _i; \
+    PprzLogTransportPutUint8(_dev, _n); \
+    for(_i = 0; _i < _n; _i++) { \
+      _put(_dev, &_x[_i]); \
+    } \
+  }
 
 #define PprzLogTransportPutInt8Array(_dev, _n, _x) PprzLogTransportPutArray(_dev, PprzLogTransportPutInt8ByAddr, _n, _x)
 #define PprzLogTransportPutUint8Array(_dev, _n, _x) PprzLogTransportPutArray(_dev, PprzLogTransportPutUint8ByAddr, _n, _x)
@@ -159,11 +159,11 @@ extern uint8_t log_ck;
 #define PprzLogTransportPutDoubleArray(_dev, _n, _x) PprzLogTransportPutArray(_dev, PprzLogTransportPutDoubleByAddr, _n, _x)
 
 #define PprzLogTransportPutFixedArray(_dev, _put, _n, _x) { \
-  uint8_t _i; \
-  for(_i = 0; _i < _n; _i++) { \
-    _put(_dev, &_x[_i]); \
-  } \
-}
+    uint8_t _i; \
+    for(_i = 0; _i < _n; _i++) { \
+      _put(_dev, &_x[_i]); \
+    } \
+  }
 
 #define PprzLogTransportPutInt8FixedArray(_dev, _n, _x) PprzLogTransportPutFixedArray(_dev, PprzLogTransportPutInt8ByAddr, _n, _x)
 #define PprzLogTransportPutUint8FixedArray(_dev, _n, _x) PprzLogTransportPutFixedArray(_dev, PprzLogTransportPutUint8ByAddr, _n, _x)

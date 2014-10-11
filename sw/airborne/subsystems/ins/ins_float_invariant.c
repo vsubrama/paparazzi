@@ -62,13 +62,14 @@
 
 #if !INS_UPDATE_FW_ESTIMATOR && PERIODIC_TELEMETRY
 #include "subsystems/datalink/telemetry.h"
-static void send_ins_ref(void) {
+static void send_ins_ref(void)
+{
   float foo = 0.;
   if (state.ned_initialized_i) {
     DOWNLINK_SEND_INS_REF(DefaultChannel, DefaultDevice,
-        &state.ned_origin_i.ecef.x, &state.ned_origin_i.ecef.y, &state.ned_origin_i.ecef.z,
-        &state.ned_origin_i.lla.lat, &state.ned_origin_i.lla.lon, &state.ned_origin_i.lla.alt,
-        &state.ned_origin_i.hmsl, &foo);
+                          &state.ned_origin_i.ecef.x, &state.ned_origin_i.ecef.y, &state.ned_origin_i.ecef.z,
+                          &state.ned_origin_i.lla.lat, &state.ned_origin_i.lla.lon, &state.ned_origin_i.lla.alt,
+                          &state.ned_origin_i.hmsl, &foo);
   }
 }
 #endif
@@ -178,16 +179,17 @@ bool_t ins_baro_initialized;
 #endif
 PRINT_CONFIG_VAR(INS_BARO_ID)
 abi_event baro_ev;
-static void baro_cb(uint8_t sender_id, const float *pressure);
+static void baro_cb(uint8_t sender_id, const float* pressure);
 
 /* gps */
 bool_t ins_gps_fix_once;
 
 /* error computation */
-static inline void error_output(struct InsFloatInv * _ins);
+static inline void error_output(struct InsFloatInv* _ins);
 
 /* propagation model (called by runge-kutta library) */
-static inline void invariant_model(float * o, const float * x, const int n, const float * u, const int m);
+static inline void invariant_model(float* o, const float* x, const int n, const float* u,
+                                   const int m);
 
 
 /** Right multiplication by a quaternion.
@@ -198,7 +200,8 @@ void float_quat_vmul_right(struct FloatQuat* mright, const struct FloatQuat* q,
 
 
 /* init state and measurements */
-static inline void init_invariant_state(void) {
+static inline void init_invariant_state(void)
+{
   // init state
   float_quat_identity(&ins_impl.state.quat);
   FLOAT_RATES_ZERO(ins_impl.state.bias);
@@ -217,7 +220,8 @@ static inline void init_invariant_state(void) {
   ins_gps_fix_once = FALSE;
 }
 
-void ins_init() {
+void ins_init()
+{
 
   // init position
 #if INS_UPDATE_FW_ESTIMATOR
@@ -272,14 +276,15 @@ void ins_init() {
 }
 
 
-void ins_reset_local_origin( void ) {
+void ins_reset_local_origin(void)
+{
 #if INS_UPDATE_FW_ESTIMATOR
   struct UtmCoor_f utm;
 #ifdef GPS_USE_LATLONG
   /* Recompute UTM coordinates in this zone */
   struct LlaCoor_f lla;
   LLA_FLOAT_OF_BFP(lla, gps.lla_pos);
-  utm.zone = (gps.lla_pos.lon/1e7 + 180) / 6 + 1;
+  utm.zone = (gps.lla_pos.lon / 1e7 + 180) / 6 + 1;
   utm_of_lla_f(&utm, &lla);
 #else
   utm.zone = gps.utm_pos.zone;
@@ -298,7 +303,8 @@ void ins_reset_local_origin( void ) {
 #endif
 }
 
-void ins_reset_altitude_ref( void ) {
+void ins_reset_altitude_ref(void)
+{
 #if INS_UPDATE_FW_ESTIMATOR
   struct UtmCoor_f utm = state.utm_origin_f;
   utm.alt = gps.hmsl / 1000.0f;
@@ -311,19 +317,21 @@ void ins_reset_altitude_ref( void ) {
   };
   struct LtpDef_i ltp_def;
   ltp_def_from_lla_i(&ltp_def, &lla),
-  ltp_def.hmsl = gps.hmsl;
+                     ltp_def.hmsl = gps.hmsl;
   stateSetLocalOrigin_i(&ltp_def);
 #endif
 }
 
-void ahrs_init(void) {
+void ahrs_init(void)
+{
   ahrs.status = AHRS_UNINIT;
 }
 
 void ahrs_align(void)
 {
   /* Compute an initial orientation from accel and mag directly as quaternion */
-  ahrs_float_get_quat_from_accel_mag(&ins_impl.state.quat, &ahrs_aligner.lp_accel, &ahrs_aligner.lp_mag);
+  ahrs_float_get_quat_from_accel_mag(&ins_impl.state.quat, &ahrs_aligner.lp_accel,
+                                     &ahrs_aligner.lp_mag);
 
   /* use average gyro as initial value for bias */
   struct FloatRates bias0;
@@ -335,7 +343,8 @@ void ahrs_align(void)
   ins.status = INS_RUNNING;
 }
 
-void ahrs_propagate(float dt) {
+void ahrs_propagate(float dt)
+{
   struct FloatVect3 accel;
   struct FloatRates body_rates;
 
@@ -350,7 +359,7 @@ void ahrs_propagate(float dt) {
 
   // fill command vector
   struct Int32Rates gyro_meas_body;
-  struct Int32RMat *body_to_imu_rmat = orientationGetRMat_i(&imu.body_to_imu);
+  struct Int32RMat* body_to_imu_rmat = orientationGetRMat_i(&imu.body_to_imu);
   int32_rmat_transp_ratemult(&gyro_meas_body, body_to_imu_rmat, &imu.gyro);
   RATES_FLOAT_OF_BFP(ins_impl.cmd.rates, gyro_meas_body);
   struct Int32Vect3 accel_meas_body;
@@ -363,9 +372,9 @@ void ahrs_propagate(float dt) {
   // propagate model
   struct inv_state new_state;
   runge_kutta_4_float((float*)&new_state,
-      (float*)&ins_impl.state, INV_STATE_DIM,
-      (float*)&ins_impl.cmd, INV_COMMAND_DIM,
-      invariant_model, dt);
+                      (float*)&ins_impl.state, INV_STATE_DIM,
+                      (float*)&ins_impl.cmd, INV_COMMAND_DIM,
+                      invariant_model, dt);
   ins_impl.state = new_state;
 
   // normalize quaternion
@@ -390,74 +399,76 @@ void ahrs_propagate(float dt) {
 #if SEND_INVARIANT_FILTER
   struct FloatEulers eulers;
   FLOAT_EULERS_OF_QUAT(eulers, ins_impl.state.quat);
-  RunOnceEvery(3,{
-      DOWNLINK_SEND_INV_FILTER(DefaultChannel, DefaultDevice,
-        &ins_impl.state.quat.qi,
-        &eulers.phi,
-        &eulers.theta,
-        &eulers.psi,
-        &ins_impl.state.speed.x,
-        &ins_impl.state.speed.y,
-        &ins_impl.state.speed.z,
-        &ins_impl.state.pos.x,
-        &ins_impl.state.pos.y,
-        &ins_impl.state.pos.z,
-        &ins_impl.state.bias.p,
-        &ins_impl.state.bias.q,
-        &ins_impl.state.bias.r,
-        &ins_impl.state.as,
-        &ins_impl.state.hb,
-        &ins_impl.meas.baro_alt,
-        &ins_impl.meas.pos_gps.z)
-      });
+  RunOnceEvery(3, {
+    DOWNLINK_SEND_INV_FILTER(DefaultChannel, DefaultDevice,
+    &ins_impl.state.quat.qi,
+    &eulers.phi,
+    &eulers.theta,
+    &eulers.psi,
+    &ins_impl.state.speed.x,
+    &ins_impl.state.speed.y,
+    &ins_impl.state.speed.z,
+    &ins_impl.state.pos.x,
+    &ins_impl.state.pos.y,
+    &ins_impl.state.pos.z,
+    &ins_impl.state.bias.p,
+    &ins_impl.state.bias.q,
+    &ins_impl.state.bias.r,
+    &ins_impl.state.as,
+    &ins_impl.state.hb,
+    &ins_impl.meas.baro_alt,
+    &ins_impl.meas.pos_gps.z)
+  });
 #endif
 
 #if LOG_INVARIANT_FILTER
   if (pprzLogFile.fs != NULL) {
     if (!log_started) {
       // log file header
-      sdLogWriteLog(&pprzLogFile, "p q r ax ay az gx gy gz gvx gvy gvz mx my mz b qi qx qy qz bp bq br vx vy vz px py pz hb as\n");
+      sdLogWriteLog(&pprzLogFile,
+                    "p q r ax ay az gx gy gz gvx gvy gvz mx my mz b qi qx qy qz bp bq br vx vy vz px py pz hb as\n");
       log_started = TRUE;
-    }
-    else {
-      sdLogWriteLog(&pprzLogFile, "%.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f\n",
-          ins_impl.cmd.rates.p,
-          ins_impl.cmd.rates.q,
-          ins_impl.cmd.rates.r,
-          ins_impl.cmd.accel.x,
-          ins_impl.cmd.accel.y,
-          ins_impl.cmd.accel.z,
-          ins_impl.meas.pos_gps.x,
-          ins_impl.meas.pos_gps.y,
-          ins_impl.meas.pos_gps.z,
-          ins_impl.meas.speed_gps.x,
-          ins_impl.meas.speed_gps.y,
-          ins_impl.meas.speed_gps.z,
-          ins_impl.meas.mag.x,
-          ins_impl.meas.mag.y,
-          ins_impl.meas.mag.z,
-          ins_impl.meas.baro_alt,
-          ins_impl.state.quat.qi,
-          ins_impl.state.quat.qx,
-          ins_impl.state.quat.qy,
-          ins_impl.state.quat.qz,
-          ins_impl.state.bias.p,
-          ins_impl.state.bias.q,
-          ins_impl.state.bias.r,
-          ins_impl.state.speed.x,
-          ins_impl.state.speed.y,
-          ins_impl.state.speed.z,
-          ins_impl.state.pos.x,
-          ins_impl.state.pos.y,
-          ins_impl.state.pos.z,
-          ins_impl.state.hb,
-          ins_impl.state.as);
+    } else {
+      sdLogWriteLog(&pprzLogFile,
+                    "%.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f\n",
+                    ins_impl.cmd.rates.p,
+                    ins_impl.cmd.rates.q,
+                    ins_impl.cmd.rates.r,
+                    ins_impl.cmd.accel.x,
+                    ins_impl.cmd.accel.y,
+                    ins_impl.cmd.accel.z,
+                    ins_impl.meas.pos_gps.x,
+                    ins_impl.meas.pos_gps.y,
+                    ins_impl.meas.pos_gps.z,
+                    ins_impl.meas.speed_gps.x,
+                    ins_impl.meas.speed_gps.y,
+                    ins_impl.meas.speed_gps.z,
+                    ins_impl.meas.mag.x,
+                    ins_impl.meas.mag.y,
+                    ins_impl.meas.mag.z,
+                    ins_impl.meas.baro_alt,
+                    ins_impl.state.quat.qi,
+                    ins_impl.state.quat.qx,
+                    ins_impl.state.quat.qy,
+                    ins_impl.state.quat.qz,
+                    ins_impl.state.bias.p,
+                    ins_impl.state.bias.q,
+                    ins_impl.state.bias.r,
+                    ins_impl.state.speed.x,
+                    ins_impl.state.speed.y,
+                    ins_impl.state.speed.z,
+                    ins_impl.state.pos.x,
+                    ins_impl.state.pos.y,
+                    ins_impl.state.pos.z,
+                    ins_impl.state.hb,
+                    ins_impl.state.as);
     }
   }
 #endif
 }
 
-void ahrs_update_gps(void) {
+void ahrs_update_gps(void)
+{
 
   if (gps.fix == GPS_FIX_3D && ins.status == INS_RUNNING) {
     ins_gps_fix_once = TRUE;
@@ -487,7 +498,8 @@ void ahrs_update_gps(void) {
 }
 
 
-static void baro_cb(uint8_t __attribute__((unused)) sender_id, const float *pressure) {
+static void baro_cb(uint8_t __attribute__((unused)) sender_id, const float* pressure)
+{
   static float ins_qfe = 101325.0f;
   static float alpha = 10.0f;
   static int32_t i = 1;
@@ -501,8 +513,8 @@ static void baro_cb(uint8_t __attribute__((unused)) sender_id, const float *pres
       baro_moy = *pressure;
       baro_prev = *pressure;
     }
-    baro_moy = (baro_moy*(i-1) + *pressure) / i;
-    alpha = (10.*alpha + (baro_moy-baro_prev)) / (11.0f);
+    baro_moy = (baro_moy * (i - 1) + *pressure) / i;
+    alpha = (10.*alpha + (baro_moy - baro_prev)) / (11.0f);
     baro_prev = baro_moy;
     // test stop condition
     if (fabs(alpha) < 0.005f) {
@@ -514,19 +526,20 @@ static void baro_cb(uint8_t __attribute__((unused)) sender_id, const float *pres
       ins_baro_initialized = TRUE;
     }
     i++;
-  }
-  else { /* normal update with baro measurement */
+  } else { /* normal update with baro measurement */
     ins_impl.meas.baro_alt = -pprz_isa_height_of_pressure(*pressure, ins_qfe); // Z down
   }
 }
 
-void ahrs_update_accel(float dt __attribute__((unused))) {
+void ahrs_update_accel(float dt __attribute__((unused)))
+{
 }
 
 // assume mag is dead when values are not moving anymore
 #define MAG_FROZEN_COUNT 30
 
-void ahrs_update_mag(float dt __attribute__((unused))) {
+void ahrs_update_mag(float dt __attribute__((unused)))
+{
   static uint32_t mag_frozen_count = MAG_FROZEN_COUNT;
   static int32_t last_mx = 0;
 
@@ -537,10 +550,9 @@ void ahrs_update_mag(float dt __attribute__((unused))) {
       FLOAT_VECT3_ZERO(ins_impl.meas.mag);
       mag_frozen_count = MAG_FROZEN_COUNT;
     }
-  }
-  else {
+  } else {
     // values are moving
-    struct Int32RMat *body_to_imu_rmat = orientationGetRMat_i(&imu.body_to_imu);
+    struct Int32RMat* body_to_imu_rmat = orientationGetRMat_i(&imu.body_to_imu);
     struct Int32Vect3 mag_meas_body;
     // new values in body frame
     int32_rmat_transp_vmult(&mag_meas_body, body_to_imu_rmat, &imu.mag);
@@ -556,7 +568,9 @@ void ahrs_update_mag(float dt __attribute__((unused))) {
  *
  * x_dot = evolution_model + (gain_matrix * error)
  */
-static inline void invariant_model(float* o, const float* x, const int n, const float* u, const int m __attribute__((unused))) {
+static inline void invariant_model(float* o, const float* x, const int n, const float* u,
+                                   const int m __attribute__((unused)))
+{
 
 #pragma GCC diagnostic push // require GCC 4.6
 #pragma GCC diagnostic ignored "-Wcast-qual"
@@ -610,14 +624,15 @@ static inline void invariant_model(float* o, const float* x, const int n, const 
   s_dot.hb = ins_impl.corr.SE;
 
   // set output
-  memcpy(o, &s_dot, n*sizeof(float));
+  memcpy(o, &s_dot, n * sizeof(float));
 }
 
 /** Compute correction vectors
  * E = ( ŷ - y )
  * LE, ME, NE, OE : ( gain matrix * error )
  */
-static inline void error_output(struct InsFloatInv * _ins) {
+static inline void error_output(struct InsFloatInv* _ins)
+{
 
   struct FloatVect3 YBt, I, Ev, Eb, Ex, Itemp, Ebtemp, Evtemp;
   float Eh;
@@ -645,17 +660,16 @@ static inline void error_output(struct InsFloatInv * _ins) {
   // or while waiting first GPS data to prevent diverging
   if ((gps.fix == GPS_FIX_3D && ins.status == INS_RUNNING
 #if INS_UPDATE_FW_ESTIMATOR
-    && state.utm_initialized_f
+       && state.utm_initialized_f
 #else
-    && state.ned_initialized_f
+       && state.ned_initialized_f
 #endif
-    ) || !ins_gps_fix_once) {
+      ) || !ins_gps_fix_once) {
     /* Ev = (V - YV)   */
     VECT3_DIFF(Ev, _ins->state.speed, _ins->meas.speed_gps);
     /* Ex = (X - YX)  */
     VECT3_DIFF(Ex, _ins->state.pos, _ins->meas.pos_gps);
-  }
-  else {
+  } else {
     FLOAT_VECT3_ZERO(Ev);
     FLOAT_VECT3_ZERO(Ex);
   }
@@ -665,12 +679,12 @@ static inline void error_output(struct InsFloatInv * _ins) {
   /*--------------Gains--------------*/
 
   /**** LvEv + LbEb = -lvIa x Ev +  lb < B x Eb, Ia > Ia *****/
-  VECT3_SMUL(Itemp, I, -_ins->gains.lv/100.);
+  VECT3_SMUL(Itemp, I, -_ins->gains.lv / 100.);
   VECT3_CROSS_PRODUCT(Evtemp, Itemp, Ev);
 
   VECT3_CROSS_PRODUCT(Ebtemp, B, Eb);
   temp = VECT3_DOT_PRODUCT(Ebtemp, I);
-  temp = (_ins->gains.lb/100.) * temp;
+  temp = (_ins->gains.lb / 100.) * temp;
 
   VECT3_SMUL(Ebtemp, I, temp);
   VECT3_ADD(Evtemp, Ebtemp);
@@ -687,12 +701,12 @@ static inline void error_output(struct InsFloatInv * _ins) {
   _ins->corr.NE.z = ((-_ins->gains.nxz) * Ex.z) + ((-_ins->gains.nh) * Eh);
 
   /****** OvEv + ObEb = ovIa x Ev - ob < B x Eb, Ia > Ia ********/
-  VECT3_SMUL(Itemp, I, _ins->gains.ov/1000.);
+  VECT3_SMUL(Itemp, I, _ins->gains.ov / 1000.);
   VECT3_CROSS_PRODUCT(Evtemp, Itemp, Ev);
 
   VECT3_CROSS_PRODUCT(Ebtemp, B, Eb);
   temp = VECT3_DOT_PRODUCT(Ebtemp, I);
-  temp = (-_ins->gains.ob/1000.) * temp;
+  temp = (-_ins->gains.ob / 1000.) * temp;
 
   VECT3_SMUL(Ebtemp, I, temp);
   VECT3_ADD(Evtemp, Ebtemp);
@@ -700,7 +714,8 @@ static inline void error_output(struct InsFloatInv * _ins) {
 
   /* a scalar */
   /****** RvEv + RhEh = rv < Ia, Ev > + (-rhEh) **************/
-  _ins->corr.RE = ((_ins->gains.rv/100.) * VECT3_DOT_PRODUCT(Ev, I)) + ((-_ins->gains.rh/10000.) * Eh);
+  _ins->corr.RE = ((_ins->gains.rv / 100.) * VECT3_DOT_PRODUCT(Ev,
+                   I)) + ((-_ins->gains.rh / 10000.) * Eh);
 
   /****** ShEh ******/
   _ins->corr.SE = (_ins->gains.sh) * Eh;

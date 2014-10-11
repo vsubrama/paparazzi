@@ -27,7 +27,8 @@
 
 struct ImuNps imu_nps;
 
-void imu_impl_init(void) {
+void imu_impl_init(void)
+{
 
   imu_nps.gyro_available = FALSE;
   imu_nps.mag_available = FALSE;
@@ -35,14 +36,17 @@ void imu_impl_init(void) {
 
 }
 
-void imu_periodic(void) {
+void imu_periodic(void)
+{
 }
 
 
-void imu_feed_gyro_accel(void) {
+void imu_feed_gyro_accel(void)
+{
 
   RATES_ASSIGN(imu.gyro_unscaled, sensors.gyro.value.x, sensors.gyro.value.y, sensors.gyro.value.z);
-  VECT3_ASSIGN(imu.accel_unscaled, sensors.accel.value.x, sensors.accel.value.y, sensors.accel.value.z);
+  VECT3_ASSIGN(imu.accel_unscaled, sensors.accel.value.x, sensors.accel.value.y,
+               sensors.accel.value.z);
 
   // set availability flags...
   imu_nps.accel_available = TRUE;
@@ -51,7 +55,8 @@ void imu_feed_gyro_accel(void) {
 }
 
 
-void imu_feed_mag(void) {
+void imu_feed_mag(void)
+{
 
   VECT3_ASSIGN(imu.mag_unscaled, sensors.mag.value.x, sensors.mag.value.y, sensors.mag.value.z);
   imu_nps.mag_available = TRUE;

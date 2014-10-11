@@ -28,7 +28,7 @@ static const int16_t rc_joby_signs[RADIO_CONTROL_NB_CHANNEL] = RC_JOBY_SIGNS;
 
 static void handle_channel(void (* callback)(void))
 {
- if (parser.parser_normal_buf == RC_JOBY_MAGIC_START) {
+  if (parser.parser_normal_buf == RC_JOBY_MAGIC_START) {
     // got start channel, look for channel 0 next
     parser.current_channel = 0;
   } else if (parser.current_channel == -1) {
@@ -37,7 +37,8 @@ static void handle_channel(void (* callback)(void))
     parser.current_inverted = READING_NORMAL;
   } else {
     // valid channel, store and look for next
-    radio_control.values[parser.current_channel] = rc_joby_signs[parser.current_channel] * parser.parser_normal_buf;
+    radio_control.values[parser.current_channel] = rc_joby_signs[parser.current_channel] *
+        parser.parser_normal_buf;
     parser.current_channel++;
     if (parser.current_channel == RADIO_CONTROL_NB_CHANNEL) {
       // all channels read, reset parser and handle message
@@ -45,8 +46,9 @@ static void handle_channel(void (* callback)(void))
       radio_control.frame_cpt++;
       radio_control.status = RC_OK;
       radio_control.time_since_last_frame = 0;
-      if (callback != NULL)
-    callback();
+      if (callback != NULL) {
+        callback();
+      }
     }
   }
 }
@@ -75,8 +77,9 @@ void rc_joby_parse(int8_t c, void (* callback)(void))
 {
   if (parser.current_byte == READING_HIGH_BYTE) {
     parser.high_byte_buf = c;
-    if (parser.current_channel >= 0 || parser.high_byte_buf == (RC_JOBY_MAGIC_START >> 8) || parser.current_inverted == READING_INVERTED) {
-       // only advance parser state to low byte if we're not looking for a sync byte which we didn't find
+    if (parser.current_channel >= 0 || parser.high_byte_buf == (RC_JOBY_MAGIC_START >> 8)
+        || parser.current_inverted == READING_INVERTED) {
+      // only advance parser state to low byte if we're not looking for a sync byte which we didn't find
       parser.current_byte = READING_LOW_BYTE;
     }
   } else { // READING_LOW_BYTE
@@ -86,7 +89,8 @@ void rc_joby_parse(int8_t c, void (* callback)(void))
   }
 }
 
-void radio_control_impl_init(void) {
+void radio_control_impl_init(void)
+{
   parser.current_byte = READING_HIGH_BYTE;
   parser.current_inverted = READING_NORMAL;
   parser.current_channel = -1;

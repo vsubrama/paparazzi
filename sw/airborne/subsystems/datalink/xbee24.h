@@ -30,12 +30,12 @@
 #define XBEE_RFDATA_OFFSET 5
 
 #define XBeeTransportPutTXHeader(_dev) { \
-  XBeeTransportPutUint8(_dev, XBEE_TX_ID); \
-  XBeeTransportPutUint8(_dev, NO_FRAME_ID); \
-  XBeeTransportPutUint8(_dev, GROUND_STATION_ADDR >> 8); \
-  XBeeTransportPutUint8(_dev, GROUND_STATION_ADDR & 0xff); \
-  XBeeTransportPutUint8(_dev, TX_OPTIONS); \
-}
+    XBeeTransportPutUint8(_dev, XBEE_TX_ID); \
+    XBeeTransportPutUint8(_dev, NO_FRAME_ID); \
+    XBeeTransportPutUint8(_dev, GROUND_STATION_ADDR >> 8); \
+    XBeeTransportPutUint8(_dev, GROUND_STATION_ADDR & 0xff); \
+    XBeeTransportPutUint8(_dev, TX_OPTIONS); \
+  }
 
 /* 4 = frame_id + addr_msb + addr_lsb + options */
 #define XBeeTransportSizeOf(_dev, _x) XBeeAPISizeOf(_dev, _x+4)

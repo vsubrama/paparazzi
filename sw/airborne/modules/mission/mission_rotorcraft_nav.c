@@ -38,10 +38,11 @@
 #define BUFFER_ZONE_DIST 10
 
 // Utility function: converts lla to local point
-bool_t mission_point_of_lla(struct EnuCoor_f *point, struct LlaCoor_f *lla) {
+bool_t mission_point_of_lla(struct EnuCoor_f* point, struct LlaCoor_f* lla)
+{
   // return FALSE if there is no valid local coordinate
   // FIXME we should only test if local frame is initialized, not valid
-  if (!stateIsLocalCoordinateValid()) return FALSE;
+  if (!stateIsLocalCoordinateValid()) { return FALSE; }
 
   // change geoid alt to ellipsoid alt
   lla->alt = lla->alt - state.ned_origin_f.hmsl + state.ned_origin_f.lla.alt;
@@ -69,7 +70,8 @@ bool_t mission_point_of_lla(struct EnuCoor_f *point, struct LlaCoor_f *lla) {
 }
 
 //Function that converts target wp from float point versions to int
-bool_t mission_element_convert(struct _mission_element * el) {
+bool_t mission_element_convert(struct _mission_element* el)
+{
   struct _mission_element tmp_element = *el;
   uint8_t i = 0;
 
@@ -78,15 +80,18 @@ bool_t mission_element_convert(struct _mission_element * el) {
       ENU_BFP_OF_REAL(el->element.mission_wp.wp.wp_i, tmp_element.element.mission_wp.wp.wp_f);
       break;
     case MissionCircle:
-      ENU_BFP_OF_REAL(el->element.mission_circle.center.center_i, tmp_element.element.mission_circle.center.center_f);
+      ENU_BFP_OF_REAL(el->element.mission_circle.center.center_i,
+                      tmp_element.element.mission_circle.center.center_f);
       break;
     case MissionSegment:
-      ENU_BFP_OF_REAL(el->element.mission_segment.from.from_i, tmp_element.element.mission_segment.from.from_f);
+      ENU_BFP_OF_REAL(el->element.mission_segment.from.from_i,
+                      tmp_element.element.mission_segment.from.from_f);
       ENU_BFP_OF_REAL(el->element.mission_segment.to.to_i, tmp_element.element.mission_segment.to.to_f);
       break;
     case MissionPath:
       for (i = 0; i < 5; i++) {
-        ENU_BFP_OF_REAL(el->element.mission_path.path.path_i[i], tmp_element.element.mission_path.path.path_f[i]);
+        ENU_BFP_OF_REAL(el->element.mission_path.path.path_i[i],
+                        tmp_element.element.mission_path.path.path_f[i]);
       }
       break;
     default:
@@ -106,7 +111,8 @@ struct EnuCoor_i last_mission_wp = { 0., 0., 0. };
 
 /** Navigation function to a single waypoint
 */
-static inline bool_t mission_nav_wp(struct _mission_element * el) {
+static inline bool_t mission_nav_wp(struct _mission_element* el)
+{
   struct EnuCoor_i* target_wp = &(el->element.mission_wp.wp.wp_i);
 
   //Check proximity and wait for 'duration' seconds in proximity circle if desired
@@ -114,9 +120,8 @@ static inline bool_t mission_nav_wp(struct _mission_element * el) {
     last_mission_wp = *target_wp;
 
     if (el->duration > 0.) {
-      if (nav_check_wp_time(target_wp, el->duration)) return FALSE;
-    }
-    else return FALSE;
+      if (nav_check_wp_time(target_wp, el->duration)) { return FALSE; }
+    } else { return FALSE; }
 
   }
   //Go to Mission Waypoint
@@ -130,7 +135,8 @@ static inline bool_t mission_nav_wp(struct _mission_element * el) {
 
 /** Navigation function on a circle
 */
-static inline bool_t mission_nav_circle(struct _mission_element * el) {
+static inline bool_t mission_nav_circle(struct _mission_element* el)
+{
   struct EnuCoor_i* center_wp = &(el->element.mission_circle.center.center_i);
   int32_t radius = el->element.mission_circle.radius;
 
@@ -149,7 +155,8 @@ static inline bool_t mission_nav_circle(struct _mission_element * el) {
 
 /** Navigation function along a segment
 */
-static inline bool_t mission_nav_segment(struct _mission_element * el) {
+static inline bool_t mission_nav_segment(struct _mission_element* el)
+{
   struct EnuCoor_i* from_wp = &(el->element.mission_segment.from.from_i);
   struct EnuCoor_i* to_wp   = &(el->element.mission_segment.to.to_i);
 
@@ -158,9 +165,8 @@ static inline bool_t mission_nav_segment(struct _mission_element * el) {
     last_mission_wp = *to_wp;
 
     if (el->duration > 0.) {
-      if (nav_check_wp_time(to_wp, el->duration)) return FALSE;
-    }
-    else return FALSE;
+      if (nav_check_wp_time(to_wp, el->duration)) { return FALSE; }
+    } else { return FALSE; }
   }
 
   //Route Between from-to
@@ -175,45 +181,48 @@ static inline bool_t mission_nav_segment(struct _mission_element * el) {
 
 /** Navigation function along a path
 */
-static inline bool_t mission_nav_path(struct _mission_element * el) {
+static inline bool_t mission_nav_path(struct _mission_element* el)
+{
   if (el->element.mission_path.nb == 0) {
     return FALSE; // nothing to do
   }
 
   if (el->element.mission_path.path_idx == 0) { //first wp of path
     el->element.mission_wp.wp.wp_i = el->element.mission_path.path.path_i[0];
-    if (!mission_nav_wp(el)) el->element.mission_path.path_idx++;
+    if (!mission_nav_wp(el)) { el->element.mission_path.path_idx++; }
   }
 
   else if (el->element.mission_path.path_idx < el->element.mission_path.nb) { //standart wp of path
 
-    struct EnuCoor_i* from_wp = &(el->element.mission_path.path.path_i[(el->element.mission_path.path_idx) - 1]);
-    struct EnuCoor_i* to_wp   = &(el->element.mission_path.path.path_i[el->element.mission_path.path_idx]);
+    struct EnuCoor_i* from_wp = &
+                                (el->element.mission_path.path.path_i[(el->element.mission_path.path_idx) - 1]);
+    struct EnuCoor_i* to_wp   = &
+                                (el->element.mission_path.path.path_i[el->element.mission_path.path_idx]);
 
     //Check proximity and wait for t seconds in proximity circle if desired
     if (nav_approaching_from(to_wp, from_wp, CARROT)) {
       last_mission_wp = *to_wp;
 
       if (el->duration > 0.) {
-        if (nav_check_wp_time(to_wp, el->duration))
+        if (nav_check_wp_time(to_wp, el->duration)) {
           el->element.mission_path.path_idx++;
-      }
-      else el->element.mission_path.path_idx++;
+        }
+      } else { el->element.mission_path.path_idx++; }
     }
     //Route Between from-to
     horizontal_mode = HORIZONTAL_MODE_ROUTE;
     nav_route(from_wp, to_wp);
     NavVerticalAutoThrottleMode(RadOfDeg(0.0));
     NavVerticalAltitudeMode(POS_FLOAT_OF_BFP(from_wp->z), 0.);
-  }
-  else return FALSE;  //end of path
+  } else { return FALSE; } //end of path
 
   return TRUE;
 }
 
-int mission_run() {
+int mission_run()
+{
   // current element
-  struct _mission_element * el = NULL;
+  struct _mission_element* el = NULL;
   if ((el = mission_get()) == NULL) {
     mission.element_time = 0;
     mission.current_idx  = 0;
@@ -221,7 +230,7 @@ int mission_run() {
   }
 
   bool_t el_running = FALSE;
-  switch (el->type){
+  switch (el->type) {
     case MissionWP:
       el_running = mission_nav_wp(el);
       break;

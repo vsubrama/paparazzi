@@ -42,19 +42,22 @@ struct adc_buf buf_airspeed;
 
 #endif
 
-void airspeed_adc_init( void ) {
+void airspeed_adc_init(void)
+{
 #ifndef SITL
   adc_buf_channel(ADC_CHANNEL_AIRSPEED, &buf_airspeed, ADC_CHANNEL_AIRSPEED_NB_SAMPLES);
 #endif
 }
 
-void airspeed_adc_update( void ) {
+void airspeed_adc_update(void)
+{
 #ifndef SITL
   adc_airspeed_val = buf_airspeed.sum / buf_airspeed.av_nb_sample;
 #ifdef AIRSPEED_QUADRATIC_SCALE
   float airspeed = (adc_airspeed_val - AIRSPEED_BIAS);
-  if (airspeed <= 0.0f)
+  if (airspeed <= 0.0f) {
     airspeed = 0.0f;
+  }
   airspeed = sqrtf(airspeed) * AIRSPEED_QUADRATIC_SCALE;
 #else
   float airspeed = AIRSPEED_SCALE * (adc_airspeed_val - AIRSPEED_BIAS);

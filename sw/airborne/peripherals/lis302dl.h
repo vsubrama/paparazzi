@@ -53,7 +53,7 @@ struct Lis302dlConfig {
   enum Lis302dlRates rate;   ///< Data Output Rate
 };
 
-static inline void lis302dl_set_default_config(struct Lis302dlConfig *c)
+static inline void lis302dl_set_default_config(struct Lis302dlConfig* c)
 {
   c->int_invert = TRUE;
   c->filt_data = FALSE;

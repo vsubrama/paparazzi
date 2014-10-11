@@ -67,9 +67,9 @@ void float_rmat_inv(struct FloatRMat* m_b2a, struct FloatRMat* m_a2b)
 
 float float_rmat_norm(struct FloatRMat* rm)
 {
-  return sqrtf(SQUARE(rm->m[0])+ SQUARE(rm->m[1])+ SQUARE(rm->m[2])+
-               SQUARE(rm->m[3])+ SQUARE(rm->m[4])+ SQUARE(rm->m[5])+
-               SQUARE(rm->m[6])+ SQUARE(rm->m[7])+ SQUARE(rm->m[8]));
+  return sqrtf(SQUARE(rm->m[0]) + SQUARE(rm->m[1]) + SQUARE(rm->m[2]) +
+               SQUARE(rm->m[3]) + SQUARE(rm->m[4]) + SQUARE(rm->m[5]) +
+               SQUARE(rm->m[6]) + SQUARE(rm->m[7]) + SQUARE(rm->m[8]));
 }
 
 /** Composition (multiplication) of two rotation matrices.
@@ -137,7 +137,8 @@ void float_rmat_ratemult(struct FloatRates* rb, struct FloatRMat* m_a2b, struct 
 /** rotate anglular rates by transposed rotation matrix.
  * rb = m_b2a^T * ra
  */
-void float_rmat_transp_ratemult(struct FloatRates* rb, struct FloatRMat* m_b2a, struct FloatRates* ra)
+void float_rmat_transp_ratemult(struct FloatRates* rb, struct FloatRMat* m_b2a,
+                                struct FloatRates* ra)
 {
   rb->p = m_b2a->m[0] * ra->p + m_b2a->m[3] * ra->q + m_b2a->m[6] * ra->r;
   rb->q = m_b2a->m[1] * ra->p + m_b2a->m[4] * ra->q + m_b2a->m[7] * ra->r;
@@ -321,21 +322,24 @@ void float_quat_inv_comp(struct FloatQuat* b2c, struct FloatQuat* a2b, struct Fl
   b2c->qz = a2b->qi * a2c->qz - a2b->qx * a2c->qy + a2b->qy * a2c->qx - a2b->qz * a2c->qi;
 }
 
-void float_quat_comp_norm_shortest(struct FloatQuat* a2c, struct FloatQuat* a2b, struct FloatQuat* b2c)
+void float_quat_comp_norm_shortest(struct FloatQuat* a2c, struct FloatQuat* a2b,
+                                   struct FloatQuat* b2c)
 {
   float_quat_comp(a2c, a2b, b2c);
   float_quat_wrap_shortest(a2c);
   float_quat_normalize(a2c);
 }
 
-void float_quat_comp_inv_norm_shortest(struct FloatQuat* a2b, struct FloatQuat* a2c, struct FloatQuat* b2c)
+void float_quat_comp_inv_norm_shortest(struct FloatQuat* a2b, struct FloatQuat* a2c,
+                                       struct FloatQuat* b2c)
 {
   float_quat_comp_inv(a2b, a2c, b2c);
   float_quat_wrap_shortest(a2b);
   float_quat_normalize(a2b);
 }
 
-void float_quat_inv_comp_norm_shortest(struct FloatQuat* b2c, struct FloatQuat* a2b, struct FloatQuat* a2c)
+void float_quat_inv_comp_norm_shortest(struct FloatQuat* b2c, struct FloatQuat* a2b,
+                                       struct FloatQuat* a2c)
 {
   float_quat_inv_comp(b2c, a2b, a2c);
   float_quat_wrap_shortest(b2c);

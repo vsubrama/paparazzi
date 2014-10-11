@@ -68,7 +68,7 @@ enum Itg3200ConfStatus {
 };
 
 struct Itg3200 {
-  struct i2c_periph *i2c_p;
+  struct i2c_periph* i2c_p;
   struct i2c_transaction i2c_trans;
   bool_t initialized;                 ///< config done flag
   enum Itg3200ConfStatus init_status; ///< init status
@@ -83,18 +83,20 @@ struct Itg3200 {
 // TODO IRQ handling
 
 // Functions
-extern void itg3200_init(struct Itg3200 *itg, struct i2c_periph *i2c_p, uint8_t i2c_address);
-extern void itg3200_set_default_config(struct Itg3200Config *conf);
-extern void itg3200_start_configure(struct Itg3200 *itg);
-extern void itg3200_read(struct Itg3200 *itg);
-extern void itg3200_event(struct Itg3200 *itg);
+extern void itg3200_init(struct Itg3200* itg, struct i2c_periph* i2c_p, uint8_t i2c_address);
+extern void itg3200_set_default_config(struct Itg3200Config* conf);
+extern void itg3200_start_configure(struct Itg3200* itg);
+extern void itg3200_read(struct Itg3200* itg);
+extern void itg3200_event(struct Itg3200* itg);
 
 /// convenience function: read or start configuration if not already initialized
-static inline void itg3200_periodic(struct Itg3200 *itg) {
-  if (itg->initialized)
+static inline void itg3200_periodic(struct Itg3200* itg)
+{
+  if (itg->initialized) {
     itg3200_read(itg);
-  else
+  } else {
     itg3200_start_configure(itg);
+  }
 }
 
 #endif // ITG3200_H

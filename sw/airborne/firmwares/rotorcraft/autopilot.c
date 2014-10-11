@@ -88,12 +88,14 @@ bool_t   autopilot_detect_ground_once;
 
 #ifndef AUTOPILOT_DISABLE_AHRS_KILL
 #include "subsystems/ahrs.h"
-static inline int ahrs_is_aligned(void) {
+static inline int ahrs_is_aligned(void)
+{
   return (ahrs.status == AHRS_RUNNING);
 }
 #else
 PRINT_CONFIG_MSG("Using AUTOPILOT_DISABLE_AHRS_KILL")
-static inline int ahrs_is_aligned(void) {
+static inline int ahrs_is_aligned(void)
+{
   return TRUE;
 }
 #endif
@@ -138,7 +140,8 @@ PRINT_CONFIG_MSG("Enabled UNLOCKED_HOME_MODE since MODE_AUTO2 is AP_MODE_HOME")
 #endif
 #endif
 
-static void send_alive(void) {
+static void send_alive(void)
+{
   DOWNLINK_SEND_ALIVE(DefaultChannel, DefaultDevice, 16, MD5SUM);
 }
 
@@ -146,7 +149,8 @@ static void send_alive(void) {
 #include "subsystems/actuators/motor_mixing.h"
 #endif
 
-static void send_status(void) {
+static void send_status(void)
+{
   uint32_t imu_nb_err = 0;
 #if USE_MOTOR_MIXING
   uint8_t _motor_nb_err = motor_mixing.nb_saturation + motor_mixing.nb_failure * 10;
@@ -160,15 +164,16 @@ static void send_status(void) {
 #endif
   uint16_t time_sec = sys_time.nb_sec;
   DOWNLINK_SEND_ROTORCRAFT_STATUS(DefaultChannel, DefaultDevice,
-      &imu_nb_err, &_motor_nb_err,
-      &radio_control.status, &radio_control.frame_rate,
-      &fix, &autopilot_mode,
-      &autopilot_in_flight, &autopilot_motors_on,
-      &guidance_h_mode, &guidance_v_mode,
-      &electrical.vsupply, &time_sec);
+                                  &imu_nb_err, &_motor_nb_err,
+                                  &radio_control.status, &radio_control.frame_rate,
+                                  &fix, &autopilot_mode,
+                                  &autopilot_in_flight, &autopilot_motors_on,
+                                  &guidance_h_mode, &guidance_v_mode,
+                                  &electrical.vsupply, &time_sec);
 }
 
-static void send_energy(void) {
+static void send_energy(void)
+{
   const int16_t e = electrical.energy;
   const float vsup = ((float)electrical.vsupply) / 10.0f;
   const float curs = ((float)electrical.current) / 1000.0f;
@@ -176,68 +181,75 @@ static void send_energy(void) {
   DOWNLINK_SEND_ENERGY(DefaultChannel, DefaultDevice, &vsup, &curs, &e, &power);
 }
 
-static void send_fp(void) {
+static void send_fp(void)
+{
   int32_t carrot_up = -guidance_v_z_sp;
   DOWNLINK_SEND_ROTORCRAFT_FP(DefaultChannel, DefaultDevice,
-      &(stateGetPositionEnu_i()->x),
-      &(stateGetPositionEnu_i()->y),
-      &(stateGetPositionEnu_i()->z),
-      &(stateGetSpeedEnu_i()->x),
-      &(stateGetSpeedEnu_i()->y),
-      &(stateGetSpeedEnu_i()->z),
-      &(stateGetNedToBodyEulers_i()->phi),
-      &(stateGetNedToBodyEulers_i()->theta),
-      &(stateGetNedToBodyEulers_i()->psi),
-      &guidance_h_pos_sp.y,
-      &guidance_h_pos_sp.x,
-      &carrot_up,
-      &guidance_h_heading_sp,
-      &stabilization_cmd[COMMAND_THRUST],
-      &autopilot_flight_time);
+                              &(stateGetPositionEnu_i()->x),
+                              &(stateGetPositionEnu_i()->y),
+                              &(stateGetPositionEnu_i()->z),
+                              &(stateGetSpeedEnu_i()->x),
+                              &(stateGetSpeedEnu_i()->y),
+                              &(stateGetSpeedEnu_i()->z),
+                              &(stateGetNedToBodyEulers_i()->phi),
+                              &(stateGetNedToBodyEulers_i()->theta),
+                              &(stateGetNedToBodyEulers_i()->psi),
+                              &guidance_h_pos_sp.y,
+                              &guidance_h_pos_sp.x,
+                              &carrot_up,
+                              &guidance_h_heading_sp,
+                              &stabilization_cmd[COMMAND_THRUST],
+                              &autopilot_flight_time);
 }
 
 #ifdef RADIO_CONTROL
-static void send_rc(void) {
+static void send_rc(void)
+{
   DOWNLINK_SEND_RC(DefaultChannel, DefaultDevice, RADIO_CONTROL_NB_CHANNEL, radio_control.values);
 }
 
-static void send_rotorcraft_rc(void) {
+static void send_rotorcraft_rc(void)
+{
 #ifdef RADIO_KILL_SWITCH
   int16_t _kill_switch = radio_control.values[RADIO_KILL_SWITCH];
 #else
   int16_t _kill_switch = 42;
 #endif
   DOWNLINK_SEND_ROTORCRAFT_RADIO_CONTROL(DefaultChannel, DefaultDevice,
-      &radio_control.values[RADIO_ROLL],
-      &radio_control.values[RADIO_PITCH],
-      &radio_control.values[RADIO_YAW],
-      &radio_control.values[RADIO_THROTTLE],
-      &radio_control.values[RADIO_MODE],
-      &_kill_switch,
-      &radio_control.status);
+                                         &radio_control.values[RADIO_ROLL],
+                                         &radio_control.values[RADIO_PITCH],
+                                         &radio_control.values[RADIO_YAW],
+                                         &radio_control.values[RADIO_THROTTLE],
+                                         &radio_control.values[RADIO_MODE],
+                                         &_kill_switch,
+                                         &radio_control.status);
 }
 #endif
 
 #ifdef ACTUATORS
-static void send_actuators(void) {
+static void send_actuators(void)
+{
   DOWNLINK_SEND_ACTUATORS(DefaultChannel, DefaultDevice , ACTUATORS_NB, actuators);
 }
 #endif
 
-static void send_dl_value(void) {
+static void send_dl_value(void)
+{
   PeriodicSendDlValue(DefaultChannel, DefaultDevice);
 }
 
-static void send_rotorcraft_cmd(void) {
+static void send_rotorcraft_cmd(void)
+{
   DOWNLINK_SEND_ROTORCRAFT_CMD(DefaultChannel, DefaultDevice,
-      &stabilization_cmd[COMMAND_ROLL],
-      &stabilization_cmd[COMMAND_PITCH],
-      &stabilization_cmd[COMMAND_YAW],
-      &stabilization_cmd[COMMAND_THRUST]);
+                               &stabilization_cmd[COMMAND_ROLL],
+                               &stabilization_cmd[COMMAND_PITCH],
+                               &stabilization_cmd[COMMAND_YAW],
+                               &stabilization_cmd[COMMAND_THRUST]);
 }
 
 
-void autopilot_init(void) {
+void autopilot_init(void)
+{
   /* mode is finally set at end of init if MODE_STARTUP is not KILL */
   autopilot_mode = AP_MODE_KILL;
   autopilot_motors_on = FALSE;
@@ -286,23 +298,24 @@ void autopilot_init(void) {
 
 
 #define NAV_PRESCALER (PERIODIC_FREQUENCY / NAV_FREQ)
-void autopilot_periodic(void) {
+void autopilot_periodic(void)
+{
 
   RunOnceEvery(NAV_PRESCALER, compute_dist2_to_home());
 
   if (autopilot_in_flight) {
     if (too_far_from_home) {
-      if (dist2_to_home > failsafe_mode_dist2)
+      if (dist2_to_home > failsafe_mode_dist2) {
         autopilot_set_mode(FAILSAFE_MODE_TOO_FAR_FROM_HOME);
-      else
+      } else {
         autopilot_set_mode(AP_MODE_HOME);
+      }
     }
   }
 
   if (autopilot_mode == AP_MODE_HOME) {
     RunOnceEvery(NAV_PRESCALER, nav_home());
-  }
-  else {
+  } else {
     // otherwise always call nav_periodic_task so that carrot is always updated in GCS for other modes
     RunOnceEvery(NAV_PRESCALER, nav_periodic_task());
   }
@@ -312,13 +325,15 @@ void autopilot_periodic(void) {
    * or just "detected" ground, go to KILL mode.
    */
   if (autopilot_mode == AP_MODE_FAILSAFE) {
-    if (!autopilot_in_flight)
+    if (!autopilot_in_flight) {
       autopilot_set_mode(AP_MODE_KILL);
+    }
 
 #if FAILSAFE_GROUND_DETECT
-INFO("Using FAILSAFE_GROUND_DETECT: KILL")
-    if (autopilot_ground_detected)
+    INFO("Using FAILSAFE_GROUND_DETECT: KILL")
+    if (autopilot_ground_detected) {
       autopilot_set_mode(AP_MODE_KILL);
+    }
 #endif
   }
 
@@ -335,21 +350,22 @@ INFO("Using FAILSAFE_GROUND_DETECT: KILL")
    */
   if (autopilot_mode == AP_MODE_KILL) {
     SetCommands(commands_failsafe);
-  }
-  else {
-    guidance_v_run( autopilot_in_flight );
-    guidance_h_run( autopilot_in_flight );
+  } else {
+    guidance_v_run(autopilot_in_flight);
+    guidance_h_run(autopilot_in_flight);
     SetRotorcraftCommands(stabilization_cmd, autopilot_in_flight, autopilot_motors_on);
   }
 
 }
 
 
-void autopilot_set_mode(uint8_t new_autopilot_mode) {
+void autopilot_set_mode(uint8_t new_autopilot_mode)
+{
 
   /* force kill mode as long as AHRS is not aligned */
-  if (!ahrs_is_aligned())
+  if (!ahrs_is_aligned()) {
     new_autopilot_mode = AP_MODE_KILL;
+  }
 
   if (new_autopilot_mode != autopilot_mode) {
     /* horizontal mode */
@@ -443,37 +459,34 @@ void autopilot_set_mode(uint8_t new_autopilot_mode) {
 }
 
 
-void autopilot_check_in_flight(bool_t motors_on) {
+void autopilot_check_in_flight(bool_t motors_on)
+{
   if (autopilot_in_flight) {
     if (autopilot_in_flight_counter > 0) {
       /* probably in_flight if thrust, speed and accel above IN_FLIGHT_MIN thresholds */
       if ((stabilization_cmd[COMMAND_THRUST] <= AUTOPILOT_IN_FLIGHT_MIN_THRUST) &&
           (abs(stateGetSpeedNed_f()->z) < AUTOPILOT_IN_FLIGHT_MIN_SPEED) &&
-          (abs(stateGetAccelNed_f()->z) < AUTOPILOT_IN_FLIGHT_MIN_ACCEL))
-      {
+          (abs(stateGetAccelNed_f()->z) < AUTOPILOT_IN_FLIGHT_MIN_ACCEL)) {
         autopilot_in_flight_counter--;
         if (autopilot_in_flight_counter == 0) {
           autopilot_in_flight = FALSE;
         }
-      }
-      else {  /* thrust, speed or accel not above min threshold, reset counter */
+      } else { /* thrust, speed or accel not above min threshold, reset counter */
         autopilot_in_flight_counter = AUTOPILOT_IN_FLIGHT_TIME;
       }
     }
-  }
-  else { /* currently not in flight */
+  } else { /* currently not in flight */
     if (autopilot_in_flight_counter < AUTOPILOT_IN_FLIGHT_TIME &&
-        motors_on)
-    {
+        motors_on) {
       /* if thrust above min threshold, assume in_flight.
        * Don't check for velocity and acceleration above threshold here...
        */
       if (stabilization_cmd[COMMAND_THRUST] > AUTOPILOT_IN_FLIGHT_MIN_THRUST) {
         autopilot_in_flight_counter++;
-        if (autopilot_in_flight_counter == AUTOPILOT_IN_FLIGHT_TIME)
+        if (autopilot_in_flight_counter == AUTOPILOT_IN_FLIGHT_TIME) {
           autopilot_in_flight = TRUE;
-      }
-      else { /* currently not in_flight and thrust below threshold, reset counter */
+        }
+      } else { /* currently not in_flight and thrust below threshold, reset counter */
         autopilot_in_flight_counter = 0;
       }
     }
@@ -481,27 +494,28 @@ void autopilot_check_in_flight(bool_t motors_on) {
 }
 
 
-void autopilot_set_motors_on(bool_t motors_on) {
-  if (autopilot_mode != AP_MODE_KILL && ahrs_is_aligned() && motors_on)
+void autopilot_set_motors_on(bool_t motors_on)
+{
+  if (autopilot_mode != AP_MODE_KILL && ahrs_is_aligned() && motors_on) {
     autopilot_motors_on = TRUE;
-  else
+  } else {
     autopilot_motors_on = FALSE;
+  }
   kill_throttle = ! autopilot_motors_on;
   autopilot_arming_set(autopilot_motors_on);
 }
 
 
-void autopilot_on_rc_frame(void) {
+void autopilot_on_rc_frame(void)
+{
 
   if (kill_switch_is_on()) {
     autopilot_set_mode(AP_MODE_KILL);
-  }
-  else if ((autopilot_mode != AP_MODE_HOME)
+  } else if ((autopilot_mode != AP_MODE_HOME)
 #if UNLOCKED_HOME_MODE
-           || !too_far_from_home
+             || !too_far_from_home
 #endif
-           )
-  {
+            ) {
     uint8_t new_autopilot_mode = 0;
     AP_MODE_OF_PPRZ(radio_control.values[RADIO_MODE], new_autopilot_mode);
 

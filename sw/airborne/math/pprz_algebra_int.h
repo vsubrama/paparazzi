@@ -455,42 +455,50 @@ extern void int32_quat_comp(struct Int32Quat* a2c, struct Int32Quat* a2b, struct
 /** Composition (multiplication) of two quaternions.
  * a2b = a2c comp_inv b2c , aka  a2b = a2c * inv(b2c)
  */
-extern void int32_quat_comp_inv(struct Int32Quat* a2b, struct Int32Quat* a2c, struct Int32Quat* b2c);
+extern void int32_quat_comp_inv(struct Int32Quat* a2b, struct Int32Quat* a2c,
+                                struct Int32Quat* b2c);
 
 /** Composition (multiplication) of two quaternions.
  * b2c = a2b inv_comp a2c , aka  b2c = inv(_a2b) * a2c
  */
-extern void int32_quat_inv_comp(struct Int32Quat* b2c, struct Int32Quat* a2b, struct Int32Quat* a2c);
+extern void int32_quat_inv_comp(struct Int32Quat* b2c, struct Int32Quat* a2b,
+                                struct Int32Quat* a2c);
 
 /** Composition (multiplication) of two quaternions with normalization.
  * a2c = a2b comp b2c , aka  a2c = a2b * b2c
  */
-extern void int32_quat_comp_norm_shortest(struct Int32Quat* a2c, struct Int32Quat* a2b, struct Int32Quat* b2c);
+extern void int32_quat_comp_norm_shortest(struct Int32Quat* a2c, struct Int32Quat* a2b,
+    struct Int32Quat* b2c);
 
 /** Composition (multiplication) of two quaternions with normalization.
  * a2b = a2c comp_inv b2c , aka  a2b = a2c * inv(b2c)
  */
-extern void int32_quat_comp_inv_norm_shortest(struct Int32Quat* a2b, struct Int32Quat* a2c, struct Int32Quat* b2c);
+extern void int32_quat_comp_inv_norm_shortest(struct Int32Quat* a2b, struct Int32Quat* a2c,
+    struct Int32Quat* b2c);
 
 /** Composition (multiplication) of two quaternions with normalization.
  * b2c = a2b inv_comp a2c , aka  b2c = inv(_a2b) * a2c
  */
-extern void int32_quat_inv_comp_norm_shortest(struct Int32Quat* b2c, struct Int32Quat* a2b, struct Int32Quat* a2c);
+extern void int32_quat_inv_comp_norm_shortest(struct Int32Quat* b2c, struct Int32Quat* a2b,
+    struct Int32Quat* a2c);
 
 /** Quaternion derivative from rotational velocity.
  * qd = -0.5*omega(r) * q
  * or equally:
  * qd = 0.5 * q * omega(r)
  */
-extern void int32_quat_derivative(struct Int32Quat* qd, const struct Int32Rates* r, struct Int32Quat* q);
+extern void int32_quat_derivative(struct Int32Quat* qd, const struct Int32Rates* r,
+                                  struct Int32Quat* q);
 
 /** in place quaternion first order integration with constant rotational velocity. */
-extern void int32_quat_integrate_fi(struct Int32Quat* q, struct Int64Quat* hr, struct Int32Rates* omega, int freq);
+extern void int32_quat_integrate_fi(struct Int32Quat* q, struct Int64Quat* hr,
+                                    struct Int32Rates* omega, int freq);
 
 /** rotate 3D vector by quaternion.
  * vb = q_a2b * va * q_a2b^-1
  */
-extern void int32_quat_vmult(struct Int32Vect3* v_out, struct Int32Quat* q, struct Int32Vect3* v_in);
+extern void int32_quat_vmult(struct Int32Vect3* v_out, struct Int32Quat* q,
+                             struct Int32Vect3* v_in);
 
 /// Quaternion from Euler angles.
 extern void int32_quat_of_eulers(struct Int32Quat* q, struct Int32Eulers* e);
@@ -566,8 +574,10 @@ extern void int32_eulers_of_quat(struct Int32Eulers* e, struct Int32Quat* q);
   }
 
 
-extern void int32_rates_of_eulers_dot_321(struct Int32Rates* r, struct Int32Eulers* e, struct Int32Eulers* ed);
-extern void int32_eulers_dot_321_of_rates(struct Int32Eulers* ed, struct Int32Eulers* e, struct Int32Rates* r);
+extern void int32_rates_of_eulers_dot_321(struct Int32Rates* r, struct Int32Eulers* e,
+    struct Int32Eulers* ed);
+extern void int32_eulers_dot_321_of_rates(struct Int32Eulers* ed, struct Int32Eulers* e,
+    struct Int32Rates* r);
 
 #define int32_eulers_dot_of_rates int32_eulers_dot_321_of_rates
 

@@ -31,48 +31,56 @@
 #include "mcu_periph/uart.h"
 #include "armVIC.h"
 
-static inline void uart_disable_interrupts(struct uart_periph* p) {
+static inline void uart_disable_interrupts(struct uart_periph* p)
+{
   // disable interrups
-  ((uartRegs_t *)(p->reg_addr))->ier = 0x00;  // disable all interrupts
-  ((uartRegs_t *)(p->reg_addr))->iir;         // clear interrupt ID
-  ((uartRegs_t *)(p->reg_addr))->rbr;         // clear receive register
-  ((uartRegs_t *)(p->reg_addr))->lsr;         // clear line status register
+  ((uartRegs_t*)(p->reg_addr))->ier = 0x00;   // disable all interrupts
+  ((uartRegs_t*)(p->reg_addr))->iir;          // clear interrupt ID
+  ((uartRegs_t*)(p->reg_addr))->rbr;          // clear receive register
+  ((uartRegs_t*)(p->reg_addr))->lsr;          // clear line status register
 }
 
-static inline void uart_enable_interrupts(struct uart_periph* p) {
+static inline void uart_enable_interrupts(struct uart_periph* p)
+{
   // enable receiver interrupts
-  ((uartRegs_t *)(p->reg_addr))->ier = UIER_ERBFI;
+  ((uartRegs_t*)(p->reg_addr))->ier = UIER_ERBFI;
 }
 
-static inline void uart_set_baudrate(struct uart_periph* p, uint32_t baud) {
+static inline void uart_set_baudrate(struct uart_periph* p, uint32_t baud)
+{
   /* calculate the baudrate */
   uint32_t _baud_reg_val = (uint16_t)((PCLK / (((float)baud) * 16.0)) + 0.5);
   /* select divisor latches */
-  ((uartRegs_t *)(p->reg_addr))->lcr = ULCR_DLAB_ENABLE;
+  ((uartRegs_t*)(p->reg_addr))->lcr = ULCR_DLAB_ENABLE;
   /* set for baud low byte */
-  ((uartRegs_t *)(p->reg_addr))->dll = (uint8_t)_baud_reg_val;
+  ((uartRegs_t*)(p->reg_addr))->dll = (uint8_t)_baud_reg_val;
   /* set for baud high byte */
-  ((uartRegs_t *)(p->reg_addr))->dlm = (uint8_t)(_baud_reg_val >> 8);
+  ((uartRegs_t*)(p->reg_addr))->dlm = (uint8_t)(_baud_reg_val >> 8);
 
   // set the number of characters and other
   // user specified operating parameters
   // For now: hard wired configuration 8 bits 1 stop no parity
   //          fifo triger -> 8 bytes
-  ((uartRegs_t *)(p->reg_addr))->lcr = (UART_8N1 & ~ULCR_DLAB_ENABLE);
-  ((uartRegs_t *)(p->reg_addr))->fcr = UART_FIFO_8;
+  ((uartRegs_t*)(p->reg_addr))->lcr = (UART_8N1 & ~ULCR_DLAB_ENABLE);
+  ((uartRegs_t*)(p->reg_addr))->fcr = UART_FIFO_8;
 }
 
-void uart_periph_set_baudrate(struct uart_periph* p, uint32_t baud) {
+void uart_periph_set_baudrate(struct uart_periph* p, uint32_t baud)
+{
   uart_disable_interrupts(p);
   uart_set_baudrate(p, baud);
   uart_enable_interrupts(p);
 }
 
-void uart_periph_set_bits_stop_parity(struct uart_periph* p __attribute__((unused)), uint8_t bits __attribute__((unused)), uint8_t stop __attribute__((unused)), uint8_t __attribute__((unused)) parity) {
+void uart_periph_set_bits_stop_parity(struct uart_periph* p __attribute__((unused)),
+                                      uint8_t bits __attribute__((unused)), uint8_t stop __attribute__((unused)),
+                                      uint8_t __attribute__((unused)) parity)
+{
   // TBD
 }
 
-void uart_transmit(struct uart_periph* p, uint8_t data ) {
+void uart_transmit(struct uart_periph* p, uint8_t data)
+{
   uint16_t temp;
   unsigned cpsr;
 
@@ -83,7 +91,7 @@ void uart_transmit(struct uart_periph* p, uint8_t data ) {
   }
 
   cpsr = disableIRQ();                                // disable global interrupts
-  ((uartRegs_t *)(p->reg_addr))->ier &= ~UIER_ETBEI;  // disable TX interrupts
+  ((uartRegs_t*)(p->reg_addr))->ier &= ~UIER_ETBEI;   // disable TX interrupts
   restoreIRQ(cpsr);                                   // restore global interrupts
 
   // check if in process of sending data
@@ -94,11 +102,11 @@ void uart_transmit(struct uart_periph* p, uint8_t data ) {
   } else {
     // set running flag and write to output register
     p->tx_running = 1;
-    ((uartRegs_t *)(p->reg_addr))->thr = data;
+    ((uartRegs_t*)(p->reg_addr))->thr = data;
   }
 
   cpsr = disableIRQ();                              // disable global interrupts
-  ((uartRegs_t *)(p->reg_addr))->ier |= UIER_ETBEI; // enable TX interrupts
+  ((uartRegs_t*)(p->reg_addr))->ier |= UIER_ETBEI;  // enable TX interrupts
   restoreIRQ(cpsr);                                 // restore global interrupts
 }
 
@@ -106,45 +114,38 @@ static inline void uart_ISR(struct uart_periph* p)
 {
   uint8_t iid;
   // loop until not more interrupt sources
-  while (((iid = ((uartRegs_t *)(p->reg_addr))->iir) & UIIR_NO_INT) == 0)
-  {
+  while (((iid = ((uartRegs_t*)(p->reg_addr))->iir) & UIIR_NO_INT) == 0) {
     // identify & process the highest priority interrupt
-    switch (iid & UIIR_ID_MASK)
-    {
+    switch (iid & UIIR_ID_MASK) {
       case UIIR_RLS_INT:                // Receive Line Status
-        ((uartRegs_t *)(p->reg_addr))->lsr; // read LSR to clear
+        ((uartRegs_t*)(p->reg_addr))->lsr;  // read LSR to clear
         break;
 
       case UIIR_CTI_INT:                // Character Timeout Indicator
       case UIIR_RDA_INT:                // Receive Data Available
-        do
-        {
+        do {
           uint16_t temp;
 
           // calc next insert index & store character
           temp = (p->rx_insert_idx + 1) % UART_RX_BUFFER_SIZE;
-          p->rx_buf[p->rx_insert_idx] = ((uartRegs_t *)(p->reg_addr))->rbr;
+          p->rx_buf[p->rx_insert_idx] = ((uartRegs_t*)(p->reg_addr))->rbr;
 
           // check for more room in queue
-          if (temp != p->rx_extract_idx)
-            p->rx_insert_idx = temp; // update insert index
-        }
-        while (((uartRegs_t *)(p->reg_addr))->lsr & ULSR_RDR);
+          if (temp != p->rx_extract_idx) {
+            p->rx_insert_idx = temp;  // update insert index
+          }
+        } while (((uartRegs_t*)(p->reg_addr))->lsr & ULSR_RDR);
 
         break;
 
       case UIIR_THRE_INT:               // Transmit Holding Register Empty
-        while (((uartRegs_t *)(p->reg_addr))->lsr & ULSR_THRE)
-        {
+        while (((uartRegs_t*)(p->reg_addr))->lsr & ULSR_THRE) {
           // check if more data to send
-          if (p->tx_insert_idx != p->tx_extract_idx)
-          {
-            ((uartRegs_t *)(p->reg_addr))->thr = p->tx_buf[p->tx_extract_idx];
+          if (p->tx_insert_idx != p->tx_extract_idx) {
+            ((uartRegs_t*)(p->reg_addr))->thr = p->tx_buf[p->tx_extract_idx];
             p->tx_extract_idx++;
             p->tx_extract_idx %= UART_TX_BUFFER_SIZE;
-          }
-          else
-          {
+          } else {
             // no
             p->tx_running = 0;       // clear running flag
             break;
@@ -154,8 +155,8 @@ static inline void uart_ISR(struct uart_periph* p)
         break;
 
       default:                          // Unknown
-        ((uartRegs_t *)(p->reg_addr))->lsr;
-        ((uartRegs_t *)(p->reg_addr))->rbr;
+        ((uartRegs_t*)(p->reg_addr))->lsr;
+        ((uartRegs_t*)(p->reg_addr))->rbr;
         break;
     }
   }
@@ -169,12 +170,12 @@ static inline void uart_ISR(struct uart_periph* p)
 
 /* by default enable UART Tx and Rx */
 #ifndef USE_UART0_TX
-  #ifdef USE_UART0_RX_ONLY
-    #warning "USE_UART0_RX_ONLY is deprecated, please set USE_UART0_TX=FALSE instead"
-    #define USE_UART0_TX FALSE
-  #else
-    #define USE_UART0_TX TRUE
-  #endif
+#ifdef USE_UART0_RX_ONLY
+#warning "USE_UART0_RX_ONLY is deprecated, please set USE_UART0_TX=FALSE instead"
+#define USE_UART0_TX FALSE
+#else
+#define USE_UART0_TX TRUE
+#endif
 #endif
 #ifndef USE_UART0_RX
 #define USE_UART0_RX TRUE
@@ -182,7 +183,8 @@ static inline void uart_ISR(struct uart_periph* p)
 
 void uart0_ISR(void) __attribute__((naked));
 
-void uart0_ISR(void) {
+void uart0_ISR(void)
+{
   // perform proper ISR entry so thumb-interwork works properly
   ISR_ENTRY();
 
@@ -192,7 +194,8 @@ void uart0_ISR(void) {
   ISR_EXIT();                           // recover registers and return
 }
 
-void uart0_init( void ) {
+void uart0_init(void)
+{
 
   uart_periph_init(&uart0);
   uart0.reg_addr = UART0_BASE;
@@ -230,12 +233,12 @@ void uart0_init( void ) {
 
 /* by default enable UART Tx and Rx */
 #ifndef USE_UART1_TX
-  #ifdef USE_UART1_RX_ONLY
-    #warning "USE_UART1_RX_ONLY is deprecated, please set USE_UART1_TX=FALSE instead"
-    #define USE_UART1_TX FALSE
-  #else
-    #define USE_UART1_TX TRUE
-  #endif
+#ifdef USE_UART1_RX_ONLY
+#warning "USE_UART1_RX_ONLY is deprecated, please set USE_UART1_TX=FALSE instead"
+#define USE_UART1_TX FALSE
+#else
+#define USE_UART1_TX TRUE
+#endif
 #endif
 #ifndef USE_UART1_RX
 #define USE_UART1_RX TRUE
@@ -243,7 +246,8 @@ void uart0_init( void ) {
 
 void uart1_ISR(void) __attribute__((naked));
 
-void uart1_ISR(void) {
+void uart1_ISR(void)
+{
   // perform proper ISR entry so thumb-interwork works properly
   ISR_ENTRY();
 
@@ -253,7 +257,8 @@ void uart1_ISR(void) {
   ISR_EXIT();                           // recover registers and return
 }
 
-void uart1_init( void ) {
+void uart1_init(void)
+{
 
   uart_periph_init(&uart1);
   uart1.reg_addr = UART1_BASE;

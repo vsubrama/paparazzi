@@ -157,11 +157,11 @@ extern uint16_t downlink_nb_msgs;
 #define DownlinkCountBytes(_trans, _dev, _n) downlink_nb_bytes += _n;
 
 #define DownlinkStartMessage(_trans, _dev, _name, msg_id, payload_len) { \
-  downlink_nb_msgs++; \
-  Transport(_trans, Header(_dev, DownlinkIDsSize(_trans, _dev, payload_len))); \
-  Transport(_trans, PutUint8(_dev, AC_ID)); \
-  Transport(_trans, PutNamedUint8(_dev, _name, msg_id)); \
-}
+    downlink_nb_msgs++; \
+    Transport(_trans, Header(_dev, DownlinkIDsSize(_trans, _dev, payload_len))); \
+    Transport(_trans, PutUint8(_dev, AC_ID)); \
+    Transport(_trans, PutNamedUint8(_dev, _name, msg_id)); \
+  }
 
 #define DownlinkEndMessage(_trans, _dev) Transport(_trans, Trailer(_dev))
 

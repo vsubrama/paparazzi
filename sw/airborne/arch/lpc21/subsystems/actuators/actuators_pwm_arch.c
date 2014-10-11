@@ -32,45 +32,52 @@
 
 const uint8_t pwm_latch_value = 0
 #if defined PWM_SERVO_0
-    | PWM_SERVO_0_LATCH
+                                | PWM_SERVO_0_LATCH
 #endif
 #if defined PWM_SERVO_1
-    | PWM_SERVO_1_LATCH
+                                | PWM_SERVO_1_LATCH
 #endif
 #if defined PWM_SERVO_2
-    | PWM_SERVO_2_LATCH
+                                | PWM_SERVO_2_LATCH
 #endif
 #if defined PWM_SERVO_3
-    | PWM_SERVO_3_LATCH
+                                | PWM_SERVO_3_LATCH
 #endif
 #if defined PWM_SERVO_4
-    | PWM_SERVO_4_LATCH
+                                | PWM_SERVO_4_LATCH
 #endif
 #if defined PWM_SERVO_5
-    | PWM_SERVO_5_LATCH
+                                | PWM_SERVO_5_LATCH
 #endif
-  ;
+                                ;
 
-void actuators_pwm_arch_init ( void ) {
+void actuators_pwm_arch_init(void)
+{
 
   /* configure pins for PWM */
 #if defined PWM_SERVO_0
-  PWM_SERVO_0_PINSEL = (PWM_SERVO_0_PINSEL & PWM_SERVO_0_PINSEL_MASK) | PWM_SERVO_0_PINSEL_VAL << PWM_SERVO_0_PINSEL_BIT;
+  PWM_SERVO_0_PINSEL = (PWM_SERVO_0_PINSEL & PWM_SERVO_0_PINSEL_MASK) | PWM_SERVO_0_PINSEL_VAL <<
+                       PWM_SERVO_0_PINSEL_BIT;
 #endif
 #if defined PWM_SERVO_1
-  PWM_SERVO_1_PINSEL = (PWM_SERVO_1_PINSEL & PWM_SERVO_1_PINSEL_MASK) | PWM_SERVO_1_PINSEL_VAL << PWM_SERVO_1_PINSEL_BIT;
+  PWM_SERVO_1_PINSEL = (PWM_SERVO_1_PINSEL & PWM_SERVO_1_PINSEL_MASK) | PWM_SERVO_1_PINSEL_VAL <<
+                       PWM_SERVO_1_PINSEL_BIT;
 #endif
 #if defined PWM_SERVO_2
-  PWM_SERVO_2_PINSEL = (PWM_SERVO_2_PINSEL & PWM_SERVO_2_PINSEL_MASK) | PWM_SERVO_2_PINSEL_VAL << PWM_SERVO_2_PINSEL_BIT;
+  PWM_SERVO_2_PINSEL = (PWM_SERVO_2_PINSEL & PWM_SERVO_2_PINSEL_MASK) | PWM_SERVO_2_PINSEL_VAL <<
+                       PWM_SERVO_2_PINSEL_BIT;
 #endif
 #if defined PWM_SERVO_3
-  PWM_SERVO_3_PINSEL = (PWM_SERVO_3_PINSEL & PWM_SERVO_3_PINSEL_MASK) | PWM_SERVO_3_PINSEL_VAL << PWM_SERVO_3_PINSEL_BIT;
+  PWM_SERVO_3_PINSEL = (PWM_SERVO_3_PINSEL & PWM_SERVO_3_PINSEL_MASK) | PWM_SERVO_3_PINSEL_VAL <<
+                       PWM_SERVO_3_PINSEL_BIT;
 #endif
 #if defined PWM_SERVO_4
-  PWM_SERVO_4_PINSEL = (PWM_SERVO_4_PINSEL & PWM_SERVO_4_PINSEL_MASK) | PWM_SERVO_4_PINSEL_VAL << PWM_SERVO_4_PINSEL_BIT;
+  PWM_SERVO_4_PINSEL = (PWM_SERVO_4_PINSEL & PWM_SERVO_4_PINSEL_MASK) | PWM_SERVO_4_PINSEL_VAL <<
+                       PWM_SERVO_4_PINSEL_BIT;
 #endif
 #if defined PWM_SERVO_5
-  PWM_SERVO_5_PINSEL = (PWM_SERVO_5_PINSEL & PWM_SERVO_5_PINSEL_MASK) | PWM_SERVO_5_PINSEL_VAL << PWM_SERVO_5_PINSEL_BIT;
+  PWM_SERVO_5_PINSEL = (PWM_SERVO_5_PINSEL & PWM_SERVO_5_PINSEL_MASK) | PWM_SERVO_5_PINSEL_VAL <<
+                       PWM_SERVO_5_PINSEL_BIT;
 #endif
 
   /* set servo refresh rate */
@@ -83,24 +90,24 @@ void actuators_pwm_arch_init ( void ) {
   /* enable all 6 PWM outputs in single edge mode*/
   PWMPCR = 0
 #if defined PWM_SERVO_0
-    | PWM_SERVO_0_ENA
+           | PWM_SERVO_0_ENA
 #endif
 #if defined PWM_SERVO_1
-    | PWM_SERVO_1_ENA
+           | PWM_SERVO_1_ENA
 #endif
 #if defined PWM_SERVO_2
-    | PWM_SERVO_2_ENA
+           | PWM_SERVO_2_ENA
 #endif
 #if defined PWM_SERVO_3
-    | PWM_SERVO_3_ENA
+           | PWM_SERVO_3_ENA
 #endif
 #if defined PWM_SERVO_4
-    | PWM_SERVO_4_ENA
+           | PWM_SERVO_4_ENA
 #endif
 #if defined PWM_SERVO_5
-    | PWM_SERVO_5_ENA
+           | PWM_SERVO_5_ENA
 #endif
-    ;
+           ;
 
   /* commit PWMMRx changes */
   PWMLER = PWMLER_LATCH0;

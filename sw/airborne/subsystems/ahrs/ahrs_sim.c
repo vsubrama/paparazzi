@@ -50,7 +50,8 @@ float ins_roll_neutral = INS_ROLL_NEUTRAL_DEFAULT;
 float ins_pitch_neutral = INS_PITCH_NEUTRAL_DEFAULT;
 
 
-void update_ahrs_from_sim(void) {
+void update_ahrs_from_sim(void)
+{
 
   struct FloatEulers ltp_to_imu_euler = { sim_phi, sim_theta, sim_psi };
   struct FloatRates imu_rate = { sim_p, sim_q, sim_r };
@@ -61,7 +62,8 @@ void update_ahrs_from_sim(void) {
 }
 
 
-void ahrs_init(void) {
+void ahrs_init(void)
+{
   //ahrs_float.status = AHRS_UNINIT;
   // set to running for now
   ahrs.status = AHRS_RUNNING;
@@ -82,7 +84,8 @@ void ahrs_align(void)
 }
 
 
-void ahrs_propagate(float dt __attribute__((unused))) {
+void ahrs_propagate(float dt __attribute__((unused)))
+{
   if (ahrs_sim_available) {
     update_ahrs_from_sim();
     ahrs_sim_available = FALSE;

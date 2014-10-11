@@ -78,10 +78,14 @@ bool_t log_ptu_started;
 static inline void meteo_stick_send_data(void)
 {
   float ptu_data[MS_DATA_SIZE];
-  ptu_data[0] = (float)(MS_PRESSURE_SCALE * ((int32_t)meteo_stick.pressure.data - MS_PRESSURE_OFFSET));
-  ptu_data[1] = (float)(MS_TEMPERATURE_SCALE * ((int32_t)meteo_stick.temperature.data - MS_TEMPERATURE_OFFSET));
-  ptu_data[2] = (float)(MS_HUMIDTY_SCALE * ((int32_t)meteo_stick.humidity_period - MS_HUMIDTY_OFFSET));
-  ptu_data[3] = (float)(MS_DIFF_PRESSURE_SCALE * ((int32_t)meteo_stick.diff_pressure.data - MS_DIFF_PRESSURE_OFFSET));
+  ptu_data[0] = (float)(MS_PRESSURE_SCALE * ((int32_t)meteo_stick.pressure.data -
+                        MS_PRESSURE_OFFSET));
+  ptu_data[1] = (float)(MS_TEMPERATURE_SCALE * ((int32_t)meteo_stick.temperature.data -
+                        MS_TEMPERATURE_OFFSET));
+  ptu_data[2] = (float)(MS_HUMIDTY_SCALE * ((int32_t)meteo_stick.humidity_period -
+                        MS_HUMIDTY_OFFSET));
+  ptu_data[3] = (float)(MS_DIFF_PRESSURE_SCALE * ((int32_t)meteo_stick.diff_pressure.data -
+                        MS_DIFF_PRESSURE_OFFSET));
   DOWNLINK_SEND_PAYLOAD_FLOAT(DefaultChannel, DefaultDevice, MS_DATA_SIZE, ptu_data);
 }
 
@@ -152,16 +156,16 @@ void meteo_stick_periodic(void)
 #if LOG_MS
   if (pprzLogFile.fs != NULL) {
     if (!log_ptu_started) {
-      sdLogWriteLog(&pprzLogFile, "P(adc) T(adc) H(ticks) P_diff(adc) GPS_fix TOW(ms) Week Lat(1e7rad) Lon(1e7rad) HMSL(mm) gpseed(cm/s) course(1e7rad) climb(cm/s)\n");
+      sdLogWriteLog(&pprzLogFile,
+                    "P(adc) T(adc) H(ticks) P_diff(adc) GPS_fix TOW(ms) Week Lat(1e7rad) Lon(1e7rad) HMSL(mm) gpseed(cm/s) course(1e7rad) climb(cm/s)\n");
       log_ptu_started = TRUE;
-    }
-    else {
+    } else {
       sdLogWriteLog(&pprzLogFile, "%d %d %d %d %d %d %d %d %d %d %d %d %d\n",
-          meteo_stick.pressure.data, meteo_stick.temperature.data,
-          meteo_stick.humidity_period, meteo_stick.diff_pressure.data,
-          gps.fix, gps.tow, gps.week,
-          gps.lla_pos.lat, gps.lla_pos.lon, gps.hmsl,
-          gps.gspeed, gps.course, -gps.ned_vel.z);
+                    meteo_stick.pressure.data, meteo_stick.temperature.data,
+                    meteo_stick.humidity_period, meteo_stick.diff_pressure.data,
+                    gps.fix, gps.tow, gps.week,
+                    gps.lla_pos.lat, gps.lla_pos.lon, gps.hmsl,
+                    gps.gspeed, gps.course, -gps.ned_vel.z);
     }
   }
 #endif
@@ -189,7 +193,8 @@ void meteo_stick_event(void)
 
   // send differential pressure data over ABI as soon as available
   if (meteo_stick.diff_pressure.data_available) {
-    float diff = MS_DIFF_PRESSURE_SCALE * (float)((int32_t)meteo_stick.diff_pressure.data - MS_DIFF_PRESSURE_OFFSET);
+    float diff = MS_DIFF_PRESSURE_SCALE * (float)((int32_t)meteo_stick.diff_pressure.data -
+                 MS_DIFF_PRESSURE_OFFSET);
     AbiSendMsgBARO_DIFF(METEO_STICK_SENDER_ID, &diff);
     meteo_stick.diff_pressure.data_available = FALSE;
   }

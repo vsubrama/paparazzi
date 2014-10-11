@@ -76,30 +76,36 @@ tid_t electrical_tid;   ///< id for electrical_periodic() timer
 
 /********** PERIODIC MESSAGES ************************************************/
 #if PERIODIC_TELEMETRY
-static void send_commands(void) {
+static void send_commands(void)
+{
   DOWNLINK_SEND_COMMANDS(DefaultChannel, DefaultDevice, COMMANDS_NB, commands);
 }
 
 #ifdef RADIO_CONTROL
-static void send_fbw_status(void) {
+static void send_fbw_status(void)
+{
   DOWNLINK_SEND_FBW_STATUS(DefaultChannel, DefaultDevice,
-      &(radio_control.status), &(radio_control.frame_rate), &fbw_mode, &electrical.vsupply, &electrical.current);
+                           &(radio_control.status), &(radio_control.frame_rate), &fbw_mode, &electrical.vsupply,
+                           &electrical.current);
 }
 
-static void send_rc(void) {
+static void send_rc(void)
+{
   DOWNLINK_SEND_RC(DefaultChannel, DefaultDevice, RADIO_CONTROL_NB_CHANNEL, radio_control.values);
 }
 
 #else
-static void send_fbw_status(void) {
+static void send_fbw_status(void)
+{
   uint8_t dummy = 0;
   DOWNLINK_SEND_FBW_STATUS(DefaultChannel, DefaultDevice,
-      &dummy, &dummy, &fbw_mode, &electrical.vsupply, &electrical.current);
+                           &dummy, &dummy, &fbw_mode, &electrical.vsupply, &electrical.current);
 }
 #endif
 
 #ifdef ACTUATORS
-static void send_actuators(void) {
+static void send_actuators(void)
+{
   DOWNLINK_SEND_ACTUATORS(DefaultChannel, DefaultDevice , ACTUATORS_NB, actuators);
 }
 #endif
@@ -107,7 +113,8 @@ static void send_actuators(void) {
 #endif
 
 /********** INIT *************************************************************/
-void init_fbw( void ) {
+void init_fbw(void)
+{
 
   mcu_init();
 
@@ -137,7 +144,7 @@ void init_fbw( void ) {
   fbw_mode = FBW_MODE_FAILSAFE;
 
   /**** start timers for periodic functions *****/
-  fbw_periodic_tid = sys_time_register_timer((1./60.), NULL);
+  fbw_periodic_tid = sys_time_register_timer((1. / 60.), NULL);
   electrical_tid = sys_time_register_timer(0.1, NULL);
 
 #ifndef SINGLE_MCU
@@ -158,7 +165,8 @@ void init_fbw( void ) {
 }
 
 
-static inline void set_failsafe_mode( void ) {
+static inline void set_failsafe_mode(void)
+{
   fbw_mode = FBW_MODE_FAILSAFE;
   SetCommands(commands_failsafe);
   fbw_new_actuators = 1;
@@ -166,10 +174,10 @@ static inline void set_failsafe_mode( void ) {
 
 
 #ifdef RADIO_CONTROL
-static inline void handle_rc_frame( void ) {
+static inline void handle_rc_frame(void)
+{
   fbw_mode = FBW_MODE_OF_PPRZ(radio_control.values[RADIO_MODE]);
-  if (fbw_mode == FBW_MODE_MANUAL)
-  {
+  if (fbw_mode == FBW_MODE_MANUAL) {
     SetCommandsFromRC(commands, radio_control.values);
     fbw_new_actuators = 1;
   }
@@ -179,7 +187,8 @@ static inline void handle_rc_frame( void ) {
 uint8_t ap_has_been_ok = FALSE;
 /********** EVENT ************************************************************/
 
-void event_task_fbw( void) {
+void event_task_fbw(void)
+{
 #ifdef RADIO_CONTROL
   RadioControlEvent(handle_rc_frame);
 #endif
@@ -224,8 +233,7 @@ void event_task_fbw( void) {
       SetCommands(ap_state->commands);
     }
 #ifdef SetApOnlyCommands
-    else
-    {
+    else {
       SetApOnlyCommands(ap_state->commands);
     }
 #endif
@@ -240,42 +248,39 @@ void event_task_fbw( void) {
 #warning DANGER DANGER DANGER DANGER: Outback Challenge Rule FORCE-CRASH-RULE: DANGER DANGER: AP is now capable to FORCE your FBW in failsafe mode EVEN IF RC IS NOT LOST: Consider the consequences.
   // OUTBACK: JURY REQUEST FLIGHT TERMINATION
   int crash = 0;
-  if (commands[COMMAND_FORCECRASH] >= 8000)
-  {
+  if (commands[COMMAND_FORCECRASH] >= 8000) {
     set_failsafe_mode();
     crash = 1;
   }
 
 #endif
 #ifdef ACTUATORS
-  if (fbw_new_actuators > 0)
-  {
+  if (fbw_new_actuators > 0) {
     pprz_t trimmed_commands[COMMANDS_NB];
     int i;
-    for(i = 0; i < COMMANDS_NB; i++) trimmed_commands[i] = commands[i];
+    for (i = 0; i < COMMANDS_NB; i++) { trimmed_commands[i] = commands[i]; }
 
-    #ifdef COMMAND_ROLL
-    trimmed_commands[COMMAND_ROLL] += ChopAbs(command_roll_trim, MAX_PPRZ/10);
-    #endif
-    #ifdef COMMAND_PITCH
-    trimmed_commands[COMMAND_PITCH] += ChopAbs(command_pitch_trim, MAX_PPRZ/10);
-    #endif
-    #ifdef COMMAND_YAW
+#ifdef COMMAND_ROLL
+    trimmed_commands[COMMAND_ROLL] += ChopAbs(command_roll_trim, MAX_PPRZ / 10);
+#endif
+#ifdef COMMAND_PITCH
+    trimmed_commands[COMMAND_PITCH] += ChopAbs(command_pitch_trim, MAX_PPRZ / 10);
+#endif
+#ifdef COMMAND_YAW
     trimmed_commands[COMMAND_YAW] += ChopAbs(command_yaw_trim, MAX_PPRZ);
-    #endif
+#endif
 
     SetActuatorsFromCommands(trimmed_commands, autopilot_mode);
     fbw_new_actuators = 0;
-    #if OUTBACK_CHALLENGE_VERY_DANGEROUS_RULE_AP_CAN_FORCE_FAILSAFE
-    if (crash == 1)
-    {
+#if OUTBACK_CHALLENGE_VERY_DANGEROUS_RULE_AP_CAN_FORCE_FAILSAFE
+    if (crash == 1) {
       for (;;) {
 #if FBW_DATALINK
         fbw_datalink_event();
 #endif
       }
     }
-    #endif
+#endif
 
   }
 #endif
@@ -297,7 +302,8 @@ void event_task_fbw( void) {
 
 
 /************* PERIODIC ******************************************************/
-void periodic_task_fbw( void ) {
+void periodic_task_fbw(void)
+{
 
 #ifdef FBW_DATALINK
   fbw_datalink_periodic();
@@ -318,8 +324,7 @@ void periodic_task_fbw( void ) {
 
 #ifdef INTER_MCU
   inter_mcu_periodic_task();
-  if (fbw_mode == FBW_MODE_AUTO && !ap_ok)
-  {
+  if (fbw_mode == FBW_MODE_AUTO && !ap_ok) {
     set_failsafe_mode();
   }
 #endif
@@ -340,14 +345,17 @@ void periodic_task_fbw( void ) {
 
 }
 
-void handle_periodic_tasks_fbw(void) {
+void handle_periodic_tasks_fbw(void)
+{
 
-  if (sys_time_check_and_ack_timer(fbw_periodic_tid))
+  if (sys_time_check_and_ack_timer(fbw_periodic_tid)) {
     periodic_task_fbw();
+  }
 
 #if !(DISABLE_ELECTRICAL)
-  if (sys_time_check_and_ack_timer(electrical_tid))
+  if (sys_time_check_and_ack_timer(electrical_tid)) {
     electrical_periodic();
+  }
 #endif
 
 }

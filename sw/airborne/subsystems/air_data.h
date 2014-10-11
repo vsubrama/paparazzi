@@ -50,7 +50,7 @@ extern struct AirData air_data;
 
 /** AirData initialization. Called at startup.
  */
-extern void air_data_init( void );
+extern void air_data_init(void);
 
 #endif /* AIR_DATA_H */
 

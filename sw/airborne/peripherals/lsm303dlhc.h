@@ -68,7 +68,7 @@ enum Lsm303dlhcMagConfStatus {
 };
 
 struct Lsm303dlhc {
-  struct i2c_periph *i2c_p;
+  struct i2c_periph* i2c_p;
   struct i2c_transaction i2c_trans;
   bool_t initialized;                 ///< config done flag
   union {
@@ -91,17 +91,19 @@ struct Lsm303dlhc {
 // TODO IRQ handling
 
 // Functions
-extern void lsm303dlhc_init(struct Lsm303dlhc *lsm, struct i2c_periph *i2c_p, uint8_t addr);
-extern void lsm303dlhc_start_configure(struct Lsm303dlhc *lsm);
-extern void lsm303dlhc_read(struct Lsm303dlhc *lsm);
-extern void lsm303dlhc_event(struct Lsm303dlhc *lsm);
+extern void lsm303dlhc_init(struct Lsm303dlhc* lsm, struct i2c_periph* i2c_p, uint8_t addr);
+extern void lsm303dlhc_start_configure(struct Lsm303dlhc* lsm);
+extern void lsm303dlhc_read(struct Lsm303dlhc* lsm);
+extern void lsm303dlhc_event(struct Lsm303dlhc* lsm);
 
 /// convenience function: read or start configuration if not already initialized
-static inline void lsm303dlhc_periodic(struct Lsm303dlhc *lsm) {
-  if (lsm->initialized)
+static inline void lsm303dlhc_periodic(struct Lsm303dlhc* lsm)
+{
+  if (lsm->initialized) {
     lsm303dlhc_read(lsm);
-  else
+  } else {
     lsm303dlhc_start_configure(lsm);
+  }
 }
 
 #endif /* LSM303DLHC_H */

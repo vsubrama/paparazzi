@@ -33,6 +33,6 @@ extern float distance_correction;
 void vPoint(float fPlaneEast, float fPlaneNorth, float fPlaneAltitude,
             float fRollAngle, float fPitchAngle, float fYawAngle,
             float fObjectEast, float fObjectNorth, float fAltitude,
-            float *fPan, float *fTilt);
+            float* fPan, float* fTilt);
 
 #endif /* POINT_H */

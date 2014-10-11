@@ -101,7 +101,8 @@ int pprz_svd_float(float** a, float* w, float** v, int m, int n);
  * @param n number of columns of the matrix A
  * @param l number of columns of the matrix B
  */
-void pprz_svd_solve_float(float** x, float** u, float* w, float** v, float** b, int m, int n, int l);
+void pprz_svd_solve_float(float** x, float** u, float* w, float** v, float** b, int m, int n,
+                          int l);
 
 #ifdef __cplusplus
 } /* extern "C" */

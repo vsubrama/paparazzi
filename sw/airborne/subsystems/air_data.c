@@ -42,14 +42,16 @@ struct AirData air_data;
 #endif
 static abi_event pressure_abs_ev;
 
-static void pressure_abs_cb(uint8_t __attribute__((unused)) sender_id, const float * pressure) {
+static void pressure_abs_cb(uint8_t __attribute__((unused)) sender_id, const float* pressure)
+{
   air_data.pressure = *pressure;
 }
 
 #if PERIODIC_TELEMETRY
 #include "subsystems/datalink/telemetry.h"
 
-static void send_baro_raw(void) {
+static void send_baro_raw(void)
+{
   DOWNLINK_SEND_BARO_RAW(DefaultChannel, DefaultDevice,
                          &air_data.pressure, &air_data.differential);
 }
@@ -58,7 +60,8 @@ static void send_baro_raw(void) {
 /** AirData initialization. Called at startup.
  *  Bind ABI messages
  */
-void air_data_init( void ) {
+void air_data_init(void)
+{
   AbiBindMsgBARO_ABS(AIR_DATA_BARO_ABS_ID, &pressure_abs_ev, pressure_abs_cb);
 
 #if PERIODIC_TELEMETRY

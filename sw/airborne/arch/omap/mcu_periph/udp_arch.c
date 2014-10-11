@@ -29,13 +29,15 @@
 #include <stdlib.h>
 #include <errno.h>
 
-static inline void udp_create_socket(int* sock, const int protocol, const bool_t reuse_addr, const bool_t broadcast);
+static inline void udp_create_socket(int* sock, const int protocol, const bool_t reuse_addr,
+                                     const bool_t broadcast);
 
 
 /**
  * Initialize the UDP stream
  */
-void udp_arch_periph_init(struct udp_periph* p, char* host, int port_out, int port_in, bool_t broadcast)
+void udp_arch_periph_init(struct udp_periph* p, char* host, int port_out, int port_in,
+                          bool_t broadcast)
 {
   struct UdpNetwork* network = malloc(sizeof(struct UdpNetwork));
 
@@ -98,8 +100,9 @@ void udp_send_message(struct udp_periph* p)
   struct UdpNetwork* network = (struct UdpNetwork*) p->network;
 
   if (p->tx_insert_idx > 0) {
-    ssize_t test __attribute__((unused)) = sendto(network->socket_out, p->tx_buf, p->tx_insert_idx, MSG_DONTWAIT,
-                          (struct sockaddr*)&network->addr_out, sizeof(network->addr_out));
+    ssize_t test __attribute__((unused)) = sendto(network->socket_out, p->tx_buf, p->tx_insert_idx,
+                                           MSG_DONTWAIT,
+                                           (struct sockaddr*)&network->addr_out, sizeof(network->addr_out));
     p->tx_insert_idx = 0;
   }
 }
@@ -107,7 +110,8 @@ void udp_send_message(struct udp_periph* p)
 /**
  * Create a new udp socket
  */
-static inline void udp_create_socket(int* sock, const int protocol, const bool_t reuse_addr, const bool_t broadcast)
+static inline void udp_create_socket(int* sock, const int protocol, const bool_t reuse_addr,
+                                     const bool_t broadcast)
 {
   // Create the socket with the correct protocl
   *sock = socket(PF_INET, SOCK_DGRAM, protocol);

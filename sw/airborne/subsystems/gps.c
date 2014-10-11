@@ -45,66 +45,71 @@ struct GpsTimeSync gps_time_sync;
 #if PERIODIC_TELEMETRY
 #include "subsystems/datalink/telemetry.h"
 
-static void send_gps(void) {
+static void send_gps(void)
+{
   static uint8_t i;
   int16_t climb = -gps.ned_vel.z;
-  int16_t course = (DegOfRad(gps.course)/((int32_t)1e6));
+  int16_t course = (DegOfRad(gps.course) / ((int32_t)1e6));
   DOWNLINK_SEND_GPS(DefaultChannel, DefaultDevice, &gps.fix,
-      &gps.utm_pos.east, &gps.utm_pos.north,
-      &course, &gps.hmsl, &gps.gspeed, &climb,
-      &gps.week, &gps.tow, &gps.utm_pos.zone, &i);
-  if ((gps.fix != GPS_FIX_3D) && (i >= gps.nb_channels)) i = 0;
-  if (i >= gps.nb_channels * 2) i = 0;
+                    &gps.utm_pos.east, &gps.utm_pos.north,
+                    &course, &gps.hmsl, &gps.gspeed, &climb,
+                    &gps.week, &gps.tow, &gps.utm_pos.zone, &i);
+  if ((gps.fix != GPS_FIX_3D) && (i >= gps.nb_channels)) { i = 0; }
+  if (i >= gps.nb_channels * 2) { i = 0; }
   if (i < gps.nb_channels && ((gps.fix != GPS_FIX_3D) || (gps.svinfos[i].cno > 0))) {
     DOWNLINK_SEND_SVINFO(DefaultChannel, DefaultDevice, &i,
-        &gps.svinfos[i].svid, &gps.svinfos[i].flags,
-        &gps.svinfos[i].qi, &gps.svinfos[i].cno,
-        &gps.svinfos[i].elev, &gps.svinfos[i].azim);
+                         &gps.svinfos[i].svid, &gps.svinfos[i].flags,
+                         &gps.svinfos[i].qi, &gps.svinfos[i].cno,
+                         &gps.svinfos[i].elev, &gps.svinfos[i].azim);
   }
   i++;
 }
 
-static void send_gps_int(void) {
+static void send_gps_int(void)
+{
   static uint8_t i;
   static uint8_t last_cnos[GPS_NB_CHANNELS];
   DOWNLINK_SEND_GPS_INT(DefaultChannel, DefaultDevice,
-      &gps.ecef_pos.x, &gps.ecef_pos.y, &gps.ecef_pos.z,
-      &gps.lla_pos.lat, &gps.lla_pos.lon, &gps.lla_pos.alt,
-      &gps.hmsl,
-      &gps.ecef_vel.x, &gps.ecef_vel.y, &gps.ecef_vel.z,
-      &gps.pacc, &gps.sacc,
-      &gps.tow,
-      &gps.pdop,
-      &gps.num_sv,
-      &gps.fix);
-  if (i == gps.nb_channels) i = 0;
+                        &gps.ecef_pos.x, &gps.ecef_pos.y, &gps.ecef_pos.z,
+                        &gps.lla_pos.lat, &gps.lla_pos.lon, &gps.lla_pos.alt,
+                        &gps.hmsl,
+                        &gps.ecef_vel.x, &gps.ecef_vel.y, &gps.ecef_vel.z,
+                        &gps.pacc, &gps.sacc,
+                        &gps.tow,
+                        &gps.pdop,
+                        &gps.num_sv,
+                        &gps.fix);
+  if (i == gps.nb_channels) { i = 0; }
   if (i < gps.nb_channels && gps.svinfos[i].cno > 0 && gps.svinfos[i].cno != last_cnos[i]) {
     DOWNLINK_SEND_SVINFO(DefaultChannel, DefaultDevice, &i,
-        &gps.svinfos[i].svid, &gps.svinfos[i].flags,
-        &gps.svinfos[i].qi, &gps.svinfos[i].cno,
-        &gps.svinfos[i].elev, &gps.svinfos[i].azim);
+                         &gps.svinfos[i].svid, &gps.svinfos[i].flags,
+                         &gps.svinfos[i].qi, &gps.svinfos[i].cno,
+                         &gps.svinfos[i].elev, &gps.svinfos[i].azim);
     last_cnos[i] = gps.svinfos[i].cno;
   }
   i++;
 }
 
-static void send_gps_lla(void) {
+static void send_gps_lla(void)
+{
   uint8_t err = 0;
   int16_t climb = -gps.ned_vel.z;
-  int16_t course = (DegOfRad(gps.course)/((int32_t)1e6));
+  int16_t course = (DegOfRad(gps.course) / ((int32_t)1e6));
   DOWNLINK_SEND_GPS_LLA(DefaultChannel, DefaultDevice,
-      &gps.lla_pos.lat, &gps.lla_pos.lon, &gps.lla_pos.alt,
-      &course, &gps.gspeed, &climb,
-      &gps.week, &gps.tow,
-      &gps.fix, &err);
+                        &gps.lla_pos.lat, &gps.lla_pos.lon, &gps.lla_pos.alt,
+                        &course, &gps.gspeed, &climb,
+                        &gps.week, &gps.tow,
+                        &gps.fix, &err);
 }
 
-static void send_gps_sol(void) {
+static void send_gps_sol(void)
+{
   DOWNLINK_SEND_GPS_SOL(DefaultChannel, DefaultDevice, &gps.pacc, &gps.sacc, &gps.pdop, &gps.num_sv);
 }
 #endif
 
-void gps_init(void) {
+void gps_init(void)
+{
   gps.fix = GPS_FIX_NONE;
   gps.week = 0;
   gps.tow = 0;
@@ -133,7 +138,8 @@ void gps_init(void) {
 #endif
 }
 
-void gps_periodic_check(void) {
+void gps_periodic_check(void)
+{
   if (sys_time.nb_sec - gps.last_msg_time > GPS_TIMEOUT) {
     gps.fix = GPS_FIX_NONE;
   }

@@ -48,9 +48,9 @@ extern float airspeed_filter;
 extern bool_t data_valid;
 extern struct i2c_transaction pbn_trans;
 
-extern void pbn_init( void );
-extern void pbn_periodic( void );
-extern void pbn_read_event( void );
+extern void pbn_init(void);
+extern void pbn_periodic(void);
+extern void pbn_read_event(void);
 
 #define PbnEvent() { if (pbn_trans.status == I2CTransSuccess) pbn_read_event(); }
 

@@ -68,7 +68,7 @@ enum Mpl3115Status {
 };
 
 struct Mpl3115 {
-  struct i2c_periph *i2c_p;
+  struct i2c_periph* i2c_p;
   struct i2c_transaction trans;       ///< I2C transaction for reading and configuring
   struct i2c_transaction req_trans;   ///< I2C transaction for conversion request
   enum Mpl3115Status init_status;
@@ -82,10 +82,10 @@ struct Mpl3115 {
 };
 
 // Functions
-extern void mpl3115_init(struct Mpl3115 *mpl, struct i2c_periph *i2c_p, uint8_t addr);
-extern void mpl3115_configure(struct Mpl3115 *mpl);
-extern void mpl3115_read(struct Mpl3115 *mpl);
-extern void mpl3115_event(struct Mpl3115 *mpl);
-extern void mpl3115_periodic(struct Mpl3115 *mpl);
+extern void mpl3115_init(struct Mpl3115* mpl, struct i2c_periph* i2c_p, uint8_t addr);
+extern void mpl3115_configure(struct Mpl3115* mpl);
+extern void mpl3115_read(struct Mpl3115* mpl);
+extern void mpl3115_event(struct Mpl3115* mpl);
+extern void mpl3115_periodic(struct Mpl3115* mpl);
 
 #endif // MPL3115_H

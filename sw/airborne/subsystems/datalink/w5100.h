@@ -65,13 +65,13 @@ extern uint8_t w5100_rx_buf[W5100_RX_BUFFER_SIZE];
 extern struct w5100_periph chip0;
 //extern uint8_t ck_a, ck_b;
 
-void w5100_init( void );
+void w5100_init(void);
 
-void w5100_transmit( uint8_t data );
-uint16_t w5100_receive( uint8_t *buf, uint16_t len );
-void w5100_send( void );
-uint16_t w5100_rx_size( uint8_t _s );
-bool_t w5100_ch_available( void );
+void w5100_transmit(uint8_t data);
+uint16_t w5100_receive(uint8_t* buf, uint16_t len);
+void w5100_send(void);
+uint16_t w5100_rx_size(uint8_t _s);
+bool_t w5100_ch_available(void);
 
 // Defines that are done in mcu_periph on behalf of uart.
 // We need to do these here...
@@ -122,12 +122,12 @@ bool_t w5100_ch_available( void );
     W5100TransportPut4ByteByAddr(_dev, (const uint8_t*)_byte);      \
   }
 #define W5100TransportPutUint64ByAddr(_dev, _byte) { \
-    W5100TransportPut4ByteByAddr(_dev, (const uint8_t*)_byte+4);	\
-    W5100TransportPut4ByteByAddr(_dev, (const uint8_t*)_byte);	\
+    W5100TransportPut4ByteByAddr(_dev, (const uint8_t*)_byte+4);  \
+    W5100TransportPut4ByteByAddr(_dev, (const uint8_t*)_byte);  \
   }
 #define W5100TransportPutInt64ByAddr(_dev, _byte) { \
-    W5100TransportPut4ByteByAddr(_dev, (const uint8_t*)_byte+4);	\
-    W5100TransportPut4ByteByAddr(_dev, (const uint8_t*)_byte);	\
+    W5100TransportPut4ByteByAddr(_dev, (const uint8_t*)_byte+4);  \
+    W5100TransportPut4ByteByAddr(_dev, (const uint8_t*)_byte);  \
   }
 #else
 #define W5100TransportPutDoubleByAddr(_dev, _byte) {                \
@@ -135,12 +135,12 @@ bool_t w5100_ch_available( void );
     W5100TransportPut4ByteByAddr(_dev, (const uint8_t*)_byte+4);    \
   }
 #define W5100TransportPutUint64ByAddr(_dev, _byte) { \
-    W5100TransportPut4ByteByAddr(_dev, (const uint8_t*)_byte);	\
-    W5100TransportPut4ByteByAddr(_dev, (const uint8_t*)_byte+4);	\
+    W5100TransportPut4ByteByAddr(_dev, (const uint8_t*)_byte);  \
+    W5100TransportPut4ByteByAddr(_dev, (const uint8_t*)_byte+4);  \
   }
 #define W5100TransportPutInt64ByAddr(_dev, _byte) { \
-    W5100TransportPut4ByteByAddr(_dev, (const uint8_t*)_byte);	\
-    W5100TransportPut4ByteByAddr(_dev, (const uint8_t*)_byte+4);	\
+    W5100TransportPut4ByteByAddr(_dev, (const uint8_t*)_byte);  \
+    W5100TransportPut4ByteByAddr(_dev, (const uint8_t*)_byte+4);  \
   }
 #endif
 
@@ -241,64 +241,72 @@ struct w5100_transport {
 
 extern struct w5100_transport w5100_tp;
 
-static inline void parse_w5100(struct w5100_transport * t, uint8_t c ) {
+static inline void parse_w5100(struct w5100_transport* t, uint8_t c)
+{
   switch (t->status) {
-  case UNINIT:
-    if (c == STX)
+    case UNINIT:
+      if (c == STX) {
+        t->status++;
+      }
+      break;
+    case GOT_STX:
+      if (t->trans.msg_received) {
+        t->trans.ovrn++;
+        goto error;
+      }
+      t->trans.payload_len = c - 4; /* Counting STX, LENGTH and CRC1 and CRC2 */
+      t->ck_a = t->ck_b = c;
       t->status++;
-    break;
-  case GOT_STX:
-    if (t->trans.msg_received) {
-      t->trans.ovrn++;
-      goto error;
-    }
-    t->trans.payload_len = c-4; /* Counting STX, LENGTH and CRC1 and CRC2 */
-    t->ck_a = t->ck_b = c;
-    t->status++;
-    t->payload_idx = 0;
-    break;
-  case GOT_LENGTH:
-    t->trans.payload[t->payload_idx] = c;
-    t->ck_a += c; t->ck_b += t->ck_a;
-    t->payload_idx++;
-    if (t->payload_idx == t->trans.payload_len)
+      t->payload_idx = 0;
+      break;
+    case GOT_LENGTH:
+      t->trans.payload[t->payload_idx] = c;
+      t->ck_a += c; t->ck_b += t->ck_a;
+      t->payload_idx++;
+      if (t->payload_idx == t->trans.payload_len) {
+        t->status++;
+      }
+      break;
+    case GOT_PAYLOAD:
+      if (c != t->ck_a) {
+        goto error;
+      }
       t->status++;
-    break;
-  case GOT_PAYLOAD:
-    if (c != t->ck_a)
+      break;
+    case GOT_CRC1:
+      if (c != t->ck_b) {
+        goto error;
+      }
+      t->trans.msg_received = TRUE;
+      goto restart;
+    default:
       goto error;
-    t->status++;
-    break;
-  case GOT_CRC1:
-    if (c != t->ck_b)
-      goto error;
-    t->trans.msg_received = TRUE;
-    goto restart;
-  default:
-    goto error;
   }
   return;
- error:
+error:
   t->trans.error++;
- restart:
+restart:
   t->status = UNINIT;
   return;
 }
 
-static inline void w5100_parse_payload(struct w5100_transport * t) {
+static inline void w5100_parse_payload(struct w5100_transport* t)
+{
   uint8_t i;
-  for(i = 0; i < t->trans.payload_len; i++)
+  for (i = 0; i < t->trans.payload_len; i++) {
     dl_buffer[i] = t->trans.payload[i];
+  }
   dl_msg_available = TRUE;
 }
 
-static inline void w5100_read_buffer( struct w5100_transport *t ) {
-  while ( w5100_ch_available() ) {
-    w5100_receive( w5100_rx_buf, W5100_RX_BUFFER_SIZE );
+static inline void w5100_read_buffer(struct w5100_transport* t)
+{
+  while (w5100_ch_available()) {
+    w5100_receive(w5100_rx_buf, W5100_RX_BUFFER_SIZE);
     int c = 0;
     do {
-      parse_w5100( t, w5100_rx_buf[ c++ ] );
-    } while ( ( t->status != UNINIT ) && !(t->trans.msg_received) );
+      parse_w5100(t, w5100_rx_buf[ c++ ]);
+    } while ((t->status != UNINIT) && !(t->trans.msg_received));
   }
 }
 

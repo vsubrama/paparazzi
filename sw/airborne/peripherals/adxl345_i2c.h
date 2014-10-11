@@ -37,7 +37,7 @@
 #include "peripherals/adxl345.h"
 
 struct Adxl345_I2c {
-  struct i2c_periph *i2c_p;
+  struct i2c_periph* i2c_p;
   struct i2c_transaction i2c_trans;
   enum Adxl345ConfStatus init_status; ///< init status
   bool_t initialized;                 ///< config done flag
@@ -50,17 +50,19 @@ struct Adxl345_I2c {
 };
 
 // Functions
-extern void adxl345_i2c_init(struct Adxl345_I2c *adxl, struct i2c_periph *i2c_p, uint8_t addr);
-extern void adxl345_i2c_start_configure(struct Adxl345_I2c *adxl);
-extern void adxl345_i2c_read(struct Adxl345_I2c *adxl);
-extern void adxl345_i2c_event(struct Adxl345_I2c *adxl);
+extern void adxl345_i2c_init(struct Adxl345_I2c* adxl, struct i2c_periph* i2c_p, uint8_t addr);
+extern void adxl345_i2c_start_configure(struct Adxl345_I2c* adxl);
+extern void adxl345_i2c_read(struct Adxl345_I2c* adxl);
+extern void adxl345_i2c_event(struct Adxl345_I2c* adxl);
 
 /// convenience function: read or start configuration if not already initialized
-static inline void adxl345_i2c_periodic(struct Adxl345_I2c *adxl) {
-  if (adxl->initialized)
+static inline void adxl345_i2c_periodic(struct Adxl345_I2c* adxl)
+{
+  if (adxl->initialized) {
     adxl345_i2c_read(adxl);
-  else
+  } else {
     adxl345_i2c_start_configure(adxl);
+  }
 }
 
 #endif // ADXL345_I2C_H

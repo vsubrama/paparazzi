@@ -37,7 +37,7 @@
 
 
 struct Adxl345_Spi {
-  struct spi_periph *spi_p;
+  struct spi_periph* spi_p;
   struct spi_transaction spi_trans;
   volatile uint8_t tx_buf[7];
   volatile uint8_t rx_buf[7];
@@ -52,17 +52,19 @@ struct Adxl345_Spi {
 };
 
 // Functions
-extern void adxl345_spi_init(struct Adxl345_Spi *adxl, struct spi_periph *spi_p, uint8_t addr);
-extern void adxl345_spi_start_configure(struct Adxl345_Spi *adxl);
-extern void adxl345_spi_read(struct Adxl345_Spi *adxl);
-extern void adxl345_spi_event(struct Adxl345_Spi *adxl);
+extern void adxl345_spi_init(struct Adxl345_Spi* adxl, struct spi_periph* spi_p, uint8_t addr);
+extern void adxl345_spi_start_configure(struct Adxl345_Spi* adxl);
+extern void adxl345_spi_read(struct Adxl345_Spi* adxl);
+extern void adxl345_spi_event(struct Adxl345_Spi* adxl);
 
 /// convenience function: read or start configuration if not already initialized
-static inline void adxl345_spi_periodic(struct Adxl345_Spi *adxl) {
-  if (adxl->initialized)
+static inline void adxl345_spi_periodic(struct Adxl345_Spi* adxl)
+{
+  if (adxl->initialized) {
     adxl345_spi_read(adxl);
-  else
+  } else {
     adxl345_spi_start_configure(adxl);
+  }
 }
 
 #endif // ADXL345_SPI_H

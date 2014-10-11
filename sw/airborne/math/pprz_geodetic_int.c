@@ -48,7 +48,8 @@ void ltp_of_ecef_rmat_from_lla_i(struct Int32RMat* ltp_of_ecef, struct LlaCoor_i
 
   ltp_of_ecef->m[0] = -sin_lon;
   ltp_of_ecef->m[1] =  cos_lon;
-  ltp_of_ecef->m[2] =  0; /* this element is always zero http://en.wikipedia.org/wiki/Geodetic_system#From_ECEF_to_ENU */
+  ltp_of_ecef->m[2] =
+    0; /* this element is always zero http://en.wikipedia.org/wiki/Geodetic_system#From_ECEF_to_ENU */
   ltp_of_ecef->m[3] = (int32_t)((-(int64_t)sin_lat * (int64_t)cos_lon) >> HIGH_RES_TRIG_FRAC);
   ltp_of_ecef->m[4] = (int32_t)((-(int64_t)sin_lat * (int64_t)sin_lon) >> HIGH_RES_TRIG_FRAC);
   ltp_of_ecef->m[5] =  cos_lat;

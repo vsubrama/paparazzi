@@ -492,7 +492,8 @@ int32_t int32_atan2_2(int32_t y, int32_t x)
   if (x >= 0) {
     r = ((x - abs_y) << R_FRAC) / (x + abs_y);
     int32_t r2 = (r * r) >> R_FRAC;
-    int32_t tmp1 = ((r2 * (int32_t)ANGLE_BFP_OF_REAL(0.1963)) >> INT32_ANGLE_FRAC) - ANGLE_BFP_OF_REAL(0.9817);
+    int32_t tmp1 = ((r2 * (int32_t)ANGLE_BFP_OF_REAL(0.1963)) >> INT32_ANGLE_FRAC) - ANGLE_BFP_OF_REAL(
+                     0.9817);
     a = ((tmp1 * r) >> R_FRAC) + c1;
   } else {
     r = ((x + abs_y) << R_FRAC) / (abs_y - x);

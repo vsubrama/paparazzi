@@ -33,8 +33,7 @@
 #include <stdint.h>
 #include <sys/types.h>
 
-typedef struct
-{
+typedef struct {
   uint16_t taille;
   uint16_t nu_trame;
 
@@ -75,10 +74,9 @@ typedef struct
 
   uint16_t chksum;
 
-} __attribute__ ((packed)) measures_t;
+} __attribute__((packed)) measures_t;
 
-struct bmp180_baro_calibration
-{
+struct bmp180_baro_calibration {
   int16_t ac1;
   int16_t ac2;
   int16_t ac3;
@@ -97,14 +95,14 @@ struct bmp180_baro_calibration
 
 #define NAVDATA_BUFFER_SIZE 80
 typedef struct {
-    uint8_t isInitialized;
-    uint16_t bytesRead;
-    uint32_t totalBytesRead;
-    uint32_t packetsRead;
-    uint32_t checksum_errors;
-    uint32_t lost_imu_frames;
-    uint16_t last_packet_number;
-    uint8_t buffer[NAVDATA_BUFFER_SIZE];
+  uint8_t isInitialized;
+  uint16_t bytesRead;
+  uint32_t totalBytesRead;
+  uint32_t packetsRead;
+  uint32_t checksum_errors;
+  uint32_t lost_imu_frames;
+  uint16_t last_packet_number;
+  uint8_t buffer[NAVDATA_BUFFER_SIZE];
 } navdata_port;
 
 extern measures_t navdata;
@@ -121,7 +119,7 @@ void navdata_read(void);
 void navdata_update(void);
 int16_t navdata_height(void);
 
-ssize_t full_write(int fd, const uint8_t *buf, size_t count);
-ssize_t full_read(int fd, uint8_t *buf, size_t count);
+ssize_t full_write(int fd, const uint8_t* buf, size_t count);
+ssize_t full_read(int fd, uint8_t* buf, size_t count);
 
 #endif /* NAVDATA_H_ */
