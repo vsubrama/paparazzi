@@ -38,7 +38,12 @@
 #include "subsystems/datalink/telemetry.h"
 #include "firmwares/rotorcraft/navigation.h"
 #include "firmwares/rotorcraft/guidance.h"
+
 #include "firmwares/rotorcraft/stabilization.h"
+#include "firmwares/rotorcraft/stabilization/stabilization_none.h"
+#include "firmwares/rotorcraft/stabilization/stabilization_rate.h"
+#include "firmwares/rotorcraft/stabilization/stabilization_attitude.h"
+
 #include "generated/settings.h"
 
 #ifdef POWER_SWITCH_GPIO
@@ -255,7 +260,11 @@ void autopilot_init(void) {
   nav_init();
   guidance_h_init();
   guidance_v_init();
+
   stabilization_init();
+  stabilization_none_init();
+  stabilization_rate_init();
+  stabilization_attitude_init();
 
   /* set startup mode, propagates through to guidance h/v */
   autopilot_set_mode(MODE_STARTUP);
@@ -281,7 +290,7 @@ void autopilot_periodic(void) {
 
   RunOnceEvery(NAV_PRESCALER, compute_dist2_to_home());
 
-  if (autopilot_in_flight) {
+  if (autopilot_in_flight && autopilot_mode == AP_MODE_NAV) {
     if (too_far_from_home) {
       if (dist2_to_home > failsafe_mode_dist2)
         autopilot_set_mode(FAILSAFE_MODE_TOO_FAR_FROM_HOME);

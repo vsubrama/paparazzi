@@ -34,15 +34,15 @@
 #include "mcu.h"
 #include "mcu_periph/sys_time.h"
 #include "mcu_periph/i2c.h"
+#if USE_UDP
+#include "mcu_periph/udp.h"
+#endif
 #include "led.h"
 
 #include "subsystems/datalink/telemetry.h"
 #include "subsystems/datalink/datalink.h"
 #include "subsystems/settings.h"
 #include "subsystems/datalink/xbee.h"
-#if DATALINK == UDP
-#include "subsystems/datalink/udp.h"
-#endif
 
 #include "subsystems/commands.h"
 #include "subsystems/actuators.h"
@@ -52,7 +52,6 @@
 
 #include "subsystems/imu.h"
 #include "subsystems/gps.h"
-#include "subsystems/air_data.h"
 
 #if USE_BARO_BOARD
 #include "subsystems/sensors/baro.h"
@@ -152,7 +151,6 @@ STATIC_INLINE void main_init( void ) {
 
   radio_control_init();
 
-  air_data_init();
 #if USE_BARO_BOARD
   baro_init();
 #endif
@@ -175,10 +173,6 @@ STATIC_INLINE void main_init( void ) {
 
 #if DATALINK == XBEE
   xbee_init();
-#endif
-
-#if DATALINK == UDP
-  udp_init();
 #endif
 
   // register the timers for the periodic functions
@@ -282,6 +276,10 @@ STATIC_INLINE void main_event( void ) {
 
   i2c_event();
 
+#if USE_UDP
+  udp_event();
+#endif
+
   DatalinkEvent();
 
   if (autopilot_rc) {
@@ -322,7 +320,7 @@ PRINT_CONFIG_VAR(AHRS_CORRECT_FREQUENCY)
   const float dt = 1. / (AHRS_CORRECT_FREQUENCY);
 #endif
 
-  ImuScaleAccel(imu);
+  imu_scale_accel(&imu);
 
   if (ahrs.status != AHRS_UNINIT) {
     ahrs_update_accel(dt);
@@ -345,7 +343,7 @@ PRINT_CONFIG_VAR(AHRS_PROPAGATE_FREQUENCY)
   const float dt = 1. / (AHRS_PROPAGATE_FREQUENCY);
 #endif
 
-  ImuScaleGyro(imu);
+  imu_scale_gyro(&imu);
 
   if (ahrs.status == AHRS_UNINIT) {
     ahrs_aligner_run();
@@ -374,7 +372,7 @@ static inline void on_gps_event(void) {
 }
 
 static inline void on_mag_event(void) {
-  ImuScaleMag(imu);
+  imu_scale_mag(&imu);
 
 #if USE_MAGNETOMETER
 #if USE_AUTO_AHRS_FREQ || !defined(AHRS_MAG_CORRECT_FREQUENCY)

@@ -39,6 +39,12 @@
 #include "messages.h"
 #include "subsystems/datalink/downlink.h"
 
+#ifdef BARO_PERIODIC_FREQUENCY
+#if BARO_PERIODIC_FREQUENCY > 100
+#error "For MS5611 BARO_PERIODIC_FREQUENCY has to be < 100"
+#endif
+#endif
+
 
 struct Ms5611_Spi bb_ms5611;
 
@@ -79,6 +85,8 @@ void baro_event(void) {
     if (bb_ms5611.data_available) {
       float pressure = (float)bb_ms5611.data.pressure;
       AbiSendMsgBARO_ABS(BARO_BOARD_SENDER_ID, &pressure);
+      float temp = bb_ms5611.data.temperature / 100.0f;
+      AbiSendMsgTEMPERATURE(BARO_BOARD_SENDER_ID, &temp);
       bb_ms5611.data_available = FALSE;
 
 #ifdef BARO_LED
@@ -86,11 +94,10 @@ void baro_event(void) {
 #endif
 
 #if DEBUG
-      float ftempms = bb_ms5611.data.temperature / 100.;
       float fbaroms = bb_ms5611.data.pressure / 100.;
       DOWNLINK_SEND_BARO_MS5611(DefaultChannel, DefaultDevice,
                                 &bb_ms5611.data.d1, &bb_ms5611.data.d2,
-                                &fbaroms, &ftempms);
+                                &fbaroms, &temp);
 #endif
     }
   }
