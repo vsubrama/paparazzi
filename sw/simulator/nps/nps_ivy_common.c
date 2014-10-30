@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <Ivy/ivy.h>
 #include <Ivy/ivyglibloop.h>
-
+#include <stdio.h>
 #include "generated/airframe.h"
 #include "math/pprz_algebra_double.h"
 #include "nps_autopilot.h"
@@ -151,6 +151,13 @@ static void on_DL_RC_4CH(IvyClientPtr app __attribute__ ((unused)),
 
 
 void nps_ivy_display(void) {
+	FILE *writelog = fopen("Simulator_log.log","a");
+	if (writelog == NULL)
+	{
+		printf("Error opening file!\n");
+		//Remove this later
+		exit(1);
+	}
   IvySendMsg("%d NPS_RATE_ATTITUDE %f %f %f %f %f %f",
              AC_ID,
              DegOfRad(fdm.body_ecef_rotvel.p),
@@ -159,6 +166,14 @@ void nps_ivy_display(void) {
              DegOfRad(fdm.ltp_to_body_eulers.phi),
              DegOfRad(fdm.ltp_to_body_eulers.theta),
              DegOfRad(fdm.ltp_to_body_eulers.psi));
+  fprintf(writelog, "%d NPS_RATE_ATTITUDE %f %f %f %f %f %f\n",
+          AC_ID,
+          DegOfRad(fdm.body_ecef_rotvel.p),
+          DegOfRad(fdm.body_ecef_rotvel.q),
+          DegOfRad(fdm.body_ecef_rotvel.r),
+          DegOfRad(fdm.ltp_to_body_eulers.phi),
+          DegOfRad(fdm.ltp_to_body_eulers.theta),
+          DegOfRad(fdm.ltp_to_body_eulers.psi));
   IvySendMsg("%d NPS_POS_LLH %f %f %f %f %f %f %f %f %f",
              AC_ID,
              (fdm.lla_pos_pprz.lat),
@@ -170,6 +185,17 @@ void nps_ivy_display(void) {
              (fdm.lla_pos_geod.alt),
              (fdm.agl),
              (fdm.hmsl));
+  fprintf(writelog, "%d NPS_POS_LLH %f %f %f %f %f %f %f %f %f\n",
+          AC_ID,
+          (fdm.lla_pos_pprz.lat),
+          (fdm.lla_pos_geod.lat),
+          (fdm.lla_pos_geoc.lat),
+          (fdm.lla_pos_pprz.lon),
+          (fdm.lla_pos_geod.lon),
+          (fdm.lla_pos_pprz.alt),
+          (fdm.lla_pos_geod.alt),
+          (fdm.agl),
+          (fdm.hmsl));
   IvySendMsg("%d NPS_SPEED_POS %f %f %f %f %f %f %f %f %f",
              AC_ID,
              (fdm.ltpprz_ecef_accel.x),
@@ -181,12 +207,27 @@ void nps_ivy_display(void) {
              (fdm.ltpprz_pos.x),
              (fdm.ltpprz_pos.y),
              (fdm.ltpprz_pos.z));
+  fprintf(writelog, "%d NPS_SPEED_POS %f %f %f %f %f %f %f %f %f\n",
+          AC_ID,
+          (fdm.ltpprz_ecef_accel.x),
+          (fdm.ltpprz_ecef_accel.y),
+          (fdm.ltpprz_ecef_accel.z),
+          (fdm.ltpprz_ecef_vel.x),
+          (fdm.ltpprz_ecef_vel.y),
+          (fdm.ltpprz_ecef_vel.z),
+          (fdm.ltpprz_pos.x),
+          (fdm.ltpprz_pos.y),
+          (fdm.ltpprz_pos.z));
   IvySendMsg("%d NPS_GYRO_BIAS %f %f %f",
              AC_ID,
              DegOfRad(RATE_FLOAT_OF_BFP(sensors.gyro.bias_random_walk_value.x)+sensors.gyro.bias_initial.x),
              DegOfRad(RATE_FLOAT_OF_BFP(sensors.gyro.bias_random_walk_value.y)+sensors.gyro.bias_initial.y),
              DegOfRad(RATE_FLOAT_OF_BFP(sensors.gyro.bias_random_walk_value.z)+sensors.gyro.bias_initial.z));
-
+  fprintf(writelog, "%d NPS_GYRO_BIAS %f %f %f\n",
+          AC_ID,
+          DegOfRad(RATE_FLOAT_OF_BFP(sensors.gyro.bias_random_walk_value.x)+sensors.gyro.bias_initial.x),
+          DegOfRad(RATE_FLOAT_OF_BFP(sensors.gyro.bias_random_walk_value.y)+sensors.gyro.bias_initial.y),
+          DegOfRad(RATE_FLOAT_OF_BFP(sensors.gyro.bias_random_walk_value.z)+sensors.gyro.bias_initial.z));
   /* transform magnetic field to body frame */
   struct DoubleVect3 h_body;
   double_quat_vmult(&h_body, &fdm.ltp_to_body_quat, &fdm.ltp_h);
@@ -199,10 +240,23 @@ void nps_ivy_display(void) {
          h_body.x,
          h_body.y,
          h_body.z);
+  fprintf(writelog, "%d NPS_SENSORS_SCALED %f %f %f %f %f %f\n",
+	         AC_ID,
+	         ((sensors.accel.value.x - sensors.accel.neutral.x)/NPS_ACCEL_SENSITIVITY_XX),
+	         ((sensors.accel.value.y - sensors.accel.neutral.y)/NPS_ACCEL_SENSITIVITY_YY),
+	         ((sensors.accel.value.z - sensors.accel.neutral.z)/NPS_ACCEL_SENSITIVITY_ZZ),
+	         h_body.x,
+	         h_body.y,
+	         h_body.z);
 
   IvySendMsg("%d NPS_WIND %f %f %f",
              AC_ID,
              fdm.wind.x,
              fdm.wind.y,
              fdm.wind.z);
+  fprintf(writelog, "%d NPS_WIND %f %f %f\n",
+          AC_ID,
+          fdm.wind.x,
+          fdm.wind.y,
+          fdm.wind.z);
 }
