@@ -2163,6 +2163,12 @@
   </message>
 
   <!-- 251 is free -->
+  <message name="NPS_ATP_CMD" id="251">
+    <field name="yaw"    type="int16" />
+    <field name="roll"    type="int16" />
+    <field name="pitch"   type="int16" />
+    <field name="throttle"       type="int16" />
+  </message>
   <!-- 252 is free -->
 
   <message name="I2C_ERRORS" id="253">
@@ -2821,6 +2827,8 @@
       <field name="cam_pitch" type="int16" unit="deg"/>
     </message>
   </msg_class>
+
+
 
 
 

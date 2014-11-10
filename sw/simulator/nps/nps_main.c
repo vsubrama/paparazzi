@@ -169,7 +169,7 @@ static void nps_main_run_sim_step(void) {
 
 static void nps_main_display(void) {
   //  printf("display at %f\n", nps_main.display_time);
-  nps_ivy_display();
+  //nps_ivy_display();
   if (nps_main.fg_host)
     nps_flightgear_send();
 }

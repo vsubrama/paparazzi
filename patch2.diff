@@ -1,0 +1,189 @@
+diff --git a/sw/simulator/nps/nps_autopilot_remote.c b/sw/simulator/nps/nps_autopilot_remote.c
+index 0d8ca89..c38eece 100644
+--- a/sw/simulator/nps/nps_autopilot_remote.c
++++ b/sw/simulator/nps/nps_autopilot_remote.c
+@@ -87,15 +87,32 @@ void nps_autopilot_run_systime_step(void) {
+ #include "subsystems/gps.h"
+ 
+ void nps_autopilot_run_step(double time) {
+-//#define DegOfRad(x) ((x) * (180. / M_PI))
++	static int counter = 0;
++	static int counterIR = 0;
++
++	if (nps_sensors_gyro_available()) {
++		imu_feed_gyro_accel();
++
++		//Feed the data from the gyroscope into the serial_pap
++		IvySendMsg("NPS_SENSORS_GYRO %d %d %f %f %f", 6, AC_ID,
++				sensors.gyro.value.x, sensors.gyro.value.y,
++				sensors.gyro.value.z);
++
++		//Feed the data from the accelerometer into the serial_pap
++		IvySendMsg("NPS_SENSORS_ACCEL %d %d %f %f %f", 6, AC_ID,
++				sensors.accel.value.x, sensors.accel.value.y,
++				sensors.accel.value.z);
++	}
+ 
+ 	if (nps_sensors_gps_available()) {
+ 		gps_feed_value();
+ 
+-		double vals[7];
+-		nps_fdm_remote_position(&vals[0]);
+-		IvySendMsg("NPS_SEN_NICE_GPS %d %d %f %f %f %f %f %f %f", 6, AC_ID,
+-				vals[0], vals[1], vals[2], vals[3], vals[4], vals[5], vals[6]);
++		/*
++		 double vals[7];
++		 nps_fdm_remote_position(&vals[0]);
++		 IvySendMsg("NPS_SEN_NICE_GPS %d %d %f %f %f %f %f %f %f", 6, AC_ID,
++		 vals[0], vals[1], vals[2], vals[3], vals[4], vals[5], vals[6]);
++		 */
+ 		/*
+ 		 static double gps_period = 0.;
+ 		 #define DELTA_T (.0081447*1e-3)
+@@ -118,47 +135,71 @@ void nps_autopilot_run_step(double time) {
+ 		/* It may be better to pull the data from the fdm state, it will already be processed and ready to go...
+ 		 *
+ 		 */
+-		//		IvySendMsg("NPS_SEN_NICE_GPS %d %d %f %f %f %f %f %f %f", 6, AC_ID,
+-		//				DegOfRad(fdm.lla_pos_pprz.lat), DegOfRad(fdm.lla_pos_pprz.lon), fdm.lla_pos_pprz.alt, gps.course,
+-		//				gps.gspeed, 1.0, fdm.time);
++		//Get some values from the FDM for compatability
++//		double vals[7];
++//		nps_fdm_remote_position(&vals[0]);
++//		IvySendMsg("NPS_SEN_NICE_GPS %d %d %f %f %f %f %f %f %f", 6, AC_ID,
++//				fdm.lla_pos_pprz.lat, fdm.lla_pos_pprz.lon,
++//				fdm.lla_pos_pprz.alt, vals[3], vals[4], vals[5], fdm.time);
++		IvySendMsg(
++				"NPS_SEND_GPS_INT %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",
++				6, AC_ID, gps.ecef_pos.x, gps.ecef_pos.y, gps.ecef_pos.z,
++				gps.lla_pos.lat, gps.lla_pos.lon, gps.lla_pos.alt, gps.hmsl,
++				gps.ecef_vel.x, gps.ecef_vel.y, gps.ecef_vel.z, gps.pacc,
++				gps.sacc, gps.tow, gps.pdop, gps.num_sv, gps.fix);
+ 	}
+ 
+ 	if (nps_bypass_ahrs) {
+ 		sim_overwrite_ahrs();
++
++		if (!(counterIR++ % 4)) {
++			IvySendMsg("NPS_AHRS_LTP %d %d %f %f %f %f", 6, AC_ID,
++					fdm.ltp_to_body_quat.qi, fdm.ltp_to_body_quat.qx,
++					fdm.ltp_to_body_quat.qy, fdm.ltp_to_body_quat.qz);
++
++			IvySendMsg("NPS_AHRS_ECEF %d %d %f %f %f", 6, AC_ID,
++					fdm.body_ecef_rotvel.p, fdm.body_ecef_rotvel.q,
++					fdm.body_ecef_rotvel.r);
++		}
++
+ 	}
+ 
+ 	if (nps_bypass_ins) {
+ 		sim_overwrite_ins();
+-	}
++		static int counterINS = 0;
++		if (!(counterINS++ % 4)) {
++			IvySendMsg("NPS_INS_POS %d %d %f %f %f", 6, AC_ID, fdm.ltpprz_pos.x,
++					fdm.ltpprz_pos.y, fdm.ltpprz_pos.z);
++
++			IvySendMsg("NPS_INS_ECEF_VEL %d %d %f %f %f", 6, AC_ID,
++					fdm.ltpprz_ecef_vel.x, fdm.ltpprz_ecef_vel.y,
++					fdm.ltpprz_ecef_vel.z);
++
++			IvySendMsg("NPS_INS_ECEF_ACCEL %d %d %f %f %f", 6, AC_ID,
++					fdm.ltpprz_ecef_accel.x, fdm.ltpprz_ecef_accel.y,
++					fdm.ltpprz_ecef_accel.z);
+ 
+-	//TODO Figure out when to send this data...
++		}
++	}
++//#define USE_FDM_IR
++#ifdef USE_FDM_IR
++	if (!(counterIR++ % 4)) {
++		IvySendMsg("NPS_SEN_NICE_IR %d %d %f %f %f %f %f %f", 6, AC_ID,
++				fdm.ltp_to_body_eulers.phi, fdm.ltp_to_body_eulers.theta,
++				fdm.ltp_to_body_eulers.psi, fdm.body_ecef_rotvel.p,
++				fdm.body_ecef_rotvel.q, fdm.body_ecef_rotvel.r);
++	}
++#endif
++#ifdef USE_JSBSIM_IR
++	//Send this ~every 10 hz
++	if (!(counterIR++ % 4))
+ 	{
+-		/*
+-		 //print(FDMExec);
+-		 double roll = get_value("attitude/roll-rad");
+-		 double pitch = get_value("attitude/pitch-rad");
+-		 double yaw = get_value("attitude/heading-true-rad");
+-		 double p = get_value("velocities/p-rad_sec");
+-		 double q = get_value("velocities/q-rad_sec");
+-		 double r = get_value("velocities/r-rad_sec");
+-
+-		 IvySendMsg("NPS_SEN_NICE_IR %d %d %f %f %f %f %f %f", 6, AC_ID, roll,
+-		 pitch, yaw, p, q, r);
+-		 */
+-		//It may be better to get the pose data from the fdm state ... decide in future
+-		/*
+-		 *
+-		 */
+-//		IvySendMsg("NPS_SEN_NICE_IR %d %d %f %f %f %f %f %f", 6, AC_ID,
+-//				fdm.ltp_to_body_eulers.phi, fdm.ltp_to_body_eulers.theta,
+-//				fdm.ltp_to_body_eulers.psi, fdm.body_ecef_rotvel.p,
+-//				fdm.body_ecef_rotvel.q, fdm.body_ecef_rotvel.r);
+ 		double ir[6];
+ 		nps_fdm_remote_ir(&ir[0]);
+-		IvySendMsg("NPS_SEN_NICE_IR %d %d %f %f %f %f %f %f", 6, AC_ID, ir[0],
+-				ir[1], ir[2], ir[3], ir[4], ir[5]);
++		IvySendMsg("NPS_SEN_NICE_IR %d %d %f %f %f %f %f %f", 6, AC_ID,
++				ir[0], ir[1], ir[2], ir[3], ir[4], ir[5]);
+ 	}
+-
++#endif
+ 	//Stuff the commands from the autopilot into the buffer here
+ 	/* scale final motor commands to 0-1 for feeding the fdm */
+ 	for (uint8_t i = 0; i < NPS_COMMANDS_NB; i++)
+@@ -201,3 +242,46 @@ void sim_overwrite_ins(void) {
+ 	stateSetAccelNed_f(&ltp_accel);
+ 
+ }
++/*
++ void sim_use_gps_pos(double lat, double lon, double alt, double course, double gspeed, double climb, double time) {
++ gps.fix = 3; // Mode 3D
++ gps.course = course * 1e7;
++ gps.hmsl = alt * 1000.;
++ gps.gspeed = gspeed * 100.;
++ gps.ned_vel.z = -climb * 100.;
++ gps.week = 0; // FIXME
++ gps.tow = time * 1000.;
++
++ //TODO set alt above ellipsoid and hmsl
++
++ struct LlaCoor_f lla_f;
++ struct UtmCoor_f utm_f;
++ lla_f.lat = lat;
++ lla_f.lon = lon;
++ utm_f.zone = nav_utm_zone0;
++ utm_of_lla_f(&utm_f, &lla_f);
++ LLA_BFP_OF_REAL(gps.lla_pos, lla_f);
++ gps.utm_pos.east = utm_f.east*100;
++ gps.utm_pos.north = utm_f.north*100;
++ gps.utm_pos.zone = nav_utm_zone0;
++
++ gps_available = TRUE;
++
++ }
++
++
++
++ void set_ir(double roll __attribute__ ((unused)), double pitch __attribute__ ((unused))) {
++ // INFRARED_TELEMETRY : Stupid hack to use with modules
++ #if USE_INFRARED
++ double ir_contrast = 150; //FIXME
++ double roll_sensor = roll + JSBSIM_IR_ROLL_NEUTRAL; // ir_roll_neutral;
++ double pitch_sensor = pitch + JSBSIM_IR_PITCH_NEUTRAL; // ir_pitch_neutral;
++ infrared.roll = sin(roll_sensor) * ir_contrast;
++ infrared.pitch = sin(pitch_sensor) * ir_contrast;
++ infrared.top = cos(roll_sensor) * cos(pitch_sensor) * ir_contrast;
++ #endif
++ }
++
++
++ */

@@ -1,6 +1,5 @@
 #include "nps_sensor_gps.h"
 
-
 #include "generated/airframe.h"
 #include "nps_fdm.h"
 #include "nps_random.h"
@@ -8,24 +7,24 @@
 #include NPS_SENSORS_PARAMS
 
 void nps_sensor_gps_init(struct NpsSensorGps* gps, double time) {
-  FLOAT_VECT3_ZERO(gps->ecef_pos);
-  FLOAT_VECT3_ZERO(gps->ecef_vel);
-  gps->hmsl = 0.0;
-  gps->pos_latency = NPS_GPS_POS_LATENCY;
-  gps->speed_latency = NPS_GPS_SPEED_LATENCY;
-  VECT3_ASSIGN(gps->pos_noise_std_dev,
-			   NPS_GPS_POS_NOISE_STD_DEV, NPS_GPS_POS_NOISE_STD_DEV, NPS_GPS_POS_NOISE_STD_DEV);
-  VECT3_ASSIGN(gps->speed_noise_std_dev,
-			   NPS_GPS_SPEED_NOISE_STD_DEV, NPS_GPS_SPEED_NOISE_STD_DEV, NPS_GPS_SPEED_NOISE_STD_DEV);
-  VECT3_ASSIGN(gps->pos_bias_initial,
-			   NPS_GPS_POS_BIAS_INITIAL_X, NPS_GPS_POS_BIAS_INITIAL_Y, NPS_GPS_POS_BIAS_INITIAL_Z);
-  VECT3_ASSIGN(gps->pos_bias_random_walk_std_dev,
-			   NPS_GPS_POS_BIAS_RANDOM_WALK_STD_DEV_X,
-			   NPS_GPS_POS_BIAS_RANDOM_WALK_STD_DEV_Y,
-			   NPS_GPS_POS_BIAS_RANDOM_WALK_STD_DEV_Z);
-  FLOAT_VECT3_ZERO(gps->pos_bias_random_walk_value);
-  gps->next_update = time;
-  gps->data_available = FALSE;
+	FLOAT_VECT3_ZERO(gps->ecef_pos);
+	FLOAT_VECT3_ZERO(gps->ecef_vel);
+	gps->hmsl = 0.0;
+	gps->pos_latency = NPS_GPS_POS_LATENCY;
+	gps->speed_latency = NPS_GPS_SPEED_LATENCY;
+	VECT3_ASSIGN(gps->pos_noise_std_dev, NPS_GPS_POS_NOISE_STD_DEV,
+			NPS_GPS_POS_NOISE_STD_DEV, NPS_GPS_POS_NOISE_STD_DEV);
+	VECT3_ASSIGN(gps->speed_noise_std_dev, NPS_GPS_SPEED_NOISE_STD_DEV,
+			NPS_GPS_SPEED_NOISE_STD_DEV, NPS_GPS_SPEED_NOISE_STD_DEV);
+	VECT3_ASSIGN(gps->pos_bias_initial, NPS_GPS_POS_BIAS_INITIAL_X,
+			NPS_GPS_POS_BIAS_INITIAL_Y, NPS_GPS_POS_BIAS_INITIAL_Z);
+	VECT3_ASSIGN(gps->pos_bias_random_walk_std_dev,
+			NPS_GPS_POS_BIAS_RANDOM_WALK_STD_DEV_X,
+			NPS_GPS_POS_BIAS_RANDOM_WALK_STD_DEV_Y,
+			NPS_GPS_POS_BIAS_RANDOM_WALK_STD_DEV_Z);
+	FLOAT_VECT3_ZERO(gps->pos_bias_random_walk_value);
+	gps->next_update = time;
+	gps->data_available = FALSE;
 }
 
 /*
