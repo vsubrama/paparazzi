@@ -193,4 +193,5 @@ void nps_ivy_display(void) {
              fdm.wind.x,
              fdm.wind.y,
              fdm.wind.z);
+
 }

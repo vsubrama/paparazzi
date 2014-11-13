@@ -2116,13 +2116,20 @@
       <field name="yaw_c"  type="float"/>
   </message>
 
-  <message name="BOOZ_ATT_REF_MODEL" id="251">
+  <!--message name="BOOZ_ATT_REF_MODEL" id="251">
     <field name="omega_p" type="float" />
     <field name="zeta_p" type="float" />
     <field name="omega_q" type="float" />
     <field name="zeta_q" type="float" />
     <field name="omega_r" type="float" />
     <field name="zeta_r" type="float" />
+  </message-->
+
+  <message name="NPS_ATP_CMD" id="251">
+    <field name="yaw"    type="int16" />
+    <field name="roll"    type="int16" />
+    <field name="pitch"   type="int16" />
+    <field name="throttle"       type="int16" />
   </message>
 
   <message name="BOOZ2_FF_ADAP" id="252">
@@ -2768,6 +2775,8 @@
       <field name="cam_pitch" type="int16" unit="deg"/>
     </message>
   </class>
+
+
 
 
 

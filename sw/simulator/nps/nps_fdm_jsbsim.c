@@ -75,13 +75,18 @@ static void feed_jsbsim(double* commands, int commands_nb);
 static void fetch_state(void);
 static int check_for_nan(void);
 
-static void jsbsimvec_to_vec(DoubleVect3* fdm_vector, const FGColumnVector3* jsb_vector);
-static void jsbsimloc_to_loc(EcefCoor_d* fdm_location, const FGLocation* jsb_location);
-static void jsbsimquat_to_quat(DoubleQuat* fdm_quat, const FGQuaternion* jsb_quat);
-static void jsbsimvec_to_rate(DoubleRates* fdm_rate, const FGColumnVector3* jsb_vector);
+static void jsbsimvec_to_vec(DoubleVect3* fdm_vector,
+		const FGColumnVector3* jsb_vector);
+static void jsbsimloc_to_loc(EcefCoor_d* fdm_location,
+		const FGLocation* jsb_location);
+static void jsbsimquat_to_quat(DoubleQuat* fdm_quat,
+		const FGQuaternion* jsb_quat);
+static void jsbsimvec_to_rate(DoubleRates* fdm_rate,
+		const FGColumnVector3* jsb_vector);
 static void llh_from_jsbsim(LlaCoor_d* fdm_lla, FGPropagate* propagate);
 static void lla_from_jsbsim_geodetic(LlaCoor_d* fdm_lla, FGPropagate* propagate);
-static void lla_from_jsbsim_geocentric(LlaCoor_d* fdm_lla, FGPropagate* propagate);
+static void lla_from_jsbsim_geocentric(LlaCoor_d* fdm_lla,
+		FGPropagate* propagate);
 
 static void init_jsbsim(double dt);
 static void init_ltp(void);
@@ -198,125 +203,149 @@ void nps_fdm_set_wind(double speed, double dir, int turbulence_severity) {
  */
 static void feed_jsbsim(double* commands, int commands_nb) {
 
-  char buf[64];
-  const char* names[] = NPS_ACTUATOR_NAMES;
-  string property;
+	char buf[64];
+	const char* names[] = NPS_ACTUATOR_NAMES;
+	string property;
 
-  int i;
-  for (i=0; i < commands_nb; i++) {
-    sprintf(buf,"fcs/%s",names[i]);
-    property = string(buf);
-    FDMExec->GetPropertyManager()->SetDouble(property,commands[i]);
-  }
+	int i;
+	for (i = 0; i < commands_nb; i++) {
+		sprintf(buf, "fcs/%s", names[i]);
+		property = string(buf);
+		FDMExec->GetPropertyManager()->SetDouble(property, commands[i]);
+	}
 
 }
-
 
 /**
  * Populates the NPS fdm struct after a simulation step.
  */
 static void fetch_state(void) {
 
-  FGPropertyManager* node = FDMExec->GetPropertyManager()->GetNode("simulation/sim-time-sec");
-  fdm.time = node->getDoubleValue();
+	FGPropertyManager* node = FDMExec->GetPropertyManager()->GetNode(
+			"simulation/sim-time-sec");
+	fdm.time = node->getDoubleValue();
 
 #if DEBUG_NPS_JSBSIM
-  printf("%f,",fdm.time);
+	printf("%f,", fdm.time);
 #endif
 
-  FGPropagate* propagate = FDMExec->GetPropagate();
-  FGAccelerations* accelerations = FDMExec->GetAccelerations();
+	FGPropagate* propagate = FDMExec->GetPropagate();
+	FGAccelerations* accelerations = FDMExec->GetAccelerations();
 
-  fdm.on_ground = FDMExec->GetGroundReactions()->GetWOW();
+	fdm.on_ground = FDMExec->GetGroundReactions()->GetWOW();
 
-  /*
-   * position
-   */
-  jsbsimloc_to_loc(&fdm.ecef_pos,&propagate->GetLocation());
-  fdm.hmsl = propagate->GetAltitudeASLmeters();
+	/*
+	 * position
+	 */
+	jsbsimloc_to_loc(&fdm.ecef_pos, &propagate->GetLocation());
+	fdm.hmsl = propagate->GetAltitudeASLmeters();
 
-  /*
-   * linear speed and accelerations
-   */
+	/*
+	 * linear speed and accelerations
+	 */
 
-  /* in body frame */
-  const FGColumnVector3& fg_body_ecef_vel = propagate->GetUVW();
-  jsbsimvec_to_vec(&fdm.body_ecef_vel, &fg_body_ecef_vel);
-  const FGColumnVector3& fg_body_ecef_accel = accelerations->GetUVWdot();
-  jsbsimvec_to_vec(&fdm.body_ecef_accel,&fg_body_ecef_accel);
+	/* in body frame */
+	const FGColumnVector3
+	&fg_body_ecef_vel = propagate->GetUVW();
+	jsbsimvec_to_vec(&fdm.body_ecef_vel, &fg_body_ecef_vel);
+	const FGColumnVector3
+	&fg_body_ecef_accel = accelerations->GetUVWdot();
+	jsbsimvec_to_vec(&fdm.body_ecef_accel, &fg_body_ecef_accel);
 
 #if DEBUG_NPS_JSBSIM
-  printf("%f,%f,%f,%f,%f,%f,",(&fg_body_ecef_accel)->Entry(1),(&fg_body_ecef_accel)->Entry(2),(&fg_body_ecef_accel)->Entry(3),fdm.body_ecef_accel.x,fdm.body_ecef_accel.y,fdm.body_ecef_accel.z);
+	printf("%f,%f,%f,%f,%f,%f,", (&fg_body_ecef_accel)->Entry(1),
+			(&fg_body_ecef_accel)->Entry(2), (&fg_body_ecef_accel)->Entry(3),
+			fdm.body_ecef_accel.x, fdm.body_ecef_accel.y,
+			fdm.body_ecef_accel.z);
 #endif
 
-  /* in LTP frame */
-  const FGMatrix33& body_to_ltp = propagate->GetTb2l();
-  const FGColumnVector3& fg_ltp_ecef_vel = body_to_ltp * fg_body_ecef_vel;
-  jsbsimvec_to_vec((DoubleVect3*)&fdm.ltp_ecef_vel, &fg_ltp_ecef_vel);
-  const FGColumnVector3& fg_ltp_ecef_accel = body_to_ltp * fg_body_ecef_accel;
-  jsbsimvec_to_vec((DoubleVect3*)&fdm.ltp_ecef_accel, &fg_ltp_ecef_accel);
+	/* in LTP frame */
+	const FGMatrix33
+	&body_to_ltp = propagate->GetTb2l();
+	const FGColumnVector3
+	&fg_ltp_ecef_vel = body_to_ltp * fg_body_ecef_vel;
+	jsbsimvec_to_vec((DoubleVect3*) &fdm.ltp_ecef_vel, &fg_ltp_ecef_vel);
+	const FGColumnVector3
+	&fg_ltp_ecef_accel = body_to_ltp * fg_body_ecef_accel;
+	jsbsimvec_to_vec((DoubleVect3*) &fdm.ltp_ecef_accel, &fg_ltp_ecef_accel);
 
 #if DEBUG_NPS_JSBSIM
-  printf("%f,%f,%f,%f,%f,%f,",(&fg_ltp_ecef_accel)->Entry(1),(&fg_ltp_ecef_accel)->Entry(2),(&fg_ltp_ecef_accel)->Entry(3),fdm.ltp_ecef_accel.x,fdm.ltp_ecef_accel.y,fdm.ltp_ecef_accel.z);
+	printf("%f,%f,%f,%f,%f,%f,", (&fg_ltp_ecef_accel)->Entry(1),
+			(&fg_ltp_ecef_accel)->Entry(2), (&fg_ltp_ecef_accel)->Entry(3),
+			fdm.ltp_ecef_accel.x, fdm.ltp_ecef_accel.y, fdm.ltp_ecef_accel.z);
 #endif
 
-  /* in ECEF frame */
-  const FGMatrix33& body_to_ecef = propagate->GetTb2ec();
-  const FGColumnVector3& fg_ecef_ecef_vel = body_to_ecef * fg_body_ecef_vel;
-  jsbsimvec_to_vec((DoubleVect3*)&fdm.ecef_ecef_vel, &fg_ecef_ecef_vel);
-  const FGColumnVector3& fg_ecef_ecef_accel = body_to_ecef * fg_body_ecef_accel;
-  jsbsimvec_to_vec((DoubleVect3*)&fdm.ecef_ecef_accel, &fg_ecef_ecef_accel);
+	/* in ECEF frame */
+	const FGMatrix33
+	&body_to_ecef = propagate->GetTb2ec();
+	const FGColumnVector3
+	&fg_ecef_ecef_vel = body_to_ecef * fg_body_ecef_vel;
+	jsbsimvec_to_vec((DoubleVect3*) &fdm.ecef_ecef_vel, &fg_ecef_ecef_vel);
+	const FGColumnVector3
+	&fg_ecef_ecef_accel = body_to_ecef * fg_body_ecef_accel;
+	jsbsimvec_to_vec((DoubleVect3*) &fdm.ecef_ecef_accel, &fg_ecef_ecef_accel);
 
 #if DEBUG_NPS_JSBSIM
-  printf("%f,%f,%f,%f,%f,%f,",(&fg_ecef_ecef_accel)->Entry(1),(&fg_ecef_ecef_accel)->Entry(2),(&fg_ecef_ecef_accel)->Entry(3),fdm.ecef_ecef_accel.x,fdm.ecef_ecef_accel.y,fdm.ecef_ecef_accel.z);
+	printf("%f,%f,%f,%f,%f,%f,", (&fg_ecef_ecef_accel)->Entry(1),
+			(&fg_ecef_ecef_accel)->Entry(2), (&fg_ecef_ecef_accel)->Entry(3),
+			fdm.ecef_ecef_accel.x, fdm.ecef_ecef_accel.y,
+			fdm.ecef_ecef_accel.z);
 #endif
 
-  /* in LTP pprz */
-  ned_of_ecef_point_d(&fdm.ltpprz_pos, &ltpdef, &fdm.ecef_pos);
-  ned_of_ecef_vect_d(&fdm.ltpprz_ecef_vel, &ltpdef, &fdm.ecef_ecef_vel);
-  ned_of_ecef_vect_d(&fdm.ltpprz_ecef_accel, &ltpdef, &fdm.ecef_ecef_accel);
+	/* in LTP pprz */
+	ned_of_ecef_point_d(&fdm.ltpprz_pos, &ltpdef, &fdm.ecef_pos);
+	ned_of_ecef_vect_d(&fdm.ltpprz_ecef_vel, &ltpdef, &fdm.ecef_ecef_vel);
+	ned_of_ecef_vect_d(&fdm.ltpprz_ecef_accel, &ltpdef, &fdm.ecef_ecef_accel);
 
 #if DEBUG_NPS_JSBSIM
-  printf("%f,%f,%f,",fdm.ltpprz_ecef_accel.z,fdm.ltpprz_ecef_accel.y,fdm.ltpprz_ecef_accel.z);
+	printf("%f,%f,%f,", fdm.ltpprz_ecef_accel.z, fdm.ltpprz_ecef_accel.y,
+			fdm.ltpprz_ecef_accel.z);
 #endif
 
-  /* llh */
-  llh_from_jsbsim(&fdm.lla_pos, propagate);
+	/* llh */
+	llh_from_jsbsim(&fdm.lla_pos, propagate);
 
-  //for debug
-  lla_from_jsbsim_geodetic(&fdm.lla_pos_geod, propagate);
-  lla_from_jsbsim_geocentric(&fdm.lla_pos_geoc, propagate);
-  lla_of_ecef_d(&fdm.lla_pos_pprz, &fdm.ecef_pos);
-  fdm.agl = MetersOfFeet(propagate->GetDistanceAGL());
+	//for debug
+	lla_from_jsbsim_geodetic(&fdm.lla_pos_geod, propagate);
+	lla_from_jsbsim_geocentric(&fdm.lla_pos_geoc, propagate);
+	lla_of_ecef_d(&fdm.lla_pos_pprz, &fdm.ecef_pos);
+	fdm.agl = MetersOfFeet(propagate->GetDistanceAGL());
 
 #if DEBUG_NPS_JSBSIM
-  printf("%f\n",fdm.agl);
+	printf("%f,", fdm.agl);
+	printf("%f,%f,%f,", fdm.lla_pos_pprz.lat, fdm.lla_pos_pprz.lon,
+			fdm.lla_pos_pprz.alt);
 #endif
 
-  /*
-   * attitude
-   */
-  const FGQuaternion jsb_quat = propagate->GetQuaternion();
-  jsbsimquat_to_quat(&fdm.ltp_to_body_quat, &jsb_quat);
-  /* convert to eulers */
-  DOUBLE_EULERS_OF_QUAT(fdm.ltp_to_body_eulers, fdm.ltp_to_body_quat);
-  /* the "false" pprz lpt */
-  /* FIXME: use jsbsim ltp for now */
-  EULERS_COPY(fdm.ltpprz_to_body_eulers, fdm.ltp_to_body_eulers);
-  QUAT_COPY(fdm.ltpprz_to_body_quat, fdm.ltp_to_body_quat);
+	/*
+	 * attitude
+	 */
+	const FGQuaternion jsb_quat = propagate->GetQuaternion();
+	jsbsimquat_to_quat(&fdm.ltp_to_body_quat, &jsb_quat);
+	/* convert to eulers */
+	DOUBLE_EULERS_OF_QUAT(fdm.ltp_to_body_eulers, fdm.ltp_to_body_quat);
+	/* the "false" pprz lpt */
+	/* FIXME: use jsbsim ltp for now */
+	EULERS_COPY(fdm.ltpprz_to_body_eulers, fdm.ltp_to_body_eulers);
+	QUAT_COPY(fdm.ltpprz_to_body_quat, fdm.ltp_to_body_quat);
 
-  /*
-   * rotational speed and accelerations
-   */
-  jsbsimvec_to_rate(&fdm.body_ecef_rotvel, &propagate->GetPQR());
-  jsbsimvec_to_rate(&fdm.body_ecef_rotaccel, &accelerations->GetPQRdot());
+	/*
+	 * rotational speed and accelerations
+	 */
+	jsbsimvec_to_rate(&fdm.body_ecef_rotvel, &propagate->GetPQR());
+	jsbsimvec_to_rate(&fdm.body_ecef_rotaccel, &accelerations->GetPQRdot());
 
+#if DEBUG_NPS_JSBSIM
+	printf("%f,%f,%f\n", fdm.body_ecef_rotvel.p, fdm.body_ecef_rotvel.q,
+			fdm.body_ecef_rotvel.r);
+#endif
 
-  /*
-   * wind
-   */
-  const FGColumnVector3& fg_wind_ned = FDMExec->GetWinds()->GetTotalWindNED();
-  jsbsimvec_to_vec(&fdm.wind, &fg_wind_ned);
+	/*
+	 * wind
+	 */
+	const FGColumnVector3
+	&fg_wind_ned = FDMExec->GetWinds()->GetTotalWindNED();
+	jsbsimvec_to_vec(&fdm.wind, &fg_wind_ned);
 }
 
 /**
@@ -424,29 +453,29 @@ static void init_jsbsim(double dt) {
  */
 static void init_ltp(void) {
 
-  FGPropagate* propagate = FDMExec->GetPropagate();
+	FGPropagate* propagate = FDMExec->GetPropagate();
 
-  jsbsimloc_to_loc(&fdm.ecef_pos,&propagate->GetLocation());
-  ltp_def_from_ecef_d(&ltpdef,&fdm.ecef_pos);
+	jsbsimloc_to_loc(&fdm.ecef_pos, &propagate->GetLocation());
+	ltp_def_from_ecef_d(&ltpdef, &fdm.ecef_pos);
 
-  fdm.ltp_g.x = 0.;
-  fdm.ltp_g.y = 0.;
-  fdm.ltp_g.z = 9.81;
+	fdm.ltp_g.x = 0.;
+	fdm.ltp_g.y = 0.;
+	fdm.ltp_g.z = 9.81;
 
 #ifdef AHRS_H_X
 #pragma message "Using magnetic field as defined in airframe file (AHRS section)."
-  fdm.ltp_h.x = AHRS_H_X;
-  fdm.ltp_h.y = AHRS_H_Y;
-  fdm.ltp_h.z = AHRS_H_Z;
+	fdm.ltp_h.x = AHRS_H_X;
+	fdm.ltp_h.y = AHRS_H_Y;
+	fdm.ltp_h.z = AHRS_H_Z;
 #elif defined INS_H_X
 #pragma message "Using magnetic field as defined in airframe file (INS section)."
-  fdm.ltp_h.x = INS_H_X;
-  fdm.ltp_h.y = INS_H_Y;
-  fdm.ltp_h.z = INS_H_Z;
+	fdm.ltp_h.x = INS_H_X;
+	fdm.ltp_h.y = INS_H_Y;
+	fdm.ltp_h.z = INS_H_Z;
 #else
-  fdm.ltp_h.x = 0.4912;
-  fdm.ltp_h.y = 0.1225;
-  fdm.ltp_h.z = 0.8624;
+	fdm.ltp_h.x = 0.4912;
+	fdm.ltp_h.y = 0.1225;
+	fdm.ltp_h.z = 0.8624;
 #endif
 
 }
@@ -475,11 +504,12 @@ static void jsbsimloc_to_loc(EcefCoor_d* fdm_location, const FGLocation* jsb_loc
  * @param fdm_vector    Pointer to DoubleVect3 struct
  * @param jsb_vector    Pointer to FGColumnVector3 struct
  */
-static void jsbsimvec_to_vec(DoubleVect3* fdm_vector, const FGColumnVector3* jsb_vector) {
+static void jsbsimvec_to_vec(DoubleVect3* fdm_vector,
+		const FGColumnVector3* jsb_vector) {
 
-  fdm_vector->x = MetersOfFeet(jsb_vector->Entry(1));
-  fdm_vector->y = MetersOfFeet(jsb_vector->Entry(2));
-  fdm_vector->z = MetersOfFeet(jsb_vector->Entry(3));
+	fdm_vector->x = MetersOfFeet(jsb_vector->Entry(1));
+	fdm_vector->y = MetersOfFeet(jsb_vector->Entry(2));
+	fdm_vector->z = MetersOfFeet(jsb_vector->Entry(3));
 
 }
 
@@ -489,12 +519,13 @@ static void jsbsimvec_to_vec(DoubleVect3* fdm_vector, const FGColumnVector3* jsb
  * @param fdm_quat    Pointer to DoubleQuat struct
  * @param jsb_quat    Pointer to FGQuaternion struct
  */
-static void jsbsimquat_to_quat(DoubleQuat* fdm_quat, const FGQuaternion* jsb_quat){
+static void jsbsimquat_to_quat(DoubleQuat* fdm_quat,
+		const FGQuaternion* jsb_quat) {
 
-  fdm_quat->qi = jsb_quat->Entry(1);
-  fdm_quat->qx = jsb_quat->Entry(2);
-  fdm_quat->qy = jsb_quat->Entry(3);
-  fdm_quat->qz = jsb_quat->Entry(4);
+	fdm_quat->qi = jsb_quat->Entry(1);
+	fdm_quat->qx = jsb_quat->Entry(2);
+	fdm_quat->qy = jsb_quat->Entry(3);
+	fdm_quat->qz = jsb_quat->Entry(4);
 
 }
 
@@ -504,11 +535,12 @@ static void jsbsimquat_to_quat(DoubleQuat* fdm_quat, const FGQuaternion* jsb_qua
  * @param fdm_rate    Pointer to DoubleRates struct
  * @param jsb_vector  Pointer to FGColumnVector3 struct
  */
-static void jsbsimvec_to_rate(DoubleRates* fdm_rate, const FGColumnVector3* jsb_vector) {
+static void jsbsimvec_to_rate(DoubleRates* fdm_rate,
+		const FGColumnVector3* jsb_vector) {
 
-  fdm_rate->p = jsb_vector->Entry(1);
-  fdm_rate->q = jsb_vector->Entry(2);
-  fdm_rate->r = jsb_vector->Entry(3);
+	fdm_rate->p = jsb_vector->Entry(1);
+	fdm_rate->q = jsb_vector->Entry(2);
+	fdm_rate->r = jsb_vector->Entry(3);
 
 }
 
@@ -522,12 +554,12 @@ static void jsbsimvec_to_rate(DoubleRates* fdm_rate, const FGColumnVector3* jsb_
  */
 void llh_from_jsbsim(LlaCoor_d* fdm_lla, FGPropagate* propagate) {
 
-  fdm_lla->lat = propagate->GetGeodLatitudeRad();
-  fdm_lla->lon = propagate->GetLongitude();
-  fdm_lla->alt = propagate->GetAltitudeASLmeters();
-  //printf("geodetic alt: %f\n", MetersOfFeet(propagate->GetGeodeticAltitude()));
-  //printf("ground alt: %f\n", MetersOfFeet(propagate->GetDistanceAGL()));
-  //printf("ASL alt: %f\n", propagate->GetAltitudeASLmeters());
+	fdm_lla->lat = propagate->GetGeodLatitudeRad();
+	fdm_lla->lon = propagate->GetLongitude();
+	fdm_lla->alt = propagate->GetAltitudeASLmeters();
+	//printf("geodetic alt: %f\n", MetersOfFeet(propagate->GetGeodeticAltitude()));
+	//printf("ground alt: %f\n", MetersOfFeet(propagate->GetDistanceAGL()));
+	//printf("ASL alt: %f\n", propagate->GetAltitudeASLmeters());
 
 }
 
@@ -541,9 +573,9 @@ void llh_from_jsbsim(LlaCoor_d* fdm_lla, FGPropagate* propagate) {
  */
 void lla_from_jsbsim_geocentric(LlaCoor_d* fdm_lla, FGPropagate* propagate) {
 
-  fdm_lla->lat = propagate->GetLatitude();
-  fdm_lla->lon = propagate->GetLongitude();
-  fdm_lla->alt = MetersOfFeet(propagate->GetRadius());
+	fdm_lla->lat = propagate->GetLatitude();
+	fdm_lla->lon = propagate->GetLongitude();
+	fdm_lla->alt = MetersOfFeet(propagate->GetRadius());
 
 }
 
@@ -557,16 +589,16 @@ void lla_from_jsbsim_geocentric(LlaCoor_d* fdm_lla, FGPropagate* propagate) {
  */
 void lla_from_jsbsim_geodetic(LlaCoor_d* fdm_lla, FGPropagate* propagate) {
 
-  fdm_lla->lat = propagate->GetGeodLatitudeRad();
-  fdm_lla->lon = propagate->GetLongitude();
-  fdm_lla->alt = MetersOfFeet(propagate->GetGeodeticAltitude());
+	fdm_lla->lat = propagate->GetGeodLatitudeRad();
+	fdm_lla->lon = propagate->GetLongitude();
+	fdm_lla->alt = MetersOfFeet(propagate->GetGeodeticAltitude());
 
 }
 
 #ifdef __APPLE__
 /* Why isn't this there when we include math.h (on osx with clang)? */
 /// Check if a double is NaN.
-static int isnan(double f) { return (f != f); }
+static int isnan(double f) {return (f != f);}
 #endif
 
 /**
@@ -577,73 +609,166 @@ static int isnan(double f) { return (f != f); }
  * @return Count of new NaNs. 0 for no new NaNs.
  */
 static int check_for_nan(void) {
-  int orig_nan_count = fdm.nan_count;
-  /* Check all elements for nans */
-  if (isnan(fdm.ecef_pos.x)) fdm.nan_count++;
-  if (isnan(fdm.ecef_pos.y)) fdm.nan_count++;
-  if (isnan(fdm.ecef_pos.z)) fdm.nan_count++;
-  if (isnan(fdm.ltpprz_pos.x)) fdm.nan_count++;
-  if (isnan(fdm.ltpprz_pos.y)) fdm.nan_count++;
-  if (isnan(fdm.ltpprz_pos.z)) fdm.nan_count++;
-  if (isnan(fdm.lla_pos.lon)) fdm.nan_count++;
-  if (isnan(fdm.lla_pos.lat)) fdm.nan_count++;
-  if (isnan(fdm.lla_pos.alt)) fdm.nan_count++;
-  if (isnan(fdm.hmsl)) fdm.nan_count++;
-  // Skip debugging elements
-  if (isnan(fdm.ecef_ecef_vel.x)) fdm.nan_count++;
-  if (isnan(fdm.ecef_ecef_vel.y)) fdm.nan_count++;
-  if (isnan(fdm.ecef_ecef_vel.z)) fdm.nan_count++;
-  if (isnan(fdm.ecef_ecef_accel.x)) fdm.nan_count++;
-  if (isnan(fdm.ecef_ecef_accel.y)) fdm.nan_count++;
-  if (isnan(fdm.ecef_ecef_accel.z)) fdm.nan_count++;
-  if (isnan(fdm.body_ecef_vel.x)) fdm.nan_count++;
-  if (isnan(fdm.body_ecef_vel.y)) fdm.nan_count++;
-  if (isnan(fdm.body_ecef_vel.z)) fdm.nan_count++;
-  if (isnan(fdm.body_ecef_accel.x)) fdm.nan_count++;
-  if (isnan(fdm.body_ecef_accel.y)) fdm.nan_count++;
-  if (isnan(fdm.body_ecef_accel.z)) fdm.nan_count++;
-  if (isnan(fdm.ltp_ecef_vel.x)) fdm.nan_count++;
-  if (isnan(fdm.ltp_ecef_vel.y)) fdm.nan_count++;
-  if (isnan(fdm.ltp_ecef_vel.z)) fdm.nan_count++;
-  if (isnan(fdm.ltp_ecef_accel.x)) fdm.nan_count++;
-  if (isnan(fdm.ltp_ecef_accel.y)) fdm.nan_count++;
-  if (isnan(fdm.ltp_ecef_accel.z)) fdm.nan_count++;
-  if (isnan(fdm.ltpprz_ecef_vel.x)) fdm.nan_count++;
-  if (isnan(fdm.ltpprz_ecef_vel.y)) fdm.nan_count++;
-  if (isnan(fdm.ltpprz_ecef_vel.z)) fdm.nan_count++;
-  if (isnan(fdm.ltpprz_ecef_accel.x)) fdm.nan_count++;
-  if (isnan(fdm.ltpprz_ecef_accel.y)) fdm.nan_count++;
-  if (isnan(fdm.ltpprz_ecef_accel.z)) fdm.nan_count++;
-  if (isnan(fdm.ecef_to_body_quat.qi)) fdm.nan_count++;
-  if (isnan(fdm.ecef_to_body_quat.qx)) fdm.nan_count++;
-  if (isnan(fdm.ecef_to_body_quat.qy)) fdm.nan_count++;
-  if (isnan(fdm.ecef_to_body_quat.qz)) fdm.nan_count++;
-  if (isnan(fdm.ltp_to_body_quat.qi)) fdm.nan_count++;
-  if (isnan(fdm.ltp_to_body_quat.qx)) fdm.nan_count++;
-  if (isnan(fdm.ltp_to_body_quat.qy)) fdm.nan_count++;
-  if (isnan(fdm.ltp_to_body_quat.qz)) fdm.nan_count++;
-  if (isnan(fdm.ltp_to_body_eulers.phi)) fdm.nan_count++;
-  if (isnan(fdm.ltp_to_body_eulers.theta)) fdm.nan_count++;
-  if (isnan(fdm.ltp_to_body_eulers.psi)) fdm.nan_count++;
-  if (isnan(fdm.ltpprz_to_body_quat.qi)) fdm.nan_count++;
-  if (isnan(fdm.ltpprz_to_body_quat.qx)) fdm.nan_count++;
-  if (isnan(fdm.ltpprz_to_body_quat.qy)) fdm.nan_count++;
-  if (isnan(fdm.ltpprz_to_body_quat.qz)) fdm.nan_count++;
-  if (isnan(fdm.ltpprz_to_body_eulers.phi)) fdm.nan_count++;
-  if (isnan(fdm.ltpprz_to_body_eulers.theta)) fdm.nan_count++;
-  if (isnan(fdm.ltpprz_to_body_eulers.psi)) fdm.nan_count++;
-  if (isnan(fdm.body_ecef_rotvel.p)) fdm.nan_count++;
-  if (isnan(fdm.body_ecef_rotvel.q)) fdm.nan_count++;
-  if (isnan(fdm.body_ecef_rotvel.r)) fdm.nan_count++;
-  if (isnan(fdm.body_ecef_rotaccel.p)) fdm.nan_count++;
-  if (isnan(fdm.body_ecef_rotaccel.q)) fdm.nan_count++;
-  if (isnan(fdm.body_ecef_rotaccel.r)) fdm.nan_count++;
-  if (isnan(fdm.ltp_g.x)) fdm.nan_count++;
-  if (isnan(fdm.ltp_g.y)) fdm.nan_count++;
-  if (isnan(fdm.ltp_g.z)) fdm.nan_count++;
-  if (isnan(fdm.ltp_h.x)) fdm.nan_count++;
-  if (isnan(fdm.ltp_h.y)) fdm.nan_count++;
-  if (isnan(fdm.ltp_h.z)) fdm.nan_count++;
+	int orig_nan_count = fdm.nan_count;
+	/* Check all elements for nans */
+	if (isnan(fdm.ecef_pos.x))
+		fdm.nan_count++;
+	if (isnan(fdm.ecef_pos.y))
+		fdm.nan_count++;
+	if (isnan(fdm.ecef_pos.z))
+		fdm.nan_count++;
+	if (isnan(fdm.ltpprz_pos.x))
+		fdm.nan_count++;
+	if (isnan(fdm.ltpprz_pos.y))
+		fdm.nan_count++;
+	if (isnan(fdm.ltpprz_pos.z))
+		fdm.nan_count++;
+	if (isnan(fdm.lla_pos.lon))
+		fdm.nan_count++;
+	if (isnan(fdm.lla_pos.lat))
+		fdm.nan_count++;
+	if (isnan(fdm.lla_pos.alt))
+		fdm.nan_count++;
+	if (isnan(fdm.hmsl))
+		fdm.nan_count++;
+	// Skip debugging elements
+	if (isnan(fdm.ecef_ecef_vel.x))
+		fdm.nan_count++;
+	if (isnan(fdm.ecef_ecef_vel.y))
+		fdm.nan_count++;
+	if (isnan(fdm.ecef_ecef_vel.z))
+		fdm.nan_count++;
+	if (isnan(fdm.ecef_ecef_accel.x))
+		fdm.nan_count++;
+	if (isnan(fdm.ecef_ecef_accel.y))
+		fdm.nan_count++;
+	if (isnan(fdm.ecef_ecef_accel.z))
+		fdm.nan_count++;
+	if (isnan(fdm.body_ecef_vel.x))
+		fdm.nan_count++;
+	if (isnan(fdm.body_ecef_vel.y))
+		fdm.nan_count++;
+	if (isnan(fdm.body_ecef_vel.z))
+		fdm.nan_count++;
+	if (isnan(fdm.body_ecef_accel.x))
+		fdm.nan_count++;
+	if (isnan(fdm.body_ecef_accel.y))
+		fdm.nan_count++;
+	if (isnan(fdm.body_ecef_accel.z))
+		fdm.nan_count++;
+	if (isnan(fdm.ltp_ecef_vel.x))
+		fdm.nan_count++;
+	if (isnan(fdm.ltp_ecef_vel.y))
+		fdm.nan_count++;
+	if (isnan(fdm.ltp_ecef_vel.z))
+		fdm.nan_count++;
+	if (isnan(fdm.ltp_ecef_accel.x))
+		fdm.nan_count++;
+	if (isnan(fdm.ltp_ecef_accel.y))
+		fdm.nan_count++;
+	if (isnan(fdm.ltp_ecef_accel.z))
+		fdm.nan_count++;
+	if (isnan(fdm.ltpprz_ecef_vel.x))
+		fdm.nan_count++;
+	if (isnan(fdm.ltpprz_ecef_vel.y))
+		fdm.nan_count++;
+	if (isnan(fdm.ltpprz_ecef_vel.z))
+		fdm.nan_count++;
+	if (isnan(fdm.ltpprz_ecef_accel.x))
+		fdm.nan_count++;
+	if (isnan(fdm.ltpprz_ecef_accel.y))
+		fdm.nan_count++;
+	if (isnan(fdm.ltpprz_ecef_accel.z))
+		fdm.nan_count++;
+	if (isnan(fdm.ecef_to_body_quat.qi))
+		fdm.nan_count++;
+	if (isnan(fdm.ecef_to_body_quat.qx))
+		fdm.nan_count++;
+	if (isnan(fdm.ecef_to_body_quat.qy))
+		fdm.nan_count++;
+	if (isnan(fdm.ecef_to_body_quat.qz))
+		fdm.nan_count++;
+	if (isnan(fdm.ltp_to_body_quat.qi))
+		fdm.nan_count++;
+	if (isnan(fdm.ltp_to_body_quat.qx))
+		fdm.nan_count++;
+	if (isnan(fdm.ltp_to_body_quat.qy))
+		fdm.nan_count++;
+	if (isnan(fdm.ltp_to_body_quat.qz))
+		fdm.nan_count++;
+	if (isnan(fdm.ltp_to_body_eulers.phi))
+		fdm.nan_count++;
+	if (isnan(fdm.ltp_to_body_eulers.theta))
+		fdm.nan_count++;
+	if (isnan(fdm.ltp_to_body_eulers.psi))
+		fdm.nan_count++;
+	if (isnan(fdm.ltpprz_to_body_quat.qi))
+		fdm.nan_count++;
+	if (isnan(fdm.ltpprz_to_body_quat.qx))
+		fdm.nan_count++;
+	if (isnan(fdm.ltpprz_to_body_quat.qy))
+		fdm.nan_count++;
+	if (isnan(fdm.ltpprz_to_body_quat.qz))
+		fdm.nan_count++;
+	if (isnan(fdm.ltpprz_to_body_eulers.phi))
+		fdm.nan_count++;
+	if (isnan(fdm.ltpprz_to_body_eulers.theta))
+		fdm.nan_count++;
+	if (isnan(fdm.ltpprz_to_body_eulers.psi))
+		fdm.nan_count++;
+	if (isnan(fdm.body_ecef_rotvel.p))
+		fdm.nan_count++;
+	if (isnan(fdm.body_ecef_rotvel.q))
+		fdm.nan_count++;
+	if (isnan(fdm.body_ecef_rotvel.r))
+		fdm.nan_count++;
+	if (isnan(fdm.body_ecef_rotaccel.p))
+		fdm.nan_count++;
+	if (isnan(fdm.body_ecef_rotaccel.q))
+		fdm.nan_count++;
+	if (isnan(fdm.body_ecef_rotaccel.r))
+		fdm.nan_count++;
+	if (isnan(fdm.ltp_g.x))
+		fdm.nan_count++;
+	if (isnan(fdm.ltp_g.y))
+		fdm.nan_count++;
+	if (isnan(fdm.ltp_g.z))
+		fdm.nan_count++;
+	if (isnan(fdm.ltp_h.x))
+		fdm.nan_count++;
+	if (isnan(fdm.ltp_h.y))
+		fdm.nan_count++;
+	if (isnan(fdm.ltp_h.z))
+		fdm.nan_count++;
 
-  return (fdm.nan_count - orig_nan_count);
+	return (fdm.nan_count - orig_nan_count);
+}
+
+//We are now able to pull out data directly from the simulator
+
+double get_value(const char* name) {
+	return FDMExec->GetPropertyManager()->GetNode(name)->getDoubleValue();
+}
+
+void nps_fdm_remote_position(double* ptr) {
+
+#define FT2M 0.3048
+	*ptr++ = get_value("position/lat-gc-rad");
+	*ptr++ = get_value("position/long-gc-rad");
+	*ptr++ = get_value("position/h-sl-meters");
+	*ptr++ = get_value("attitude/heading-true-rad");
+	*ptr++ = get_value("velocities/vg-fps") * FT2M;
+	*ptr++ = get_value("velocities/v-down-fps") * (-FT2M);
+	*ptr++ = get_value("simulation/sim-time-sec");
+
+}
+
+void nps_fdm_remote_ir(double * ptr){
+
+	*ptr++ = get_value("attitude/roll-rad");
+	*ptr++ = get_value("attitude/pitch-rad");
+	*ptr++ = get_value("attitude/heading-true-rad");
+	*ptr++ = get_value("velocities/p-rad_sec");
+	*ptr++ = get_value("velocities/q-rad_sec");
+	*ptr++ = get_value("velocities/r-rad_sec");
 }
