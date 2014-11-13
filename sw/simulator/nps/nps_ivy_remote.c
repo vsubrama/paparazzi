@@ -105,28 +105,22 @@ void on_COMMANDS(IvyClientPtr app __attribute__ ((unused)),
 		int argc __attribute__ ((unused)), char *argv[]) {
 
 	const char* arg = (argc < 1) ? ":::" : argv[0];
-	const char* arg2 = (argc < 2) ? "!!!" : argv[1];
-	const char* arg3 = (argc < 3) ? "???" : argv[2];
 
-	printf("on_COMMANDS message is %s %s %s \n", arg, arg2, arg3);
+	printf("on_COMMANDS message is %s\n", arg);
 
 	char *cp;
 
-	cp = strdupa(arg); /* Make writable copy.  */
+	//cp = strdupa(arg); /* Make writable copy.  */
 
 	char * pch;
-	printf("Splitting string \"%s\" into tokens:\n", cp);
-	pch = strtok(cp, " ,");
+
+	pch = strtok(argv[0], " ,");
 	int i = 0;
 	while (pch != NULL) {
-		commands[i] = atoi(pch);
+		commands[i++] = atoi(pch);
 		if (i > NPS_COMMANDS_NB)
 			break;
-		printf("%s\n", pch);
 		pch = strtok(NULL, " ,");
 	}
-
-	//TODO Parse the message here and stuff into  commands[] array.
-	//This will then get processed in the autopilot code when it is called
 
 }
