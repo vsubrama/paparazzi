@@ -91,6 +91,20 @@ void nps_autopilot_run_step(double time) {
 	static int counterIR = 0;
 //#define DegOfRad(x) ((x) * (180. / M_PI))
 
+	if (nps_sensors_gyro_available()) {
+		imu_feed_gyro_accel();
+
+		//Feed the data from the gyroscope into the serial_pap
+		IvySendMsg("NPS_SENSORS_GYRO %d %d %f %f %f", 6, AC_ID,
+				sensors.gyro.value.x, sensors.gyro.value.y,
+				sensors.gyro.value.z);
+
+		//Feed the data from the accelerometer into the serial_pap
+		IvySendMsg("NPS_SENSORS_ACCEL %d %d %f %f %f", 6, AC_ID,
+				sensors.accel.value.x, sensors.accel.value.y,
+				sensors.accel.value.z);
+	}
+
 	if (nps_sensors_gps_available()) {
 		gps_feed_value();
 
@@ -123,11 +137,17 @@ void nps_autopilot_run_step(double time) {
 		 *
 		 */
 		//Get some values from the FDM for compatability
-		double vals[7];
-		nps_fdm_remote_position(&vals[0]);
-		IvySendMsg("NPS_SEN_NICE_GPS %d %d %f %f %f %f %f %f %f", 6, AC_ID,
-				fdm.lla_pos_pprz.lat, fdm.lla_pos_pprz.lon,
-				fdm.lla_pos_pprz.alt, vals[3], vals[4], vals[5], fdm.time);
+//		double vals[7];
+//		nps_fdm_remote_position(&vals[0]);
+//		IvySendMsg("NPS_SEN_NICE_GPS %d %d %f %f %f %f %f %f %f", 6, AC_ID,
+//				fdm.lla_pos_pprz.lat, fdm.lla_pos_pprz.lon,
+//				fdm.lla_pos_pprz.alt, vals[3], vals[4], vals[5], fdm.time);
+		IvySendMsg(
+				"NPS_SEND_GPS_INT %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",
+				6, AC_ID, gps.ecef_pos.x, gps.ecef_pos.y, gps.ecef_pos.z,
+				gps.lla_pos.lat, gps.lla_pos.lon, gps.lla_pos.alt, gps.hmsl,
+				gps.ecef_vel.x, gps.ecef_vel.y, gps.ecef_vel.z, gps.pacc,
+				gps.sacc, gps.tow, gps.pdop, gps.num_sv, gps.fix);
 
 		/*IvySendMsg(
 		 "NPS_SEND_GPS_INT %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",
@@ -140,6 +160,16 @@ void nps_autopilot_run_step(double time) {
 
 	if (nps_bypass_ahrs) {
 		sim_overwrite_ahrs();
+		if (!(counterIR++ % 4)) {
+			IvySendMsg("NPS_AHRS_LTP %d %d %f %f %f %f", 6, AC_ID,
+					fdm.ltp_to_body_quat.qi, fdm.ltp_to_body_quat.qx,
+					fdm.ltp_to_body_quat.qy, fdm.ltp_to_body_quat.qz);
+
+			IvySendMsg("NPS_AHRS_ECEF %d %d %f %f %f", 6, AC_ID,
+					fdm.body_ecef_rotvel.p, fdm.body_ecef_rotvel.q,
+					fdm.body_ecef_rotvel.r);
+		}
+
 /*
 		IvySendMsg("NPS_AHRS_LTP %d %d %f %f %f %f", 6, AC_ID,
 				fdm.ltp_to_body_quat.qi, fdm.ltp_to_body_quat.qx,
@@ -155,8 +185,22 @@ void nps_autopilot_run_step(double time) {
 
 	if (nps_bypass_ins) {
 		sim_overwrite_ins();
+		static int counterINS = 0;
+		if (!(counterINS++ % 4)) {
+			IvySendMsg("NPS_INS_POS %d %d %f %f %f", 6, AC_ID, fdm.ltpprz_pos.x,
+					fdm.ltpprz_pos.y, fdm.ltpprz_pos.z);
+
+			IvySendMsg("NPS_INS_ECEF_VEL %d %d %f %f %f", 6, AC_ID,
+					fdm.ltpprz_ecef_vel.x, fdm.ltpprz_ecef_vel.y,
+					fdm.ltpprz_ecef_vel.z);
+
+			IvySendMsg("NPS_INS_ECEF_ACCEL %d %d %f %f %f", 6, AC_ID,
+					fdm.ltpprz_ecef_accel.x, fdm.ltpprz_ecef_accel.y,
+					fdm.ltpprz_ecef_accel.z);
+	//TODO Figure out when to send this data...
+		}
 	}
-#define USE_FDM_IR
+//#define USE_FDM_IR
 #ifdef USE_FDM_IR
 	if (!(counterIR++ % 4)) {
 		IvySendMsg("NPS_SEN_NICE_IR %d %d %f %f %f %f %f %f", 6, AC_ID,
