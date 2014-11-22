@@ -106,12 +106,10 @@ void nps_autopilot_run_step(double time) {
 	if (nps_sensors_gps_available()) {
 		gps_feed_value();
 
-		/*
 		 double vals[7];
 		 nps_fdm_remote_position(&vals[0]);
 		 IvySendMsg("NPS_SEN_NICE_GPS %d %d %f %f %f %f %f %f %f", 6, AC_ID,
 		 vals[0], vals[1], vals[2], vals[3], vals[4], vals[5], vals[6]);
-		 */
 		/*
 		 static double gps_period = 0.;
 		 #define DELTA_T (.0081447*1e-3)
@@ -137,15 +135,15 @@ void nps_autopilot_run_step(double time) {
 		//Get some values from the FDM for compatability
 //		double vals[7];
 //		nps_fdm_remote_position(&vals[0]);
-//		IvySendMsg("NPS_SEN_NICE_GPS %d %d %f %f %f %f %f %f %f", 6, AC_ID,
-//				fdm.lla_pos_pprz.lat, fdm.lla_pos_pprz.lon,
-//				fdm.lla_pos_pprz.alt, vals[3], vals[4], vals[5], fdm.time);
-		IvySendMsg(
+		IvySendMsg("NPS_SEN_NICE_GPS %d %d %f %f %f %f %f %f %f", 6, AC_ID,
+				fdm.lla_pos_pprz.lat, fdm.lla_pos_pprz.lon,
+				fdm.lla_pos_pprz.alt, vals[3], vals[4], vals[5], fdm.time);
+		/*IvySendMsg(
 				"NPS_SEND_GPS_INT %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",
 				6, AC_ID, gps.ecef_pos.x, gps.ecef_pos.y, gps.ecef_pos.z,
 				gps.lla_pos.lat, gps.lla_pos.lon, gps.lla_pos.alt, gps.hmsl,
 				gps.ecef_vel.x, gps.ecef_vel.y, gps.ecef_vel.z, gps.pacc,
-				gps.sacc, gps.tow, gps.pdop, gps.num_sv, gps.fix);
+				gps.sacc, gps.tow, gps.pdop, gps.num_sv, gps.fix);*/
 
 		/*IvySendMsg(
 		 "NPS_SEND_GPS_INT %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",
@@ -198,14 +196,18 @@ void nps_autopilot_run_step(double time) {
 	//TODO Figure out when to send this data...
 		}
 	}
-//#define USE_FDM_IR
+
+#ifndef USE_FDM_IR
+#define USE_FDM_IR
+#endif
+
 #ifdef USE_FDM_IR
-	if (!(counterIR++ % 4)) {
+	//if (!(counterIR++ % 4)) {
 		IvySendMsg("NPS_SEN_NICE_IR %d %d %f %f %f %f %f %f", 6, AC_ID,
 				fdm.ltp_to_body_eulers.phi, fdm.ltp_to_body_eulers.theta,
 				fdm.ltp_to_body_eulers.psi, fdm.body_ecef_rotvel.p,
 				fdm.body_ecef_rotvel.q, fdm.body_ecef_rotvel.r);
-	}
+	//}
 #endif
 #ifdef USE_JSBSIM_IR
 	//Send this ~every 10 hz
