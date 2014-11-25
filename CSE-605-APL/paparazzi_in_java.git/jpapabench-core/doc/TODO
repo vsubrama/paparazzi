@@ -1,0 +1,22 @@
+=======================
+= Java PapaBench Core =
+=======================
+
+--------
+Problems
+--------
+
+How to annotate the classes for testing with SCJ checker?
+Possible solutions:
+ - external annotations which will be process by code generator which will generate annotated source code
+ - source code would be annotated,
+ 
+----
+TODO
+----
+
+- Separates flight plans into a dedicated project.
+
+- Fix allocation of message in immortal memory.
+
+- Summarize memory allocations, which module allocates memory? Why? Where the memory is passed? 

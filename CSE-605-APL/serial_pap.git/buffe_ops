@@ -1,0 +1,75 @@
+1.There will be two abstract entities which will be using the buffer one of them readers and other will be writers.
+2. Reader Perspective:
+    Though, there might be muliple readers involve with this design but all of them will share common traits. 
+    So let's look at use cases from the perspective of reader.
+    <USE CASE entity=reader type=buff_comm optional>
+    	 The state of the buffer seen by a reader at any point of a time will be:
+	<en>
+	Reader has already read the whole buffer or just started reading.Therefore in both case it will be at the head of buffer.
+	</en>
+	<en>
+	Reader has read some partial data. So the reader will try or trying to do something in the middle of the buffer.
+	</en>
+    </USE CASE>
+    <USE CASE entity=reader type=buff_comm >
+    	 <en>
+	 Reader must wait unitl all the buffer has been filled and then filled buffer will be copied to reader's own buffer.
+	 <Reason>
+	 	 1.In our case we have only one reader therefore first copying one buffer to another is not gross inefficient.
+		 2.As our incoming messages will be combination of some continuous bytes, so reader doesn't need to wait for
+		 and check for all bytes discreetly to build the whole message. Our approach will  copy a defnite number of
+		 bytes from source buffer and above them it can process. The length of the buffer will gurantee atleast one 
+		 message.
+	 </reason>
+	 <cons>
+		1.As many of times while reader is busying processing the message, there might be many time a spill over is
+		happening at source side. Though it might not be a problem for us but we are loosing some messages.
+	 </cons>	
+	 </en>
+    </USE CASE>
+
+3.Implementation Detials:
+<entity type= source>
+	Our implementation of source thread which will collect the data from the IO source will be non-blocking. Means a reader will 
+	register with the source through a mean of call backs and as the source buffer is filled, all callbacks will be called. Here,
+	as a point of efficiency, we assume that registered call backs take small time to execute. It is also assumed that, while
+	dispatching the call back, the source thread  will stop recieving more data. Actually this strategy is also make other tasks 
+	a lot easier like if a registered entity doesn't want more message it can simply return from the call back.
+</entity>
+--------------------------------------------------------------------------------------------------------------------------------------------------
+Threads:
+------------------------------------------------------------------------------------------------------------------------------------------------
+1.Main Thread:
+2.One thread will be listening to UART and copying the data to a shared message queue.:Hardware Thread.
+3.One thread will construct the thread from this shared message queue and will put new constructed messages to some other caches.-Worker Thread.
+
+Main Thread description:
+-------------------------
+1.Start: The main thread is application's main thread.
+2.Responsibility:
+a.The main thread will open the connection to UART. and will provide the serial connection pointer to both reader and writer. 
+b.Main Thread also shares the Message Queues where reader and writer has to put their data.
+3.Finish:
+Main thread will finish when UART port is closed  due to some error or manually. Or after a particular timeout. Main thread will also
+responsible for signalling other thread that data from the serial port has stopped so they must finish their execution.It will wait for 
+other threads to finishand then exit safely.
+
+Reader Thread Description:
+-------------------------
+1.Start: This thread will be started from the main thread. The reader thread will be given a valid pointer to serial port. And also access to
+	 a shared queue where it needs to transmit the messages.
+2.Processing:This thread is mainly responsible for getting the data from the serial port and after a MAXIMUM number of
+bytes are received, these data is transferred to a fifo queue.And from this fifo queue these raw bytes are converted to some meaning full messages.
+3.Finish:This thread will continue to read the data until the serial port is closed.
+
+Processing Thread Description:
+------------------------------
+1.Start:Processing thread will started by the Main thread and provided a handle to queues of buffers from where	it will process the raw bytes and
+make some menaingfull messages. These reconstucted messages will also need to be put in a shared queue for consumptions from the clients.
+2.Finish:The main thread will signal this thread to exit and usually it will be when serial port is closed or some error occured.
+
+
+
+
+
+

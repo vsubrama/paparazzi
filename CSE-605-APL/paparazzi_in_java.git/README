@@ -1,0 +1,43 @@
+jparabench in Paparazzi
+
+##Prerequisite:
+    - JDK 1.6 or above
+    - Apache Ant version 1.8.2
+
+##Customization
+    - change jpapabench-build/personal.build.properties
+        * personal.fijivm.home.dir=YOUR_FIJIVM_HOME_DIR
+        * personal.rtsj.api=YOUR_FIJIVM_HOME_DIR/lib/rtst.jar;YOUR_FIJIVM_HOME_DIR/lib/fivmcommon;YOUR_FIJIVM_HOME_DIR/lib/fivmr.jar
+
+##Compile && Build:
+    - cd jpapabench-build
+    - ant compile.jpapabench.core
+    - ant compile.jpapabench.pj
+    - ant compile.jpapabench.rtsj
+    - ant jar.core
+    - ant jar.pj
+    - ant jar.rtsj
+
+
+
+export FIJI_HOME=/home/gassa/research/fivm
+export JPAPBENCH_DIR=/home/gassa/research/uav/rtdroid-jparabench
+
+${FIJI_HOME}/bin/fivmc --target nexus_s --rt-library=RTSJ -o jpapbench ${JPAPBENCH_DIR}/jpapabench-build/output/jar/jpapabench-rtsj.jar ${JPAPBENCH_DIR}/jpapabench-build/output/jar/jpapabench-core.jar
+${JPAPBENCH_DIR}/jpapabench-build/output/jar/jpapabench-core-flightplans.jar
+${FIJI_HOME}/bin/fivmc  --max-threads=110 --r-max-os-threads=110 --more-opt \
+ --r-nanos-per-tick=100000 --r-thr-stack-size=300000 --gc CMR --target \
+ RTEMS-leon3-rtems4.10-sparc-32 --rt-library=RTSJ -o jpapbench \
+ ${JPAPBENCH_DIR}/jpapabench-build/output/jar/jpapabench-rtsj.jar \
+ ${JPAPBENCH_DIR}/jpapabench-build/output/jar/jpapabench-core.jar \
+ ${JPAPBENCH_DIR}/jpapabench-build/output/jar/jpapabench-core-flightplans.jar
+
+
+
+ ${FIJI_HOME}/bin/fivmc  --max-threads=110 --r-max-os-threads=110 --more-opt \
+ --r-nanos-per-tick=100000 --r-thr-stack-size=300000 --gc CMR --target \
+ RTEMS-leon3-rtems4.10-sparc-32 --rt-library=RTSJ -o jpapbench \
+ ${JPAPBENCH_DIR}/jpapabench-build/output/jar/jpapabench-pj.jar \
+ ${JPAPBENCH_DIR}/jpapabench-build/output/jar/jpapabench-core.jar \
+ ${JPAPBENCH_DIR}/jpapabench-build/output/jar/jpapabench-core-flightplans.jar
+

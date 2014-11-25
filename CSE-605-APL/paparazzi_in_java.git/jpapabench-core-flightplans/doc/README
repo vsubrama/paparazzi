@@ -1,0 +1,58 @@
+# $Id$
+#
+# This file is a part of jPapaBench providing a Java implementation 
+# of PapaBench project.
+# Copyright (C) 2010  Michal Malohlava <michal.malohlava_at_d3s.mff.cuni.cz>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#
+
+==========================
+= PapaBench flight plans =
+==========================
+
+The project provides an implementation of various flightplans for PapaBench project.
+ 
+For further information, please, visit the project page: 
+http://d3s.mff.cuni.cz/~malohlava/projects/jpapabench/
+
+------
+Links
+------
+
+Java-based PapaBench
+http://d3s.mff.cuni.cz/~malohlava/projects/jpapabench/
+
+Original C-based PapaBench
+http://www.irit.fr/recherches/ARCHI/MARCH/rubrique.php3?id_rubrique=97
+
+Paparazzi - a free autopilot
+http://paparazzi.enac.fr/wiki/Main_Page
+
+
+-----------------
+Info about author
+-----------------
+
+Michal Malohlava
+Department of Dependable and Distributed Systems
+Faculty of Mathematics and Physics
+Charles University in Prague
+Malostranske nam.25
+11800 Prague 1
+Czech Republic
+
+Homepage: http://d3s.mff.cuni.cz/~malohlava
+LinkedIn: http://www.linkedin.com/in/mmalohlava

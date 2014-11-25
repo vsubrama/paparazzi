@@ -1,0 +1,23 @@
+PapaBench RTSJ version
+-----------------------
+
+Concepts:
+ - 2 main modules
+   - modules allocated in immortal memory
+ - modules threads
+   - if allocate then allocate in local scope
+ - passed data allocated in scope are copied on the base of primitive types
+ 
+Refactoring:
+ - papabench factory should be an object, not a class with static methods
+ 
+    
+Questions:
+* It would be nice to have an opportunity to use handlers implementing Runnable in RealtimeThread as well as in SCJ periodic handlers.
+ - just to have unified concept
+ 
+ FIXME:
+  - memory leak in logging
+  - memory leak in creating radio message and inter-system message
+  
+TODO: summary of memory allocation, which module allocates memory? Why? Which type of memory is used?

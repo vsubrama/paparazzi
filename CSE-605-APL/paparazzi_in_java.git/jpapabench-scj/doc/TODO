@@ -1,0 +1,23 @@
+TODO list
+-------------
+- update priorities according to task dependencies
+- telemetry module to send actual state of airplane
+
+- add anotation
+
+
+IDEAS
+--------
+- generate schedule from AADL + task dependencies
+- generate {FBW|Autopilot}*Conf from AADL
+
+- rewrite code of modules to divide requirements on modules/diveces, provided services, provided data
+
+- tool which will generate PapabenchSchedile from a description of tasks (e.g. Papa*Conf tasks configurations)
+
+- improve module injection
+
+LINKS
+---------
+Paparazzi design overview:
+ - http://paparazzi.enac.fr/wiki/DevGuide/DesignOverview

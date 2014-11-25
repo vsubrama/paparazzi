@@ -1,0 +1,71 @@
+-------------
+- Autopilot -
+-------------
+ * HW part
+  - MCU0
+  
+ * Devices
+  - Pression
+  - Tension
+  - Compas
+  - Vitesse_Air
+  - Camera_Video
+  - Emetteur
+  - GPS
+  - InfraRed
+  
+  
+ * Threads
+   - receive_gps_data (250ms)
+   - navigation_task (250ms) (autopilot/main.c:navigation_task)
+   - altitude_control (250ms) (autopilot/main.c:altitude_control_task)
+   - climb_control(250ms) (autopilot/main.c:climb_control_task)
+   - stabilization (50ms) (autopilot/main.c:stabilization_task)
+   - link_fbw_send (50ms)
+   - radio_control (25ms)
+   - reporting_task (100ms)
+   
+   
+ 
+ * Interrupts
+   - GPS interrupt (250ms)
+   - SPI_MC0_1 (50ms)
+   - SPI_MC0_2 (50ms)
+   - Interruption_Modem (100ms)
+ 
+ * Processes
+  - Nav_Stab_Control (modes: manual, auto, home)
+ 
+-------
+- FBW -
+-------
+ * Devices  
+  - Compteur
+  - Servos
+     - 
+  - Recepteur
+   
+ * Process
+   - RecepteurCde_PilotageServo
+      (modes: manual, auto, failsafe)
+      
+ * Threads
+   - test_ppm_task (25ms)
+   - check_failsafe_task (50ms)
+   - servo_transmit (50ms)
+   - send_data_to_autopilot (25ms)
+ 
+ * Interrupts
+   - Radio interrupt (RC 25ms)
+   - Interruption_Envoi_Servo ~ for simplicity 50ms - collect data from all sensors
+     - Elevator (50ms)
+     - MotorL (52ms)
+     - MotorR (54ms)
+     - AileronL (56ms)
+     - AileronR (58ms)
+     - Rudder (60ms)
+   - SPI_MCU1 (25ms)
+   
+Processor
+ - MCU1 (Rate-monotonic scheduling) - FBW (servo control)
+ 

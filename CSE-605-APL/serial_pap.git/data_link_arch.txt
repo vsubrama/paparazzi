@@ -1,0 +1,20 @@
+1. Flow chart for a thread that will transmit data to a serial port:
+   a.) Will take an item form the Shared queue.Here if the thread might have to wait for an item to be posted
+   in thq queue.
+   b.)The item will be a buffer contaning  a certain number of bytes. Which will be send one by one over the serial
+   communication.
+   c.)The termination of thread will depend upon a external signal which will notify the thread to stop. And at that time
+       the queue of item might not be empty.
+       
+2.There might be mostly tow sources which can post messages to shared queue form which transmit thread will pickup. One of the source will be
+  ivybus and other will be JSBSIM simulator.
+  a.)IVYBUS: We will get messages from IvyBus for which we subsribed to Ivy bus. These all messages will come through callbacks. These all messages
+  needs to converted into a specilisied buffer. Therefore, instead to subscribing to one type of message pattern, we will subscribe individual messages
+  to sepaerate call backs.
+  b)JSBSIM will simulate basically three items: 1.IR Sensor.2.GPS Sensor.3.AHRS. These values also required to be converted to a particular message.
+
+ 3.As every message has a different arrangements of bytes, we already have different functions defined in dl_protocol for assemebling these messages
+ to buffer. These functions will be given a object which is capable of arraning the data in to a buffer expected by client on the midium. As we are running
+ on a laptop we don't have any memory restraint therefore we plan to have seperate objects for every new thread to remove all syncroniztion issues. As we will be mostly likely going to deal with two above entity one is IVY and one is JSBSIM. We will have mostly two threads, thus two objects.
+
+

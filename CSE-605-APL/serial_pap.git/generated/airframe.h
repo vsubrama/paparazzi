@@ -1,0 +1,214 @@
+/* This file has been generated from /home/gassa/paparazzi/conf/airframes/examples/microjet.xml */
+/* Please DO NOT EDIT */
+
+#ifndef AIRFRAME_H
+#define AIRFRAME_H
+
+#define AIRFRAME_NAME "Microjet"
+#define AC_ID 5
+#define MD5SUM ((uint8_t*)"\216\174\145\374\351\126\143\032\137\344\330\320\165\252\135\005")
+
+#define SERVOS_DEFAULT_NB 4
+//#include "subsystems/actuators/actuators_default.h"
+
+#define SERVO_MOTOR 0
+#define SERVO_MOTOR_NEUTRAL 1290
+#define SERVO_MOTOR_TRAVEL_UP 0.0541666666667
+#define SERVO_MOTOR_TRAVEL_UP_NUM 13
+#define SERVO_MOTOR_TRAVEL_UP_DEN 240
+#define SERVO_MOTOR_TRAVEL_DOWN 0
+#define SERVO_MOTOR_TRAVEL_DOWN_NUM 0
+#define SERVO_MOTOR_TRAVEL_DOWN_DEN 1
+#define SERVO_MOTOR_MAX 1810
+#define SERVO_MOTOR_MIN 1290
+
+#define SERVO_AILEVON_LEFT 1
+#define SERVO_AILEVON_LEFT_NEUTRAL 1510
+#define SERVO_AILEVON_LEFT_TRAVEL_UP -0.053125
+#define SERVO_AILEVON_LEFT_TRAVEL_UP_NUM 17
+#define SERVO_AILEVON_LEFT_TRAVEL_UP_DEN -320
+#define SERVO_AILEVON_LEFT_TRAVEL_DOWN -0.0510416666667
+#define SERVO_AILEVON_LEFT_TRAVEL_DOWN_NUM 49
+#define SERVO_AILEVON_LEFT_TRAVEL_DOWN_DEN -960
+#define SERVO_AILEVON_LEFT_MAX 2000
+#define SERVO_AILEVON_LEFT_MIN 1000
+
+#define SERVO_AILEVON_RIGHT 3
+#define SERVO_AILEVON_RIGHT_NEUTRAL 1535
+#define SERVO_AILEVON_RIGHT_TRAVEL_UP 0.0484375
+#define SERVO_AILEVON_RIGHT_TRAVEL_UP_NUM 31
+#define SERVO_AILEVON_RIGHT_TRAVEL_UP_DEN 640
+#define SERVO_AILEVON_RIGHT_TRAVEL_DOWN 0.0557291666667
+#define SERVO_AILEVON_RIGHT_TRAVEL_DOWN_NUM 107
+#define SERVO_AILEVON_RIGHT_TRAVEL_DOWN_DEN 1920
+#define SERVO_AILEVON_RIGHT_MAX 2000
+#define SERVO_AILEVON_RIGHT_MIN 1000
+
+
+#define COMMAND_THROTTLE 0
+#define COMMAND_ROLL 1
+#define COMMAND_PITCH 2
+#define COMMAND_SHUTTER 3
+#define COMMANDS_NB 4
+#define COMMANDS_FAILSAFE {0,0,0,0}
+
+
+#define SetCommandsFromRC(_commands_array, _rc_array) { \
+  _commands_array[COMMAND_THROTTLE] = _rc_array[RADIO_THROTTLE];\
+  _commands_array[COMMAND_ROLL] = _rc_array[RADIO_ROLL];\
+  _commands_array[COMMAND_PITCH] = _rc_array[RADIO_PITCH];\
+}
+
+#define SECTION_MIXER 1
+#define AILEVON_AILERON_RATE 0.75
+#define AILEVON_ELEVATOR_RATE 0.75
+
+#define SERVO_AILEVON_RIGHT_IDX 2
+#define Set_AILEVON_RIGHT_Servo(_v) { \
+  actuators[SERVO_AILEVON_RIGHT_IDX] = Chop(_v, SERVO_AILEVON_RIGHT_MIN, SERVO_AILEVON_RIGHT_MAX); \
+  ActuatorDefaultSet(SERVO_AILEVON_RIGHT, actuators[SERVO_AILEVON_RIGHT_IDX]); \
+}
+
+#define SERVO_AILEVON_LEFT_IDX 1
+#define Set_AILEVON_LEFT_Servo(_v) { \
+  actuators[SERVO_AILEVON_LEFT_IDX] = Chop(_v, SERVO_AILEVON_LEFT_MIN, SERVO_AILEVON_LEFT_MAX); \
+  ActuatorDefaultSet(SERVO_AILEVON_LEFT, actuators[SERVO_AILEVON_LEFT_IDX]); \
+}
+
+#define SERVO_MOTOR_IDX 0
+#define Set_MOTOR_Servo(_v) { \
+  actuators[SERVO_MOTOR_IDX] = Chop(_v, SERVO_MOTOR_MIN, SERVO_MOTOR_MAX); \
+  ActuatorDefaultSet(SERVO_MOTOR, actuators[SERVO_MOTOR_IDX]); \
+}
+
+#define ACTUATORS_NB 3
+
+#define AllActuatorsInit() { \
+  ActuatorsDefaultInit();\
+}
+
+#define AllActuatorsCommit() { \
+  ActuatorsDefaultCommit();\
+}
+
+#define SetActuatorsFromCommands(values, AP_MODE) { \
+  int32_t servo_value;\
+  int32_t command_value;\
+\
+  int16_t _var_aileron = values[COMMAND_ROLL]  * AILEVON_AILERON_RATE; \
+  int16_t _var_elevator = values[COMMAND_PITCH] * AILEVON_ELEVATOR_RATE; \
+  command_value = values[COMMAND_THROTTLE]; \
+  command_value *= command_value>0 ? SERVO_MOTOR_TRAVEL_UP_NUM : SERVO_MOTOR_TRAVEL_DOWN_NUM; \
+  command_value /= command_value>0 ? SERVO_MOTOR_TRAVEL_UP_DEN : SERVO_MOTOR_TRAVEL_DOWN_DEN; \
+  servo_value = SERVO_MOTOR_NEUTRAL + command_value; \
+  Set_MOTOR_Servo(servo_value); \
+\
+  command_value = _var_elevator - _var_aileron; \
+  command_value *= command_value>0 ? SERVO_AILEVON_LEFT_TRAVEL_UP_NUM : SERVO_AILEVON_LEFT_TRAVEL_DOWN_NUM; \
+  command_value /= command_value>0 ? SERVO_AILEVON_LEFT_TRAVEL_UP_DEN : SERVO_AILEVON_LEFT_TRAVEL_DOWN_DEN; \
+  servo_value = SERVO_AILEVON_LEFT_NEUTRAL + command_value; \
+  Set_AILEVON_LEFT_Servo(servo_value); \
+\
+  command_value = _var_elevator + _var_aileron; \
+  command_value *= command_value>0 ? SERVO_AILEVON_RIGHT_TRAVEL_UP_NUM : SERVO_AILEVON_RIGHT_TRAVEL_DOWN_NUM; \
+  command_value /= command_value>0 ? SERVO_AILEVON_RIGHT_TRAVEL_UP_DEN : SERVO_AILEVON_RIGHT_TRAVEL_DOWN_DEN; \
+  servo_value = SERVO_AILEVON_RIGHT_NEUTRAL + command_value; \
+  Set_AILEVON_RIGHT_Servo(servo_value); \
+\
+  AllActuatorsCommit(); \
+}
+
+#define SECTION_AUTO1 1
+#define AUTO1_MAX_ROLL 0.7
+#define AUTO1_MAX_PITCH 0.6
+
+#define SECTION_INFRARED 1
+#define IR_ADC_IR1_NEUTRAL 512
+#define IR_ADC_IR2_NEUTRAL 512
+#define IR_ADC_TOP_NEUTRAL 512
+#define IR_LATERAL_CORRECTION 1.
+#define IR_LONGITUDINAL_CORRECTION 1.
+#define IR_VERTICAL_CORRECTION 1.5
+#define IR_HORIZ_SENSOR_TILTED 1
+#define IR_IR2_SIGN -1
+#define IR_TOP_SIGN -1
+#define IR_ROLL_NEUTRAL_DEFAULT -0.062831853
+#define IR_PITCH_NEUTRAL_DEFAULT 0.0872664625
+#define IR_CORRECTION_UP 1.
+#define IR_CORRECTION_DOWN 1.
+#define IR_CORRECTION_LEFT 1.
+#define IR_CORRECTION_RIGHT 1.
+
+#define SECTION_IMU 1
+#define IMU_GYRO_P_SIGN 1
+#define IMU_GYRO_P_NEUTRAL 500
+#define IMU_GYRO_P_SENS 0.137518981
+#define IMU_GYRO_P_SENS_NUM 2083
+#define IMU_GYRO_P_SENS_DEN 15147
+
+#define SECTION_BAT 1
+#define MILLIAMP_AT_FULL_THROTTLE 2000
+#define CATASTROPHIC_BAT_LEVEL 9.3
+
+#define SECTION_MISC 1
+#define NOMINAL_AIRSPEED 13.
+#define CARROT 5.
+#define KILL_MODE_DISTANCE (1.5*MAX_DIST_FROM_HOME)
+#define CONTROL_FREQUENCY 60
+#define XBEE_INIT "ATPL2\rATRN5\rATTT80\r"
+#define DEFAULT_CIRCLE_RADIUS 80.
+
+#define SECTION_VERTICAL CONTROL 1
+#define V_CTL_POWER_CTL_BAT_NOMINAL 11.1
+#define V_CTL_ALTITUDE_PGAIN 0.03
+#define V_CTL_ALTITUDE_MAX_CLIMB 2.
+#define V_CTL_AUTO_THROTTLE_NOMINAL_CRUISE_THROTTLE 0.32
+#define V_CTL_AUTO_THROTTLE_MIN_CRUISE_THROTTLE 0.25
+#define V_CTL_AUTO_THROTTLE_MAX_CRUISE_THROTTLE 0.65
+#define V_CTL_AUTO_THROTTLE_LOITER_TRIM 1500
+#define V_CTL_AUTO_THROTTLE_DASH_TRIM -4000
+#define V_CTL_AUTO_THROTTLE_CLIMB_THROTTLE_INCREMENT 0.15
+#define V_CTL_AUTO_THROTTLE_PGAIN 0.01
+#define V_CTL_AUTO_THROTTLE_IGAIN 0.1
+#define V_CTL_AUTO_THROTTLE_PITCH_OF_VZ_PGAIN 0.05
+#define V_CTL_THROTTLE_SLEW_LIMITER 2
+
+#define SECTION_HORIZONTAL CONTROL 1
+#define H_CTL_COURSE_PGAIN 1.0
+#define H_CTL_COURSE_DGAIN 0.3
+#define H_CTL_ROLL_MAX_SETPOINT 0.6
+#define H_CTL_PITCH_MAX_SETPOINT 0.5
+#define H_CTL_PITCH_MIN_SETPOINT -0.5
+#define H_CTL_PITCH_PGAIN 12000.
+#define H_CTL_PITCH_DGAIN 1.5
+#define H_CTL_ELEVATOR_OF_ROLL 1250
+#define H_CTL_ROLL_SLEW 0.1
+#define H_CTL_ROLL_ATTITUDE_GAIN 7500
+#define H_CTL_ROLL_RATE_GAIN 1500
+
+#define SECTION_AGGRESSIVE 1
+#define AGR_BLEND_START 20
+#define AGR_BLEND_END 10
+#define AGR_CLIMB_THROTTLE 1.00
+#define AGR_CLIMB_PITCH 0.3
+#define AGR_DESCENT_THROTTLE 0.1
+#define AGR_DESCENT_PITCH -0.25
+#define AGR_CLIMB_NAV_RATIO 0.8
+#define AGR_DESCENT_NAV_RATIO 1.0
+
+#define SECTION_FAILSAFE 1
+#define FAILSAFE_DELAY_WITHOUT_GPS 2
+#define FAILSAFE_DEFAULT_THROTTLE 0.3
+#define FAILSAFE_DEFAULT_ROLL 0.3
+#define FAILSAFE_DEFAULT_PITCH 0.5
+
+#define SECTION_SIMU 1
+#define JSBSIM_MODEL "Malolo1"
+#define JSBSIM_IR_ROLL_NEUTRAL 0.
+#define JSBSIM_IR_PITCH_NEUTRAL 0.
+
+#define SECTION_GCS 1
+#define AC_ICON flyingwing
+
+
+#endif // AIRFRAME_H

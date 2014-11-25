@@ -1,0 +1,5 @@
+Howto register new task
+--------------------------
+ * create new class for task
+ * create new config for the task in Papabench{Autopilot|FBW}Conf
+ * modify timeline schedule - PapabenchCyclicSchedule!

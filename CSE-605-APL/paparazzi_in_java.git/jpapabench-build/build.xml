@@ -1,0 +1,205 @@
+<!-- $Id$  
+  This file is a part of jPapaBench providing a Java implementation 
+  of PapaBench project.
+  Copyright (C) 2010  Michal Malohlava <michal.malohlava_at_d3s.mff.cuni.cz>
+ 
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU General Public License
+  as published by the Free Software Foundation; either version 2
+  of the License, or (at your option) any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+-->
+
+<!--
+	Build file for all jPapaBench versions:
+	 - plain Java
+	 - RTSJ
+	 - SCJ	
+-->
+<project name="jPapaBench" default="build.all" basedir=".">
+
+	<!-- personal build properties -->
+	<property file="personal.build.properties" />
+	
+	<!-- basic configuration properties -->
+    <property file="build.properties" />
+
+    <property name="build.sys/classpath" value="ignore" />
+	
+	<path id="classpath.build.rtsj">
+	    <fileset dir="${personal.fijivm.home.dir}/lib" includes="rtsj.jar"/>
+        <fileset dir="${personal.fijivm.home.dir}/lib" includes="fivmcommon.jar"/>
+        <fileset dir="${personal.fijivm.home.dir}/lib" includes="fivmr.jar"/>
+        <fileset dir="${personal.fijivm.home.dir}/lib" includes="fivmc.jar"/>
+        <fileset dir="${personal.fijivm.home.dir}/lib" includes="ifijicore.jar"/>
+    </path>
+	
+	<path id="classpath.build.scj">
+		<pathelement location="${build.scj.api}" />
+	</path>
+	
+	<path id="classpath.run.rtsj">
+    </path>
+		
+	<path id="classpath.run.scj">
+	</path>
+
+	<!-- build time classpaths -->
+	<path id="classpath.base">
+	</path>
+
+	<path id="classpath.build.base">
+		<path refid="classpath.base" />
+	</path>
+
+	<path id="classpath.build.jpapabench.core">
+		<path refid="classpath.build.base" />
+	    <path refid="classpath.build.rtsj" /> 
+    </path>
+
+	<path id="classpath.build.jpapabench.core.flightplans">
+		<path refid="classpath.build.base" />
+		<pathelement location="${output.jpapabench.core.dir}" />
+	</path>
+
+	<path id="classpath.build.jpapabench.pj">
+		<path refid="classpath.build.base" />
+		<path refid="classpath.build.rtsj" />
+        <pathelement location="${output.jpapabench.core.dir}" />
+		<pathelement location="${output.jpapabench.core.flightplans.dir}" />
+	</path>
+
+	<path id="classpath.build.jpapabench.rtsj">
+		<path refid="classpath.build.base" />
+		<path refid="classpath.build.rtsj" />
+		<pathelement location="${output.jpapabench.core.dir}" />
+		<pathelement location="${output.jpapabench.core.flightplans.dir}" />
+	</path>
+
+	<path id="classpath.build.jpapabench.scj">
+		<path refid="classpath.build.base" />
+		<path refid="classpath.build.scj" />
+		<pathelement location="${output.jpapabench.core.dir}" />
+		<pathelement location="${output.jpapabench.core.flightplans.dir}" />
+	</path>
+
+	<!-- runtime classpaths -->
+	<path id="classpath.run">
+		<path refid="classpath.base" />
+	</path>
+
+	<path id="classpath.run.jpapabench.scj">
+		<path refid="classpath.run" />
+		<path refid="classpath.run.scj" />
+		<pathelement location="${out.jjpapabench.scj.dir}" />
+	</path>
+
+	<path id="classpath.run.jpapabench.rtsj">
+		<path refid="classpath.run" />
+		<path refid="classpath.run.rtsj" />
+        <pathelement location="${output.jpapabench.rtsj.dir}" />
+		<pathelement location="${output.jpapabench.core.dir}" />
+		<pathelement location="${output.jpapabench.core.flightplans.dir}" />
+	</path>
+
+	<path id="classpath.run.jpapabench.pj">
+		<path refid="classpath.run" />
+		<path refid="classpath.run.rtsj" />
+        <pathelement location="${output.jpapabench.pj.dir}" />
+		<pathelement location="${output.jpapabench.core.dir}" />
+		<pathelement location="${output.jpapabench.core.flightplans.dir}" />
+	</path>
+
+	<target name="init" depends="clean">
+		<mkdir dir="${output.dir}" />
+		<mkdir dir="${output.jar.dir}" />
+        <mkdir dir="${output.jpapabench.core.dir}" />
+		<mkdir dir="${output.jpapabench.core.flightplans.dir}" />
+		<mkdir dir="${output.jpapabench.pj.dir}" />
+		<mkdir dir="${output.jpapabench.rtsj.dir}" />
+		<mkdir dir="${output.jpapabench.scj.dir}" />
+		<mkdir dir="${log.dir}" />
+	</target>
+
+	<target name="clean" description="- clean up">
+		<delete dir="${output.dir}" />
+	</target>
+
+	<target name="clean.log" description="- clean up log">
+		<delete dir="${output.dir}" />
+	</target>
+	
+	<target name="compile.jpapabench.core" depends="init">
+		<javac includeantruntime="false" srcdir="${src.jpapabench.core.dir}" destdir="${output.jpapabench.core.dir}" deprecation="on" debug="on">
+			<classpath refid="classpath.build.jpapabench.core" />
+		</javac>
+
+		<javac includeantruntime="false" srcdir="${src.jpapabench.core.flightplans.dir}" destdir="${output.jpapabench.core.flightplans.dir}" deprecation="on" debug="on">
+			<classpath refid="classpath.build.jpapabench.core.flightplans" />
+		</javac>
+	</target>
+
+    <target name="compile.jpapabench.pj" depends="compile.jpapabench.core">
+        <javac srcdir="${src.jpapabench.pj.dir}" destdir="${output.jpapabench.pj.dir}" deprecation="on" debug="on">
+            <classpath refid="classpath.build.jpapabench.pj" />
+        </javac>
+    </target>
+
+    <target name="compile.jpapabench.rtsj" depends="compile.jpapabench.core">
+	    <javac srcdir="${src.jpapabench.rtsj.dir}" destdir="${output.jpapabench.rtsj.dir}" deprecation="on" debug="on" target="1.6">
+	        <classpath refid="classpath.build.jpapabench.rtsj" />
+	    </javac>
+    </target>
+	
+
+	<target name="build.jpapabench.pj" depends="compile.jpapabench.core,compile.jpapabench.pj" description="- build plain Java version of jPapaBench" />
+   <!--  <target name="build.all"
+   depends="build.jpapabench.pj,build.jpapabench.rtsj,build.jpapabench.scj"
+   description="- build all versions of jPapaBench"/> -->
+
+	<!-- added by Gassa -->
+	<target name="jar.core" depends="compile.jpapabench.core">
+		<jar destfile="${output.jar.dir}/jpapabench-core.jar" basedir="${output.jpapabench.core.dir}" />
+	</target>
+	
+    
+    <target name="jar.flightplans">
+    	<jar destfile="${output.jar.dir}/jpapabench-core-flightplans.jar" basedir="${output.jpapabench.core.flightplans.dir}" />
+	</target>
+	
+    
+    <target name="jar.pj" depends="jar.core, jar.flightplans, compile.jpapabench.core, compile.jpapabench.pj">
+    	<jar destfile="${output.jar.dir}/jpapabench-pj.jar" >
+       	    <fileset dir="${output.jpapabench.pj.dir}" />
+            <fileset dir="${output.jpapabench.core.flightplans.dir}"/>
+    	    <fileset dir="${output.jpapabench.core.dir}"/>
+			
+            <manifest>
+			<attribute name="Main-Class" value="papabench.pj.PapaBenchPlainJavaApplication"/>
+			<attribute name="classpath" value="${build.rtsj.api}" />
+            </manifest>
+		</jar>
+	</target>
+	
+    
+    <target name="jar.rtsj" depends="jar.core, jar.flightplans, compile.jpapabench.core,compile.jpapabench.rtsj">
+    	<jar destfile="${output.jar.dir}/jpapabench-rtsj.jar" >
+	        <fileset dir="${output.jpapabench.rtsj.dir}" />
+            <fileset dir="${output.jpapabench.core.flightplans.dir}"/>
+    	    <fileset dir="${output.jpapabench.core.dir}"/>
+            
+            <manifest>
+			<attribute name="Main-Class" value="papabench.rtsj.PapaBenchRTSJApplication"/>
+			<attribute name="classpath" value="${build.rtsj.api}" />
+			</manifest>
+		</jar>
+	</target>
+</project>
