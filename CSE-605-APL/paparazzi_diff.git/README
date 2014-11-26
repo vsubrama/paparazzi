@@ -1,8 +1,0 @@
-Apply the patches to a setup and configured paparazzi installation in order.
-Install the latest version of paparazzi following the instruction on paparazzi uav wiki
-Ensure that it is working by running the program and compiling for NPS on lisam target
-Run the simulator. It should be working.
-Make clean
-Apply the patches in order
-Make
-Run the same lisam target for NPS which will now expect to interact with the remote autopilot

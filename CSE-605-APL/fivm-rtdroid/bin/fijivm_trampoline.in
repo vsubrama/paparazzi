@@ -1,2 +1,0 @@
-#!/bin/sh
-exec @RUBY@ @prefix@/share/fivm-@PACKAGE_VERSION@/bin/fijivm "$@"

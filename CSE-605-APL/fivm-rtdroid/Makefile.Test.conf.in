@@ -1,5 +1,0 @@
-{
-    RUBY = !@RUBY@
-    JAVA = !@JAVA@
-}
-
