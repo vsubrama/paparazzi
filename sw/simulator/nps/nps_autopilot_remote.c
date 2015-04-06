@@ -42,6 +42,9 @@
 #include <stdlib.h>
 #include <Ivy/ivy.h>
 #include <Ivy/ivyglibloop.h>
+//For socket connection
+#include<sys/socket.h>    //socket
+#include<arpa/inet.h> //inet_addr
 
 struct NpsAutopilot autopilot;
 bool_t nps_bypass_ahrs;
@@ -58,6 +61,11 @@ bool_t nps_bypass_ins;
 #if !defined (FBW) || !defined (AP)
 #error NPS does not currently support dual processor simulation for FBW and AP on fixedwing!
 #endif
+//Code for socket message send
+int sock;
+struct sockaddr_in server;
+char message[1000] , server_reply[2000];
+//Code for socket message send
 
 void nps_autopilot_init(enum NpsRadioControlType type_rc, int num_rc_script,
 		char* rc_dev) {
@@ -69,6 +77,23 @@ void nps_autopilot_init(enum NpsRadioControlType type_rc, int num_rc_script,
 
 	nps_bypass_ahrs = NPS_BYPASS_AHRS;
 	nps_bypass_ins = NPS_BYPASS_INS;
+	sock = socket(AF_INET , SOCK_STREAM , 0);
+	    if (sock == -1)
+	    {
+	        printf("Could not create socket");
+	    }
+	    puts("Socket created");
+
+	    server.sin_addr.s_addr = inet_addr("127.0.0.1");
+	    server.sin_family = AF_INET;
+	    server.sin_port = htons( 8080 );
+
+	    //Connect to remote server
+	    if (connect(sock , (struct sockaddr *)&server , sizeof(server)) < 0)
+	    {
+	        perror("connect failed. Error");
+	    }
+
 
 }
 
@@ -85,6 +110,7 @@ void nps_autopilot_run_systime_step(void) {
 
 #include <stdio.h>
 #include "subsystems/gps.h"
+
 
 void nps_autopilot_run_step(double time) {
 	static int counter = 0;
@@ -110,6 +136,10 @@ void nps_autopilot_run_step(double time) {
 		 nps_fdm_remote_position(&vals[0]);
 		 IvySendMsg("NPS_SEN_NICE_GPS %d %d %f %f %f %f %f %f %f", 6, AC_ID,
 		 vals[0], vals[1], vals[2], vals[3], vals[4], vals[5], vals[6]);
+		 if( send(sock , "hello" , 6 , 0) < 0)
+		         {
+		             puts("Send failed");
+		         }
 		/*
 		 static double gps_period = 0.;
 		 #define DELTA_T (.0081447*1e-3)
