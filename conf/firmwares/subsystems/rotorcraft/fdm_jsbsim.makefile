@@ -54,9 +54,9 @@ nps.srcs += $(NPSDIR)/nps_main.c                 \
        $(NPSDIR)/nps_radio_control.c             \
        $(NPSDIR)/nps_radio_control_joystick.c    \
        $(NPSDIR)/nps_radio_control_spektrum.c    \
-       $(NPSDIR)/nps_autopilot_rotorcraft.c      \
+       $(NPSDIR)/nps_autopilot_remote_rotorcraft.c	         \
        $(NPSDIR)/nps_ivy_common.c                \
-       $(NPSDIR)/nps_ivy_rotorcraft.c            \
+       $(NPSDIR)/nps_ivy_remote_rotorcraft.c            \
        $(NPSDIR)/nps_flightgear.c                \
 
 

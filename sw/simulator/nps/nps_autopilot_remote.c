@@ -266,8 +266,8 @@ void nps_autopilot_run_step(double time) {
  			/ MAX_PPRZ;
 	// do the launch when clicking launch in GCS
 	autopilot.launch = launch && !kill_throttle;
-	if (!launch)
-		autopilot.commands[COMMAND_THROTTLE] = 0;
+//	if (!launch)
+//		autopilot.commands[COMMAND_THROTTLE] = 0;
 
 }
 
