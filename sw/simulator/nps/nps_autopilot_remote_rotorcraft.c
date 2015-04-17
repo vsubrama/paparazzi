@@ -39,13 +39,13 @@ bool_t nps_bypass_ins;
 #endif
 
 #ifndef NPS_BYPASS_INS
-#define NPS_BYPASS_INS TRUE
+#define NPS_BYPASS_INS FALSE
 #endif
 
 #if NPS_COMMANDS_NB != MOTOR_MIXING_NB_MOTOR
 #error "NPS_COMMANDS_NB does not match MOTOR_MIXING_NB_MOTOR!"
 #endif
-
+int count = 0;
 void nps_autopilot_init(enum NpsRadioControlType type_rc, int num_rc_script, char* rc_dev) {
   autopilot.launch = TRUE;
 
@@ -80,24 +80,21 @@ void nps_autopilot_run_step(double time) {
   if (nps_sensors_gyro_available()) {
     imu_feed_gyro_accel();
 	//Feed the data from the gyroscope into the serial_pap
-		IvySendMsg("NPS_SENSORS_GYRO %d %d %f %f %f", 6, AC_ID,
+        IvySendMsg("NPS_SENSORS_GYRO_ACCEL %f %f %f %f %f %f",
 				sensors.gyro.value.x, sensors.gyro.value.y,
-				sensors.gyro.value.z);
+                sensors.gyro.value.z,sensors.accel.value.x, sensors.accel.value.y,
+                   sensors.accel.value.z);
 
-//        printf("NPS_SENSORS_GYRO %d %d %f %f %f\n", 6, AC_ID,
+
+//Debug
+//        printf("NPS_SENSORS_GYRO_ACCEL %f %f %f %f %f %f",
 //                sensors.gyro.value.x, sensors.gyro.value.y,
-//                sensors.gyro.value.z);
-
-		//Feed the data from the accelerometer into the serial_pap
-		IvySendMsg("NPS_SENSORS_ACCEL %d %d %f %f %f", 6, AC_ID,
-				sensors.accel.value.x, sensors.accel.value.y,
-				sensors.accel.value.z);
-
-//        printf("NPS_SENSORS_ACCEL %d %d %f %f %f\n", 6, AC_ID,
-//                sensors.accel.value.x, sensors.accel.value.y,
-//                sensors.accel.value.z);
+//                sensors.gyro.value.z,sensors.accel.value.x, sensors.accel.value.y,
+//                   sensors.accel.value.z);
     main_event();
   }
+
+//Uncomment following if you want to set NPS_BYPASS_AHRS as false(wont work otherwise)
 // if (nps_sensors_mag_available()) {
 //    imu_feed_mag();
 //    main_event();
@@ -122,10 +119,11 @@ void nps_autopilot_run_step(double time) {
 
   if (nps_sensors_gps_available()) {
     gps_feed_value();
-    IvySendMsg("GPS_CALCULAED_DEVICE %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %hd %hd %ld", gps.ecef_pos.x, gps.ecef_pos.y, gps.ecef_pos.z , gps.ecef_vel.x,gps.ecef_vel.y, gps.ecef_vel.z,
-               gps.lla_pos.lat,gps.lla_pos.lon, gps.lla_pos.alt,gps.ned_vel.x,gps.ned_vel.y,gps.ned_vel.z, gps.gspeed,gps.speed_3d,gps.course );
-    printf("GPS_CALCULAED_DEVICE %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %hd %hd %ld\n", gps.ecef_pos.x, gps.ecef_pos.y, gps.ecef_pos.z , gps.ecef_vel.x,gps.ecef_vel.y, gps.ecef_vel.z,
-               gps.lla_pos.lat,gps.lla_pos.lon, gps.lla_pos.alt,gps.ned_vel.x,gps.ned_vel.y,gps.ned_vel.z, gps.gspeed,gps.speed_3d,gps.course );
+    ++count;
+    IvySendMsg("GPS_CALCULAED_DEVICE %d %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %hd %hd %ld",count, gps.ecef_pos.x, gps.ecef_pos.y, gps.ecef_pos.z , gps.ecef_vel.x,gps.ecef_vel.y, gps.ecef_vel.z,
+               gps.lla_pos.lat,gps.lla_pos.lon, gps.lla_pos.alt,gps.hmsl,gps.ned_vel.x,gps.ned_vel.y,gps.ned_vel.z, gps.gspeed,gps.speed_3d,gps.course );
+        printf("GPS_CALCULAED_DEVICE %d %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %hd %hd %ld\n",count, gps.ecef_pos.x, gps.ecef_pos.y, gps.ecef_pos.z , gps.ecef_vel.x,gps.ecef_vel.y, gps.ecef_vel.z,
+               gps.lla_pos.lat,gps.lla_pos.lon, gps.lla_pos.alt,gps.hmsl,gps.ned_vel.x,gps.ned_vel.y,gps.ned_vel.z, gps.gspeed,gps.speed_3d,gps.course );
 
 
 //Debug
@@ -139,17 +137,17 @@ void nps_autopilot_run_step(double time) {
 
   if (nps_bypass_ahrs) {
     sim_overwrite_ahrs();
-    IvySendMsg("NPS_AHRS_LTP %d %d %f %f %f %f\n", 6, AC_ID,
+    IvySendMsg("NPS_AHRS_LTP_ECEF %f %f %f %f %f %f %f",
 					fdm.ltp_to_body_quat.qi, fdm.ltp_to_body_quat.qx,
-					fdm.ltp_to_body_quat.qy, fdm.ltp_to_body_quat.qz);
+                    fdm.ltp_to_body_quat.qy, fdm.ltp_to_body_quat.qz,
+                    fdm.body_ecef_rotvel.p, fdm.body_ecef_rotvel.q,
+                    fdm.body_ecef_rotvel.r);
 //Debug
-//printf("NPS_AHRS_LTP %d %d %f %f %f %f\n", 6, AC_ID,fdm.ltp_to_body_quat.qi, fdm.ltp_to_body_quat.qx,fdm.ltp_to_body_quat.qy, fdm.ltp_to_body_quat.qz);
-
-    IvySendMsg("NPS_AHRS_ECEF %d %d %f %f %f\n", 6, AC_ID,
-					fdm.body_ecef_rotvel.p, fdm.body_ecef_rotvel.q,
-					fdm.body_ecef_rotvel.r);
-//Debug
-//printf("NPS_AHRS_ECEF %d %d %f %f %f\n", 6, AC_ID,fdm.body_ecef_rotvel.p, fdm.body_ecef_rotvel.q,fdm.body_ecef_rotvel.r);
+//printf("NPS_AHRS_LTP_ECEF %f %f %f %f %f %f %f",
+//    fdm.ltp_to_body_quat.qi, fdm.ltp_to_body_quat.qx,
+//    fdm.ltp_to_body_quat.qy, fdm.ltp_to_body_quat.qz,
+//    fdm.body_ecef_rotvel.p, fdm.body_ecef_rotvel.q,
+//    fdm.body_ecef_rotvel.r);
   }
 
   if (nps_bypass_ins) {
