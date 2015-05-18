@@ -42,7 +42,7 @@ void nps_ivy_init(char* ivy_bus) {
 	IvyBindMsg(on_NPS_ATP_CMD, NULL, "^NPS_ATP_CMD(.*)");
 
 	//Get the standard commands from the Autopilot for this simulation
-	IvyBindMsg(on_COMMANDS, NULL, "^\\S* COMMANDS (\\S*)");
+    IvyBindMsg(on_COMMANDS, NULL, "^CMD_MSG(.*)");
 
 }
 
@@ -103,13 +103,14 @@ void on_COMMANDS(IvyClientPtr app __attribute__ ((unused)),
 
 	char * pch;
 
-	pch = strtok(argv[0], " ,");
+    pch = strtok(argv[0], ",");
 	int i = 0;
 	while (pch != NULL) {
-		commands[i++] = atoi(pch);
+        commands[i++] = atof(pch);
+        //printf("Command %d is %f\n",(i-1),atof(pch));
 		if (i > NPS_COMMANDS_NB)
 			break;
-		pch = strtok(NULL, " ,");
+        pch = strtok(NULL, ",");
 	}
 
 }

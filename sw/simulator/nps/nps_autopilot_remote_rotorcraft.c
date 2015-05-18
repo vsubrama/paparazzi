@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <Ivy/ivy.h>
 #include <Ivy/ivyglibloop.h>
+#include <subsystems/commands.h>
 
 #include "messages.h"
 #include "subsystems/datalink/downlink.h"
@@ -122,8 +123,8 @@ void nps_autopilot_run_step(double time) {
     ++count;
     IvySendMsg("GPS_CALCULAED_DEVICE %d %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %hd %hd %ld",count, gps.ecef_pos.x, gps.ecef_pos.y, gps.ecef_pos.z , gps.ecef_vel.x,gps.ecef_vel.y, gps.ecef_vel.z,
                gps.lla_pos.lat,gps.lla_pos.lon, gps.lla_pos.alt,gps.hmsl,gps.ned_vel.x,gps.ned_vel.y,gps.ned_vel.z, gps.gspeed,gps.speed_3d,gps.course );
-        printf("GPS_CALCULAED_DEVICE %d %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %hd %hd %ld\n",count, gps.ecef_pos.x, gps.ecef_pos.y, gps.ecef_pos.z , gps.ecef_vel.x,gps.ecef_vel.y, gps.ecef_vel.z,
-               gps.lla_pos.lat,gps.lla_pos.lon, gps.lla_pos.alt,gps.hmsl,gps.ned_vel.x,gps.ned_vel.y,gps.ned_vel.z, gps.gspeed,gps.speed_3d,gps.course );
+//        printf("GPS_CALCULAED_DEVICE %d %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %hd %hd %ld\n",count, gps.ecef_pos.x, gps.ecef_pos.y, gps.ecef_pos.z , gps.ecef_vel.x,gps.ecef_vel.y, gps.ecef_vel.z,
+//               gps.lla_pos.lat,gps.lla_pos.lon, gps.lla_pos.alt,gps.hmsl,gps.ned_vel.x,gps.ned_vel.y,gps.ned_vel.z, gps.gspeed,gps.speed_3d,gps.course );
 
 
 //Debug
@@ -158,7 +159,8 @@ void nps_autopilot_run_step(double time) {
 
   /* scale final motor commands to 0-1 for feeding the fdm */
   for (uint8_t i=0; i < NPS_COMMANDS_NB; i++)
-    autopilot.commands[i] = (double)motor_mixing.commands[i]/MAX_PPRZ;
+    //autopilot.commands[i] = (double)motor_mixing.commands[i]/MAX_PPRZ;
+    autopilot.commands[i] = (double)commands[i]/MAX_PPRZ;
 
 }
 
